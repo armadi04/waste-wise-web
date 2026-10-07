@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64" role="img" aria-label="Kupon Malam">
+  <rect width="64" height="64" fill="#002855"/>
+  <g transform="translate(13.6 13.6) scale(0.72)">
+    <path d="M8 42C8 42 15 41 22 34C29 27 41 8 41 8M41 8C41 8 34 9 28 8.5M41 8C41 8 42 13.5 43 20"
+      fill="none" stroke="#fbbf24" stroke-width="5.5" stroke-linecap="round" stroke-linejoin="round"/>
+  </g>
+</svg>

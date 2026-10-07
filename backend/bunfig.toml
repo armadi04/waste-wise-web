@@ -1,0 +1,6 @@
+# Bun test configuration.
+# The preload runs before any test module is imported, which is the only
+# reliable point to pin the test database / environment before the NestJS
+# AppModule (and its TypeORM + ConfigModule factories) are evaluated.
+[test]
+preload = ["./test/utils/setup-env.ts"]

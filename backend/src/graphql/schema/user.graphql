@@ -1,0 +1,54 @@
+type User {
+  id: Int!
+  email: String!
+  fullname: String
+  phone: String
+  avatar: Media
+  roles: [Role!]!
+  permissions: [Permission!]!
+  emailVerifiedAt: DateTime
+  createdAt: DateTime!
+  updatedAt: DateTime!
+}
+
+"""A page of users plus pagination metadata."""
+type UserConnection {
+  data: [User!]!
+  meta: PaginationMeta!
+}
+
+input UpdateUserInput {
+  email: String
+  password: String
+  fullname: String
+  phone: String
+  avatarId: Int
+  roleIds: [Int!]
+  permissionIds: [Int!]
+}
+
+extend type Query {
+  """List users (paginated). Requires `users.read`."""
+  users(pagination: PaginationInput): UserConnection!
+  """Fetch a single user by id. Owner, or requires `users.read`."""
+  user(id: Int!): User!
+}
+
+extend type Mutation {
+  """Update a user. Owner, or requires `users.update`."""
+  updateUser(id: Int!, input: UpdateUserInput!): User!
+  """Soft-delete a user. Requires `users.delete`."""
+  deleteUser(id: Int!): Boolean!
+  """Replace a user's roles. Requires `users.manage_roles`."""
+  syncUserRoles(id: Int!, roleIds: [Int!]!): User!
+  """Add roles to a user. Requires `users.manage_roles`."""
+  attachUserRoles(id: Int!, roleIds: [Int!]!): User!
+  """Remove roles from a user. Requires `users.manage_roles`."""
+  detachUserRoles(id: Int!, roleIds: [Int!]!): User!
+  """Replace a user's direct permissions. Requires `users.manage_permissions`."""
+  syncUserPermissions(id: Int!, permissionIds: [Int!]!): User!
+  """Add direct permissions to a user. Requires `users.manage_permissions`."""
+  attachUserPermissions(id: Int!, permissionIds: [Int!]!): User!
+  """Remove direct permissions from a user. Requires `users.manage_permissions`."""
+  detachUserPermissions(id: Int!, permissionIds: [Int!]!): User!
+}

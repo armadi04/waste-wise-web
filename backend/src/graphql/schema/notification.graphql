@@ -1,0 +1,41 @@
+"""Severity/kind of a notification."""
+enum NotificationType {
+  info
+  success
+  warning
+  error
+}
+
+type Notification {
+  id: Int!
+  userId: Int
+  user: User
+  targetRole: String
+  actorId: Int
+  title: String!
+  message: String!
+  type: NotificationType!
+  isRead: Boolean!
+  link: String
+  createdAt: DateTime!
+}
+
+"""A page of notifications plus pagination metadata."""
+type NotificationConnection {
+  data: [Notification!]!
+  meta: PaginationMeta!
+}
+
+extend type Query {
+  """The current user's notifications (own + targeted-role), paginated."""
+  myNotifications(pagination: PaginationInput): NotificationConnection!
+  """Count of the current user's unread notifications."""
+  unreadNotificationsCount: Int!
+}
+
+extend type Mutation {
+  """Mark one of the current user's notifications as read."""
+  markNotificationRead(id: Int!): Notification!
+  """Mark all of the current user's notifications as read. Returns the count updated."""
+  markAllNotificationsRead: Int!
+}

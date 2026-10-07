@@ -1,0 +1,40 @@
+type Invitation {
+  id: Int!
+  email: String!
+  roleIds: [Int!]
+  invitedBy: Int
+  expiresAt: DateTime!
+  acceptedAt: DateTime
+  createdAt: DateTime!
+}
+
+"""A page of invitations plus pagination metadata."""
+type InvitationConnection {
+  data: [Invitation!]!
+  meta: PaginationMeta!
+}
+
+"""Result of creating an invitation, including the shareable accept URL."""
+type CreateInvitationResult {
+  invitation: Invitation!
+  inviteUrl: String!
+}
+
+input CreateInvitationInput {
+  email: String!
+  roleIds: [Int!]
+}
+
+extend type Query {
+  """List invitations (paginated). Requires `users.invite`."""
+  invitations(pagination: PaginationInput): InvitationConnection!
+}
+
+extend type Mutation {
+  """Create and email an invitation. Requires `users.invite`."""
+  createInvitation(input: CreateInvitationInput!): CreateInvitationResult!
+  """Resend an existing invitation. Requires `users.invite`."""
+  resendInvitation(id: Int!): Invitation!
+  """Revoke (delete) an invitation. Requires `users.invite`."""
+  revokeInvitation(id: Int!): Boolean!
+}

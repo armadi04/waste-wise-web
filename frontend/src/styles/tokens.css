@@ -1,0 +1,48 @@
+/* KuponMalam semantic design tokens. Keep component colors on these tokens. */
+:root {
+  --km-background: #ffffff;
+  --km-foreground: #11181c;
+  --km-primary: #ca2222;
+  --km-primary-foreground: #ffffff;
+  --km-secondary: #e5e7eb;
+  --km-secondary-foreground: #11181c;
+  --km-muted: #f3f4f6;
+  --km-muted-foreground: #6a7282;
+  --km-border: #e5e7eb;
+  --km-focus: #155dfc;
+  --km-success: #16a34a;
+  --km-warning: #fbbf24;
+  --km-danger: #f31260;
+  --km-info: #155dfc;
+  --km-promo: #f59e0b;
+  --km-content-1: #ffffff;
+  --km-content-2: #f3f4f6;
+  --km-content-3: #e5e7eb;
+  --km-content-4: #d1d5db;
+  --km-overlay: #ffffff;
+  --km-divider: #e5e7eb;
+}
+
+:root.dark {
+  --km-background: #000000;
+  --km-foreground: #ecedee;
+  --km-primary: #dc2626;
+  --km-primary-foreground: #ffffff;
+  --km-secondary: #0f172a;
+  --km-secondary-foreground: #ecedee;
+  --km-muted: #262626;
+  --km-muted-foreground: #a1a1aa;
+  --km-border: #27272a;
+  --km-focus: #155dfc;
+  --km-success: #16a34a;
+  --km-warning: #fbbf24;
+  --km-danger: #f31260;
+  --km-info: #155dfc;
+  --km-promo: #f59e0b;
+  --km-content-1: #0f172a;
+  --km-content-2: #262626;
+  --km-content-3: #27272a;
+  --km-content-4: #3f3f46;
+  --km-overlay: #0f172a;
+  --km-divider: #27272a;
+}

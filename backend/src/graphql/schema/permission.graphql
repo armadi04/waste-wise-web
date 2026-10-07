@@ -1,0 +1,39 @@
+type Permission {
+  id: Int!
+  name: String!
+  description: String
+  createdAt: DateTime!
+  updatedAt: DateTime!
+}
+
+"""A page of permissions plus pagination metadata."""
+type PermissionConnection {
+  data: [Permission!]!
+  meta: PaginationMeta!
+}
+
+input CreatePermissionInput {
+  name: String!
+  description: String
+}
+
+input UpdatePermissionInput {
+  name: String
+  description: String
+}
+
+extend type Query {
+  """List permissions (paginated). Requires `permissions.read`."""
+  permissions(pagination: PaginationInput): PermissionConnection!
+  """Fetch a single permission by id. Requires `permissions.read`."""
+  permission(id: Int!): Permission!
+}
+
+extend type Mutation {
+  """Create a permission. Requires `permissions.create`."""
+  createPermission(input: CreatePermissionInput!): Permission!
+  """Update a permission. Requires `permissions.update`."""
+  updatePermission(id: Int!, input: UpdatePermissionInput!): Permission!
+  """Soft-delete a permission. Requires `permissions.delete`."""
+  deletePermission(id: Int!): Boolean!
+}

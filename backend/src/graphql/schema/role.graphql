@@ -1,0 +1,49 @@
+type Role {
+  id: Int!
+  name: String!
+  description: String
+  permissions: [Permission!]!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+}
+
+"""A page of roles plus pagination metadata."""
+type RoleConnection {
+  data: [Role!]!
+  meta: PaginationMeta!
+}
+
+input CreateRoleInput {
+  name: String!
+  description: String
+  """Permission ids to attach to the new role."""
+  permissions: [Int!]
+}
+
+input UpdateRoleInput {
+  name: String
+  description: String
+  permissions: [Int!]
+}
+
+extend type Query {
+  """List roles (paginated). Requires `roles.read`."""
+  roles(pagination: PaginationInput): RoleConnection!
+  """Fetch a single role by id. Requires `roles.read`."""
+  role(id: Int!): Role!
+}
+
+extend type Mutation {
+  """Create a role. Requires `roles.create`."""
+  createRole(input: CreateRoleInput!): Role!
+  """Update a role. Requires `roles.update`."""
+  updateRole(id: Int!, input: UpdateRoleInput!): Role!
+  """Soft-delete a role. Requires `roles.delete`."""
+  deleteRole(id: Int!): Boolean!
+  """Replace a role's permissions. Requires `roles.manage_permissions`."""
+  syncRolePermissions(id: Int!, permissionIds: [Int!]!): Role!
+  """Add permissions to a role. Requires `roles.manage_permissions`."""
+  attachRolePermissions(id: Int!, permissionIds: [Int!]!): Role!
+  """Remove permissions from a role. Requires `roles.manage_permissions`."""
+  detachRolePermissions(id: Int!, permissionIds: [Int!]!): Role!
+}

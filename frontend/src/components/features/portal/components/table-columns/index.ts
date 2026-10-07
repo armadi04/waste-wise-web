@@ -1,0 +1,1 @@
+export { getPortalColumns } from './columns'

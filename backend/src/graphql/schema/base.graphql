@@ -1,0 +1,40 @@
+# Root schema stubs for the GraphQL API. Feature schemas (users, roles, …)
+# extend the root Query/Mutation types via `extend type` in their own
+# *.graphql files.
+
+"""An ISO-8601 date-time string, e.g. `2026-07-17T10:30:00.000Z`."""
+scalar DateTime
+
+"""Pagination envelope metadata, mirroring the REST `{ data, meta }` shape."""
+type PaginationMeta {
+  """Total number of records matching the query (ignoring pagination)."""
+  total: Int!
+  """The current page (1-based)."""
+  page: Int!
+  """The index of the last page for the current page size."""
+  lastPage: Int!
+}
+
+"""Pagination, search and sort options shared by every paginated query."""
+input PaginationInput {
+  """Page number, 1-based. Defaults to 1."""
+  page: Int = 1
+  """Records per page. Defaults to 10."""
+  limit: Int = 10
+  """Optional case-insensitive search across the resource's search fields."""
+  search: String
+  """Field to sort by. Defaults to createdAt."""
+  sort: String = "createdAt"
+  """Sort direction, ASC or DESC. Defaults to DESC."""
+  direction: String = "DESC"
+}
+
+type Query {
+  """Liveness probe for the GraphQL endpoint. Returns "ok" when the API is up."""
+  _health: String!
+}
+
+type Mutation {
+  """Placeholder so feature schemas can `extend type Mutation`. Returns "ok"."""
+  _noop: String!
+}

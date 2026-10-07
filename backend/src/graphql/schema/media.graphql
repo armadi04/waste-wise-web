@@ -1,0 +1,36 @@
+type Media {
+  id: Int!
+  filename: String!
+  originalName: String
+  mimetype: String!
+  """File size in bytes."""
+  size: Float
+  url: String
+  isPrivate: Boolean!
+  userId: Int
+  user: User
+  createdAt: DateTime!
+  updatedAt: DateTime!
+}
+
+"""A page of media plus pagination metadata."""
+type MediaConnection {
+  data: [Media!]!
+  meta: PaginationMeta!
+}
+
+extend type Query {
+  """
+  List media (paginated). Requires `media.read`; scoped to the caller's own
+  media unless they hold `media.read_all` or the `superadmin` role. Uploads are
+  REST-only (`POST /api/media/upload`).
+  """
+  media(pagination: PaginationInput): MediaConnection!
+  """Fetch a single media item. Owner, `media.read_all`, or `superadmin`."""
+  mediaItem(id: Int!): Media!
+}
+
+extend type Mutation {
+  """Soft-delete a media item. Owner, `media.delete_all`, or `superadmin`."""
+  deleteMedia(id: Int!): Boolean!
+}
