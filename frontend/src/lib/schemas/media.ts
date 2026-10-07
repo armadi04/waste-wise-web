@@ -1,6 +1,6 @@
 import { z } from 'zod'
 
-/** Sortable columns the backend accepts for `/api/media`. */
+/** Sortable columns the backend accepts for `/api/v1/media`. */
 export const MEDIA_SORT_KEYS = [
   'originalName',
   'createdAt',

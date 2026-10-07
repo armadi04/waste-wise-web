@@ -9,10 +9,10 @@ test('refresh CSRF rejection redirects a stale session to login', async ({
   ])
   const errors: Array<string> = []
   page.on('pageerror', (error) => errors.push(error.message))
-  await page.route('**/api/auth/me', (route) =>
+  await page.route('**/api/v1/auth/me', (route) =>
     route.fulfill({ status: 401, json: { message: 'Unauthorized' } }),
   )
-  await page.route('**/api/auth/refresh', (route) =>
+  await page.route('**/api/v1/auth/refresh', (route) =>
     route.fulfill({ status: 403, json: { message: 'Invalid CSRF token' } }),
   )
 
@@ -34,7 +34,7 @@ test('direct session 403 renders access denied with sign-in navigation', async (
   page.on('console', (message) => {
     if (message.type() === 'warning') warnings.push(message.text())
   })
-  await page.route('**/api/auth/me', (route) =>
+  await page.route('**/api/v1/auth/me', (route) =>
     route.fulfill({ status: 403, json: { message: 'Forbidden' } }),
   )
 
@@ -60,16 +60,16 @@ test('temporary refresh failure retains the session and retries route loading', 
     { name: 'csrfToken', value: 'valid-token', domain: 'localhost', path: '/' },
   ])
   let recovered = false
-  await page.route('**/api/**', async (route) => {
+  await page.route('**/api/v1/**', async (route) => {
     const pathname = new URL(route.request().url()).pathname
-    if (pathname === '/api/auth/refresh') {
+    if (pathname === '/api/v1/auth/refresh') {
       await route.fulfill({
         status: 503,
         json: { message: 'Service unavailable' },
       })
       return
     }
-    if (pathname === '/api/auth/me') {
+    if (pathname === '/api/v1/auth/me') {
       await route.fulfill(
         recovered
           ? {
@@ -86,7 +86,7 @@ test('temporary refresh failure retains the session and retries route loading', 
       return
     }
     let payload: unknown = []
-    if (pathname === '/api/auth/profile') {
+    if (pathname === '/api/v1/auth/profile') {
       payload = {
         id: 1,
         email: 'admin@example.test',
@@ -102,13 +102,13 @@ test('temporary refresh failure retains the session and retries route loading', 
         permissions: [],
       }
     }
-    if (pathname === '/api/users' || pathname === '/api/notifications') {
+    if (pathname === '/api/v1/users' || pathname === '/api/v1/notifications') {
       payload = {
         data: [],
         meta: { total: 0, page: 1, limit: 20, lastPage: 1 },
       }
     }
-    if (pathname === '/api/notifications/unread-count') payload = 0
+    if (pathname === '/api/v1/notifications/unread-count') payload = 0
     await route.fulfill({ json: payload })
   })
 

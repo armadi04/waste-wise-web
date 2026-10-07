@@ -19,24 +19,23 @@ export const getInvitations = (params?: {
   direction?: string
   paginated?: boolean
 }) => {
-  return apiGet<PaginatedData<Invitation> | Array<Invitation>>(
-    '/api/invitations',
-    { params },
-  )
+  return apiGet<PaginatedData<Invitation> | Array<Invitation>>('/invitations', {
+    params,
+  })
 }
 
 export const createInvitation = (data: CreateInvitationData) => {
-  return apiPost<CreateInvitationResponse>('/api/invitations', data)
+  return apiPost<CreateInvitationResponse>('/invitations', data)
 }
 
 export const resendInvitation = (id: number) => {
-  return apiPost<Invitation>(`/api/invitations/${id}/resend`, {})
+  return apiPost<Invitation>(`/invitations/${id}/resend`, {})
 }
 
 export const revokeInvitation = (id: number) => {
-  return apiDelete<void>(`/api/invitations/${id}`)
+  return apiDelete<void>(`/invitations/${id}`)
 }
 
 export const bulkRevokeInvitations = (ids: Array<number>) => {
-  return apiPost<{ deleted: number }>('/api/invitations/bulk-delete', { ids })
+  return apiPost<{ deleted: number }>('/invitations/bulk-delete', { ids })
 }

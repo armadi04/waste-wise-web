@@ -39,12 +39,12 @@ export const useUpdateProfile = (user: UserProfile | null) => {
         // Append file
         formData.append('avatar', file)
 
-        return apiPatch<UserProfile>(`/api/users/${user.id}`, formData, {
+        return apiPatch<UserProfile>(`/users/${user.id}`, formData, {
           headers: { 'Content-Type': 'multipart/form-data' },
         })
       }
 
-      return apiPatch<UserProfile>(`/api/users/${user.id}`, payload)
+      return apiPatch<UserProfile>(`/users/${user.id}`, payload)
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['profile'] })

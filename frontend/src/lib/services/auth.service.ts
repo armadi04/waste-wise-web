@@ -1,5 +1,5 @@
 import axios from 'axios'
-import api from '../api'
+import api, { apiUrl } from '../api'
 import { clearAuthFlag } from '../utils/cookies'
 import type {
   CurrentUser,
@@ -16,7 +16,7 @@ import { getCsrfToken } from '@/lib/utils/csrf'
 export async function login(
   credentials: LoginCredentials,
 ): Promise<LoginResponse> {
-  const response = await api.post<LoginResponse>('/api/auth/login', credentials)
+  const response = await api.post<LoginResponse>('/auth/login', credentials)
   return response.data
 }
 
@@ -24,7 +24,7 @@ export async function login(
  * Login user with Google. Cookies are set by the backend.
  */
 export async function loginWithGoogle(token: string): Promise<LoginResponse> {
-  const response = await api.post<LoginResponse>('/api/auth/google', { token })
+  const response = await api.post<LoginResponse>('/auth/google', { token })
   return response.data
 }
 
@@ -34,7 +34,7 @@ export async function loginWithGoogle(token: string): Promise<LoginResponse> {
  */
 export async function switchRole(role: string): Promise<LoginResponse> {
   const response = await api.post<LoginResponse>(
-    '/api/auth/switch-role',
+    '/auth/switch-role',
     { role },
     { headers: { 'X-CSRF-Token': getCsrfToken() } },
   )
@@ -47,7 +47,7 @@ export async function switchRole(role: string): Promise<LoginResponse> {
  */
 export async function impersonate(userId: number): Promise<LoginResponse> {
   const response = await api.post<LoginResponse>(
-    `/api/auth/impersonate/${userId}`,
+    `/auth/impersonate/${userId}`,
     {},
     { headers: { 'X-CSRF-Token': getCsrfToken() } },
   )
@@ -57,7 +57,7 @@ export async function impersonate(userId: number): Promise<LoginResponse> {
 /** Return to the administrator's own account. */
 export async function stopImpersonating(): Promise<LoginResponse> {
   const response = await api.post<LoginResponse>(
-    '/api/auth/stop-impersonating',
+    '/auth/stop-impersonating',
     {},
     { headers: { 'X-CSRF-Token': getCsrfToken() } },
   )
@@ -68,7 +68,7 @@ export async function stopImpersonating(): Promise<LoginResponse> {
  * Get user profile
  */
 export async function getProfile(): Promise<UserProfile> {
-  const response = await api.get<UserProfile>('/api/auth/profile')
+  const response = await api.get<UserProfile>('/auth/profile')
   return response.data
 }
 
@@ -79,13 +79,13 @@ export async function getProfile(): Promise<UserProfile> {
 export async function logout(sid?: string): Promise<void> {
   if (sid) {
     clearAuthFlag()
-    window.location.href = '/api/auth/sso/logout'
+    window.location.href = apiUrl('/auth/sso/logout')
     return
   }
 
   try {
     await api.post(
-      '/api/auth/logout',
+      '/auth/logout',
       {},
       { headers: { 'X-CSRF-Token': getCsrfToken() } },
     )
@@ -112,7 +112,7 @@ export async function getCurrentUser(): Promise<CurrentUser | null> {
       activeRole?: string
       sid?: string
       impersonatorId?: number
-    }>('/api/auth/me')
+    }>('/auth/me')
     return {
       sub: data.userId,
       email: data.email,
@@ -139,7 +139,7 @@ export async function forgotPassword(
   email: string,
 ): Promise<{ message: string }> {
   const response = await api.post<{ message: string }>(
-    '/api/auth/forgot-password',
+    '/auth/forgot-password',
     { email },
   )
   return response.data
@@ -152,10 +152,10 @@ export async function resetPassword(
   token: string,
   password: string,
 ): Promise<{ message: string }> {
-  const response = await api.post<{ message: string }>(
-    '/api/auth/reset-password',
-    { token, password },
-  )
+  const response = await api.post<{ message: string }>('/auth/reset-password', {
+    token,
+    password,
+  })
   return response.data
 }
 
@@ -170,7 +170,7 @@ export async function refreshAccessToken(): Promise<void> {
   // base URL so the API-origin-scoped refresh cookie is sent (cross-origin setup).
   // The backend resets the httpOnly accessToken cookie; nothing to store here.
   await axios.post(
-    `${api.defaults.baseURL ?? ''}/api/auth/refresh`,
+    apiUrl('/auth/refresh'),
     {},
     { withCredentials: true, headers: { 'X-CSRF-Token': csrfToken } },
   )
@@ -181,7 +181,7 @@ export async function refreshAccessToken(): Promise<void> {
  */
 export async function verifyEmail(token: string): Promise<{ message: string }> {
   const response = await api.get<{ message: string }>(
-    `/api/auth/verify-email?token=${token}`,
+    `/auth/verify-email?token=${token}`,
   )
   return response.data
 }
@@ -193,7 +193,7 @@ export async function resendVerification(
   email: string,
 ): Promise<{ message: string }> {
   const response = await api.post<{ message: string }>(
-    '/api/auth/resend-verification',
+    '/auth/resend-verification',
     { email },
   )
   return response.data
@@ -204,7 +204,7 @@ export async function resendVerification(
  */
 export async function getInvitation(token: string): Promise<{ email: string }> {
   const response = await api.get<{ email: string }>(
-    `/api/invitations/accept?token=${token}`,
+    `/invitations/accept?token=${token}`,
   )
   return response.data
 }
@@ -216,9 +216,9 @@ export async function acceptInvitation(
   token: string,
   data: { fullname?: string; phone?: string; password: string },
 ): Promise<{ message: string }> {
-  const response = await api.post<{ message: string }>(
-    '/api/invitations/accept',
-    { token, ...data },
-  )
+  const response = await api.post<{ message: string }>('/invitations/accept', {
+    token,
+    ...data,
+  })
   return response.data
 }

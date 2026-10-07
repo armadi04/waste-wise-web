@@ -1,4 +1,5 @@
 import axios from 'axios'
+import { buildApiUrl } from './config/api-url'
 import { clearAuthFlag } from './utils/cookies'
 import type {
   AxiosError,
@@ -27,7 +28,7 @@ const processQueue = (error: any) => {
 }
 
 const api: AxiosInstance = axios.create({
-  baseURL: import.meta.env.VITE_API_URL || '',
+  baseURL: buildApiUrl(import.meta.env.VITE_API_URL),
   timeout: 30000,
   // Auth is a cookie (httpOnly accessToken) sent automatically; no
   // Authorization header is set client-side. withCredentials is required so the
@@ -39,6 +40,7 @@ const api: AxiosInstance = axios.create({
 })
 
 api.interceptors.request.use((config) => {
+  buildApiUrl(import.meta.env.VITE_API_URL, config.url ?? '')
   if (['post', 'put', 'patch', 'delete'].includes(config.method ?? 'get')) {
     const csrf = getCsrfToken()
     if (csrf) config.headers.set('X-CSRF-Token', csrf)
@@ -92,7 +94,7 @@ api.interceptors.response.use(
         // scoped to the API origin — is actually sent in a cross-origin setup.
         // The backend resets the httpOnly accessToken cookie; nothing stored here.
         await axios.post(
-          `${api.defaults.baseURL ?? ''}/api/auth/refresh`,
+          api.getUri({ url: '/auth/refresh' }),
           {},
           {
             withCredentials: true,
@@ -116,8 +118,7 @@ api.interceptors.response.use(
         // The full-page redirect destroys this QueryClient. Let the pending
         // session read settle so its route guard can redirect without CancelledError.
         clearAuthFlag()
-        if (originalRequest.url !== '/api/auth/me')
-          window.location.href = '/login'
+        if (originalRequest.url !== '/auth/me') window.location.href = '/login'
         return Promise.reject(requestError)
       } finally {
         isRefreshing = false
@@ -163,3 +164,7 @@ export const apiPatch = <T>(url: string, data?: object, config?: object) =>
 
 export const apiDelete = <T>(url: string, config?: object) =>
   api.delete<T>(url, config).then((res) => res.data)
+
+/** Resolve a backend path against the configured origin for browser navigation. */
+export const apiUrl = (path: string) =>
+  buildApiUrl(import.meta.env.VITE_API_URL, path)

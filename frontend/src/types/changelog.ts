@@ -1,5 +1,5 @@
 /**
- * One published release as `GET /api/changelog` returns it.
+ * One published release as `GET /api/v1/changelog` returns it.
  *
  * `notes` is the GitHub Release body verbatim — semantic-release generates it
  * with the `conventionalcommits` preset, so it already carries its own

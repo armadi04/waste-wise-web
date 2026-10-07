@@ -5,17 +5,17 @@ export const getNotifications = (params?: {
   page?: number
   limit?: number
 }) => {
-  return apiGet<PaginatedData<Notification>>('/api/notifications', { params })
+  return apiGet<PaginatedData<Notification>>('/notifications', { params })
 }
 
 export const getUnreadCount = () => {
-  return apiGet<number>('/api/notifications/unread-count')
+  return apiGet<number>('/notifications/unread-count')
 }
 
 export const markAsRead = (id: number) => {
-  return apiPatch<void>(`/api/notifications/${id}/read`)
+  return apiPatch<void>(`/notifications/${id}/read`)
 }
 
 export const markAllAsRead = () => {
-  return apiPost<void>('/api/notifications/read-all')
+  return apiPost<void>('/notifications/read-all')
 }

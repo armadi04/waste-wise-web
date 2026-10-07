@@ -10,15 +10,15 @@ test('admin deep link loads filtered data once and keeps pagination in URL', asy
     { name: 'authenticated', value: '1', domain: 'localhost', path: '/' },
   ])
   const users: Array<string> = []
-  await page.route('**/api/**', async (route) => {
+  await page.route('**/api/v1/**', async (route) => {
     const url = new URL(route.request().url())
     let payload: unknown = []
-    if (url.pathname === '/api/notifications')
+    if (url.pathname === '/api/v1/notifications')
       payload = {
         data: [],
         meta: { total: 0, page: 1, limit: 10, lastPage: 1 },
       }
-    if (url.pathname === '/api/auth/me')
+    if (url.pathname === '/api/v1/auth/me')
       payload = {
         userId: 1,
         email: 'admin@example.test',
@@ -26,7 +26,7 @@ test('admin deep link loads filtered data once and keeps pagination in URL', asy
         permissions: ['users.read', 'menu.users'],
         emailVerified: true,
       }
-    if (url.pathname === '/api/auth/profile')
+    if (url.pathname === '/api/v1/auth/profile')
       payload = {
         id: 1,
         email: 'admin@example.test',
@@ -41,7 +41,7 @@ test('admin deep link loads filtered data once and keeps pagination in URL', asy
         ],
         permissions: [],
       }
-    if (url.pathname === '/api/users') {
+    if (url.pathname === '/api/v1/users') {
       users.push(url.search)
       payload = {
         data: [
@@ -64,11 +64,11 @@ test('admin deep link loads filtered data once and keeps pagination in URL', asy
       }
     }
     if (
-      url.pathname === '/api/users' &&
+      url.pathname === '/api/v1/users' &&
       url.searchParams.get('paginated') === 'false'
     )
       payload = (payload as { data: unknown }).data
-    if (url.pathname === '/api/notifications/unread-count') payload = 0
+    if (url.pathname === '/api/v1/notifications/unread-count') payload = 0
     await route.fulfill({ json: payload })
   })
   const errors: Array<string> = []
@@ -164,10 +164,10 @@ test('admin signed-out deep links redirect after validating the session', async 
 }) => {
   const errors: Array<string> = []
   page.on('pageerror', (error) => errors.push(error.message))
-  await page.route('**/api/auth/me', (route) =>
+  await page.route('**/api/v1/auth/me', (route) =>
     route.fulfill({ status: 401, json: { message: 'Unauthorized' } }),
   )
-  await page.route('**/api/auth/refresh', (route) =>
+  await page.route('**/api/v1/auth/refresh', (route) =>
     route.fulfill({ status: 401, json: { message: 'Unauthorized' } }),
   )
   await page.goto('http://localhost:32012/users')
