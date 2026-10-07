@@ -49,12 +49,15 @@ function escapeHtml(value: string): string {
 @Injectable()
 export class MailService {
   constructor(private readonly outbox: MailOutboxService) {}
+  private get appName(): string {
+    return process.env.APP_NAME || 'Nestplate';
+  }
 
   async sendVerificationEmail(email: string, verifyUrl: string): Promise<void> {
     const html = this.renderEmail({
       title: 'Verifikasi alamat email',
       paragraphs: [
-        'Terima kasih sudah mendaftar di KuponMalam. Klik tombol di bawah untuk memverifikasi alamat emailmu.',
+        `Terima kasih sudah mendaftar di ${this.appName}. Klik tombol di bawah untuk memverifikasi alamat emailmu.`,
       ],
       action: { label: 'Verifikasi email', url: verifyUrl },
       expiry: '24 jam',
@@ -64,9 +67,9 @@ export class MailService {
 
     await this.outbox.enqueue({
       to: email,
-      subject: 'Verifikasi email KuponMalam',
+      subject: `Verifikasi email ${this.appName}`,
       html,
-      text: `Verifikasi alamat email KuponMalam\n\nTerima kasih sudah mendaftar. Buka tautan berikut untuk memverifikasi alamat emailmu (berlaku selama 24 jam):\n\n${verifyUrl}\n\nJika kamu tidak membuat akun, email ini bisa diabaikan.`,
+      text: `Verifikasi alamat email ${this.appName}\n\nTerima kasih sudah mendaftar. Buka tautan berikut untuk memverifikasi alamat emailmu (berlaku selama 24 jam):\n\n${verifyUrl}\n\nJika kamu tidak membuat akun, email ini bisa diabaikan.`,
     });
   }
 
@@ -74,7 +77,7 @@ export class MailService {
     const html = this.renderEmail({
       title: 'Kamu mendapat undangan',
       paragraphs: [
-        'Kamu diundang untuk bergabung dengan KuponMalam. Klik tombol di bawah untuk menyiapkan akunmu.',
+        `Kamu diundang untuk bergabung dengan ${this.appName}. Klik tombol di bawah untuk menyiapkan akunmu.`,
       ],
       action: { label: 'Terima undangan', url: inviteUrl },
       expiry: '7 hari',
@@ -84,9 +87,9 @@ export class MailService {
 
     await this.outbox.enqueue({
       to: email,
-      subject: 'Undangan bergabung di KuponMalam',
+      subject: `Undangan bergabung di ${this.appName}`,
       html,
-      text: `Undangan bergabung di KuponMalam\n\nBuka tautan berikut untuk menyiapkan akunmu (berlaku selama 7 hari):\n\n${inviteUrl}\n\nJika kamu tidak mengharapkan undangan ini, email ini bisa diabaikan.`,
+      text: `Undangan bergabung di ${this.appName}\n\nBuka tautan berikut untuk menyiapkan akunmu (berlaku selama 7 hari):\n\n${inviteUrl}\n\nJika kamu tidak mengharapkan undangan ini, email ini bisa diabaikan.`,
     });
   }
 
@@ -94,7 +97,7 @@ export class MailService {
     const html = this.renderEmail({
       title: 'Atur ulang password',
       paragraphs: [
-        'Kami menerima permintaan untuk mengatur ulang password akun KuponMalam. Klik tombol di bawah untuk membuat password baru.',
+        `Kami menerima permintaan untuk mengatur ulang password akun ${this.appName}. Klik tombol di bawah untuk membuat password baru.`,
       ],
       action: { label: 'Atur ulang password', url: resetUrl },
       expiry: '30 menit',
@@ -104,17 +107,17 @@ export class MailService {
 
     await this.outbox.enqueue({
       to: email,
-      subject: 'Atur ulang password KuponMalam',
+      subject: `Atur ulang password ${this.appName}`,
       html,
-      text: `Atur ulang password KuponMalam\n\nKami menerima permintaan untuk mengatur ulang passwordmu. Buka tautan berikut untuk membuat password baru (berlaku selama 30 menit):\n\n${resetUrl}\n\nJika kamu tidak meminta pengaturan ulang password, email ini bisa diabaikan.`,
+      text: `Atur ulang password ${this.appName}\n\nKami menerima permintaan untuk mengatur ulang passwordmu. Buka tautan berikut untuk membuat password baru (berlaku selama 30 menit):\n\n${resetUrl}\n\nJika kamu tidak meminta pengaturan ulang password, email ini bisa diabaikan.`,
     });
   }
 
-  async sendPortalOtp(email: string, code: string): Promise<void> {
+  async sendLoginOtp(email: string, code: string): Promise<void> {
     const html = this.renderEmail({
       title: 'Kode masuk kamu',
       paragraphs: [
-        'Gunakan kode berikut untuk masuk atau membuat akun KuponMalam.',
+        `Gunakan kode berikut untuk masuk atau membuat akun ${this.appName}.`,
       ],
       code,
       expiry: '10 menit',
@@ -123,41 +126,12 @@ export class MailService {
 
     await this.outbox.enqueue({
       to: email,
-      subject: 'Kode masuk KuponMalam',
+      subject: `Kode masuk ${this.appName}`,
       html,
-      text: `Kode masuk KuponMalam: ${code}\n\nKode berlaku selama 10 menit dan hanya bisa digunakan sekali. Jika bukan kamu yang meminta kode ini, email ini bisa diabaikan.`,
+      text: `Kode masuk ${this.appName}: ${code}\n\nKode berlaku selama 10 menit dan hanya bisa digunakan sekali. Jika bukan kamu yang meminta kode ini, email ini bisa diabaikan.`,
       // The code is a credential: never keep it in the outbox, never send it late.
       redactAfterSend: true,
       expiresAt: new Date(Date.now() + 10 * 60 * 1000),
-    });
-  }
-
-  async sendPortalGift(
-    email: string,
-    recipientName: string,
-    offerTitle: string,
-    code: string,
-    message: string,
-    giftUrl: string,
-  ): Promise<void> {
-    const html = this.renderEmail({
-      title: 'Kamu mendapat voucher hadiah',
-      paragraphs: [
-        `Hai ${recipientName}, kamu mendapat ${offerTitle} dari temanmu.`,
-        message ||
-          'Masuk ke KuponMalam memakai email ini untuk mengklaim hadiahmu.',
-      ],
-      action: { label: 'Klaim hadiah', url: giftUrl },
-      code,
-      expiry: 'sesuai masa berlaku voucher',
-      fallbackUrl: giftUrl,
-      note: 'Jangan bagikan kode hadiah kepada orang lain.',
-    });
-    await this.outbox.enqueue({
-      to: email,
-      subject: 'Kamu mendapat voucher hadiah KuponMalam',
-      html,
-      text: `Kamu mendapat voucher hadiah: ${offerTitle}\n\nKode: ${code}\n\nKlaim di: ${giftUrl}\n\n${message}`,
     });
   }
 
@@ -220,7 +194,7 @@ export class MailService {
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
-  <title>${escapedTitle} | KuponMalam</title>
+  <title>${escapedTitle} | ${escapeHtml(this.appName)}</title>
 </head>
 <body style="margin:0;padding:0;background-color:${EMAIL_COLORS.background};font-family:${EMAIL_FONT};">
   <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color:${EMAIL_COLORS.background};padding:40px 16px;">
@@ -229,7 +203,7 @@ export class MailService {
         <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width:520px;">
           <tr>
             <td align="center" style="padding-bottom:24px;">
-              <span style="font-size:24px;line-height:1.2;font-weight:800;color:${EMAIL_COLORS.primary};letter-spacing:-0.02em;">KuponMalam</span>
+              <span style="font-size:24px;line-height:1.2;font-weight:800;color:${EMAIL_COLORS.primary};letter-spacing:-0.02em;">${escapeHtml(this.appName)}</span>
             </td>
           </tr>
           <tr>
@@ -250,7 +224,7 @@ export class MailService {
           <tr>
             <td align="center" style="padding-top:24px;">
               <p style="margin:0;font-size:12px;line-height:1.6;color:${EMAIL_COLORS.mutedForeground};">
-                &copy; ${new Date().getFullYear()} KuponMalam. Semua hak dilindungi.
+                &copy; ${new Date().getFullYear()} ${escapeHtml(this.appName)}. Semua hak dilindungi.
               </p>
             </td>
           </tr>

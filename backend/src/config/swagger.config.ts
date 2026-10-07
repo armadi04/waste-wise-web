@@ -11,8 +11,8 @@ export interface SwaggerConfigOptions {
  */
 export function buildSwaggerConfig(options: SwaggerConfigOptions = {}) {
   const builder = new DocumentBuilder()
-    .setTitle('Kupon Malam API')
-    .setDescription('The Kupon Malam API description')
+    .setTitle('Nestplate API')
+    .setDescription('Nestplate Starter API')
     .setVersion('1.0');
 
   if (options.apiPrefix) {

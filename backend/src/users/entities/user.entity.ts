@@ -20,6 +20,7 @@ import { ApiProperty } from '@nestjs/swagger';
 import { RegisterMethodEnum } from '../register-method.enum';
 
 @Entity('users')
+@Index('UQ_users_email_active', { synchronize: false })
 export class User {
   @ApiProperty({ nullable: true })
   @Column({ name: 'timeZone', type: 'varchar', length: 100, nullable: true })
@@ -41,7 +42,7 @@ export class User {
   @ApiProperty()
   // Unique case-insensitively among live accounts: UQ_users_email_active is
   // ON (LOWER("email")) WHERE "deletedAt" IS NULL, which TypeORM can't
-  // declare, so it lives in migration 1791220000000 only.
+  // declare, so it lives in the starter baseline migration.
   @Index()
   @Column({ name: 'email' })
   email: string;
@@ -57,15 +58,6 @@ export class User {
   @ApiProperty({ nullable: true })
   @Column({ name: 'phone', type: 'varchar', nullable: true })
   phone: string;
-
-  @ApiProperty({ nullable: true })
-  @Column({
-    name: 'preferredCity',
-    type: 'varchar',
-    length: 80,
-    nullable: true,
-  })
-  preferredCity: string | null;
 
   @ApiProperty()
   @Column({ name: 'notificationsEnabled', type: 'boolean', default: true })

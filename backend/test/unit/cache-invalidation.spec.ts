@@ -9,9 +9,9 @@ describe('cross-resource cache invalidation', () => {
     await new CacheInvalidationListener({ clearKeys } as any).clearUsers();
     expect(clearKeys).toHaveBeenCalledWith('*/users*');
   });
-  it('clears admin portal lists after successful writes, preserving read and failed request caches', async () => {
+  it('clears resource lists after successful writes, preserving read and failed request caches', async () => {
     const clearKeys = mock(async () => {});
-    const Interceptor = ClearCacheOnWrite('*/portal/admin*');
+    const Interceptor = ClearCacheOnWrite('*/users*');
     const interceptor = new Interceptor({ clearKeys } as any);
     const context = (method: string) =>
       ({
@@ -40,6 +40,6 @@ describe('cross-resource cache invalidation', () => {
         }),
       ),
     ).toEqual({ saved: true });
-    expect(clearKeys).toHaveBeenCalledWith('*/portal/admin*');
+    expect(clearKeys).toHaveBeenCalledWith('*/users*');
   });
 });

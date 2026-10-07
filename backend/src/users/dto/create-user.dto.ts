@@ -30,11 +30,6 @@ export class CreateUserDto {
   @IsOptional()
   phone?: string;
 
-  @ApiPropertyOptional({ example: 'Jakarta' })
-  @IsString()
-  @IsOptional()
-  preferredCity?: string;
-
   @ApiPropertyOptional({ default: true })
   @IsOptional()
   @IsBoolean()

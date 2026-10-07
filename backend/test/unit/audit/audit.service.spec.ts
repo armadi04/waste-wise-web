@@ -71,13 +71,13 @@ describe('AuditService', () => {
   it('propagates durable delivery failures so the outbox can retry', async () => {
     repository.save.mockRejectedValue(new Error('database down'));
     await expect(
-      service.record({ action: 'portal.order_paid', eventId: 'payment:1' }),
+      service.record({ action: 'user.created', eventId: 'user:1' }),
     ).rejects.toThrow('database down');
   });
 
   it('skips an already recorded durable event', async () => {
     repository.findOneBy.mockResolvedValue({ id: 1, eventId: 'payment:1' });
-    await service.record({ action: 'portal.order_paid', eventId: 'payment:1' });
+    await service.record({ action: 'user.created', eventId: 'user:1' });
     expect(repository.save).not.toHaveBeenCalled();
   });
 

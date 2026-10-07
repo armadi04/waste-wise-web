@@ -1,6 +1,5 @@
 import { describe, expect, it } from 'bun:test';
 import {
-  audienceForRoles,
   nextIdleDeadline,
   sessionDeadlines,
   sessionPolicy,
@@ -8,17 +7,12 @@ import {
 import { sessionCookieMaxAge } from '../../../src/auth/session-cookies';
 
 const HOUR = 60 * 60 * 1000;
-const DAY = 24 * HOUR;
 
 describe('session policy', () => {
-  it('defaults to 2 h idle / 8 h absolute for staff and 14 d / 30 d for customers', () => {
+  it('defaults to 2 h idle / 8 h absolute for dashboard sessions', () => {
     expect(sessionPolicy('admin', {})).toEqual({
       idleMs: 2 * HOUR,
       absoluteMs: 8 * HOUR,
-    });
-    expect(sessionPolicy('portal', {})).toEqual({
-      idleMs: 14 * DAY,
-      absoluteMs: 30 * DAY,
     });
   });
 
@@ -26,16 +20,10 @@ describe('session policy', () => {
     const env = {
       SESSION_ADMIN_IDLE_MINUTES: '30',
       SESSION_ADMIN_ABSOLUTE_HOURS: '0',
-      SESSION_PORTAL_IDLE_DAYS: '7',
-      SESSION_PORTAL_ABSOLUTE_DAYS: 'x',
     };
     expect(sessionPolicy('admin', env)).toEqual({
       idleMs: 30 * 60 * 1000,
       absoluteMs: 8 * HOUR,
-    });
-    expect(sessionPolicy('portal', env)).toEqual({
-      idleMs: 7 * DAY,
-      absoluteMs: 30 * DAY,
     });
   });
 
@@ -52,12 +40,6 @@ describe('session policy', () => {
     expect(nextIdleDeadline('admin', late, absoluteExpiresAt, {})).toEqual(
       absoluteExpiresAt,
     );
-  });
-
-  it('treats customer-only accounts as portal sessions', () => {
-    expect(audienceForRoles(['customer'])).toBe('portal');
-    expect(audienceForRoles(['customer', 'superadmin'])).toBe('admin');
-    expect(audienceForRoles([])).toBe('admin');
   });
 
   it('sizes cookies to the remaining absolute lifetime', () => {

@@ -17,7 +17,7 @@ async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule, {
     bufferLogs: true,
   });
-  // Behind the portal BFF every request arrives from one address; trusting that
+  // Behind a reverse proxy every request arrives from one address; trusting that
   // proxy's X-Forwarded-For gives throttling and sessions the real client IP.
   const trustProxy = parseTrustProxy(process.env.TRUST_PROXY);
   if (trustProxy !== undefined) app.set('trust proxy', trustProxy);
@@ -68,7 +68,6 @@ async function bootstrap() {
       'Accept',
       'X-CSRF-Token',
       'Idempotency-Key',
-      'X-Portal-Webhook-Secret',
     ],
   });
 

@@ -31,7 +31,7 @@ import { StatsModule } from './stats/stats.module';
 import { ChangelogModule } from './changelog/changelog.module';
 import { AppRefreshModule } from './app-refresh/app-refresh.module';
 import { GraphqlApiModule } from './graphql/graphql-api.module';
-import { PortalModule } from './portal/portal.module';
+import { TimeZoneModule } from './time-zone/time-zone.module';
 import { GqlThrottlerGuard } from './common/guards/gql-throttler.guard';
 import env from './config/env';
 import { requestLogSerializers } from './common/utils/request-logging';
@@ -64,6 +64,7 @@ const initLogger = pino({
     EventEmitterModule.forRoot(),
     ConfigModule.forRoot({
       isGlobal: true,
+      ignoreEnvFile: process.env.NODE_ENV === 'test',
     }),
     ThrottlerModule.forRootAsync({
       imports: [ConfigModule],
@@ -180,7 +181,7 @@ const initLogger = pino({
     StatsModule,
     ChangelogModule,
     AppRefreshModule,
-    PortalModule,
+    TimeZoneModule,
     // Opt-in GraphQL API — mounted only when GRAPHQL_ENABLED=true.
     ...(env.GRAPHQL_ENABLED ? [GraphqlApiModule] : []),
   ],

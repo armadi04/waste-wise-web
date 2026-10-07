@@ -422,13 +422,13 @@ describe('AuthService', () => {
         await service.login(user as unknown as User);
         expect(refreshExpiresIn()).toBe(2 * 60 * 60);
         (jwtService.sign as jest.Mock).mockClear();
-        await service.login(user as unknown as User, { audience: 'portal' });
+        await service.login(user as unknown as User, { audience: 'admin' });
         expect(sessionsService.start).toHaveBeenLastCalledWith(1, undefined, {
-          audience: 'portal',
+          audience: 'admin',
           isSso: false,
           impersonatedById: undefined,
         });
-        expect(refreshExpiresIn()).toBe(14 * 24 * 60 * 60);
+        expect(refreshExpiresIn()).toBe(2 * 60 * 60);
       });
 
       it('returns the session absolute deadline for cookie lifetimes', async () => {
@@ -465,18 +465,18 @@ describe('AuthService', () => {
         expect(tokens.sessionExpiresAt).toBe(sessionDeadline);
       });
 
-      it('opens a portal session for legacy customer tokens without a session', async () => {
+      it('opens a dashboard session for tokens without a session', async () => {
         (jwtService.verify as jest.Mock).mockReturnValue({
           sub: 1,
           tokenType: 'refresh',
         });
         usersService.findOne.mockResolvedValue({
           ...user,
-          roles: [{ name: 'customer', permissions: [] }],
+          roles: [{ name: 'user', permissions: [] }],
         });
         await service.refresh('legacy');
         expect(sessionsService.start).toHaveBeenCalledWith(1, undefined, {
-          audience: 'portal',
+          audience: 'admin',
           isSso: false,
         });
       });
