@@ -1,13 +1,17 @@
 import { Injectable } from '@nestjs/common';
+import { ApiProperty } from '@nestjs/swagger';
+import { API_VERSION } from './config/api-routing';
+import { SWAGGER_UI_PATH } from './config/swagger.config';
 
-export interface ApiInfo {
+export class ApiInfo {
+  @ApiProperty({ example: 'Nestplate API' })
   name: string;
-  status: 'ok';
-  version: string;
-  environment: string;
+
+  @ApiProperty({ example: API_VERSION })
+  apiVersion: string;
+
+  @ApiProperty({ example: SWAGGER_UI_PATH })
   docs: string;
-  timestamp: string;
-  uptime: number;
 }
 
 @Injectable()
@@ -15,12 +19,8 @@ export class AppService {
   getApiInfo(): ApiInfo {
     return {
       name: 'Nestplate API',
-      status: 'ok',
-      version: process.env.npm_package_version ?? '0.0.0',
-      environment: process.env.NODE_ENV ?? 'development',
-      docs: '/api/docs',
-      timestamp: new Date().toISOString(),
-      uptime: Math.floor(process.uptime()),
+      apiVersion: API_VERSION,
+      docs: SWAGGER_UI_PATH,
     };
   }
 }
