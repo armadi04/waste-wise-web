@@ -31,7 +31,7 @@ Selectors: `hasRole`, `hasPermission`, `hasAnyPermission`, `hasAllPermissions`.
 
 `logout()` calls the service (which clears cookies and redirects to `/login`) then
 `syncAuth()`. For **SSO sessions** (the session identity carries a `sid`), the service instead
-redirects to `/api/auth/sso/logout` so the IdP session is ended too (RP-initiated logout).
+redirects to `/api/v1/auth/sso/logout` so the IdP session is ended too (RP-initiated logout).
 
 ## Accessing auth in components
 
@@ -85,13 +85,13 @@ The sidebar (`useSidebarLogic` in `use-sidebar.ts`) filters `sidebarData` by bot
    toasts. A persisted `auth_error` in `sessionStorage` is surfaced on next mount.
 
 **SSO login** is a plain full-page link, not a store action: the "Sign in with Stekom SSO"
-button on the login page points at `<a href="/api/auth/sso/login">`. The backend runs the
+button on the login page points at `<a href="/api/v1/auth/sso/login">`. The backend runs the
 OIDC flow, sets the same session cookies, and redirects back into the SPA — `auth.store`
-hydrates from `/api/auth/me` on load, so no client-side token handling is needed.
+hydrates from `/api/v1/auth/me` on load, so no client-side token handling is needed.
 Enabled when the backend has `SSO_ISSUER` configured.
 
 **Silent login** (`useSilentSso`, `src/hooks/use-silent-sso.ts`) — when `VITE_SSO_SILENT=true`,
-the login page redirects an unauthenticated visitor once to `/api/auth/sso/silent`
+the login page redirects an unauthenticated visitor once to `/api/v1/auth/sso/silent`
 (`prompt=none`). An active IdP session logs them straight in; otherwise the backend bounces
 back and a one-shot `sso_silent` cookie keeps the login form from looping.
 
@@ -151,7 +151,7 @@ without a chosen role receives no role-derived permissions. Use the backend role
 flow; clear Query cache and reload identity instead of combining all roles client-side.
 Profile-derived UI checks cannot grant authority beyond the backend session.
 
-Admin password and Google login use camelCase `twoFactorRequired`/`challengeToken`. A failed `/api/auth/2fa/verify` returns to the code form without refreshing or redirecting, preserving the pending challenge.
+Admin password and Google login use camelCase `twoFactorRequired`/`challengeToken`. A failed `/api/v1/auth/2fa/verify` returns to the code form without refreshing or redirecting, preserving the pending challenge.
 
 ## Turnstile lifecycle
 

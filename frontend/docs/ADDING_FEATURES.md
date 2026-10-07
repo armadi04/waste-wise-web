@@ -8,7 +8,8 @@ the contract and permissions; UI gates only presentation and preloading.
 After backend `spec:generate`, run `bun run api:generate`. Keep hand-authored domain views
 aligned with the generated response; list pagination is `{ data, meta: { total, page, lastPage } }`.
 
-Create typed HTTP methods in `src/lib/services/project.service.ts` through shared helpers:
+Create typed HTTP methods in `src/lib/services/project.service.ts` through shared helpers.
+Pass resource paths without `/api/v1`; the shared builder supplies the versioned base:
 
 ```ts
 import { apiGet, apiPost, apiPatch, apiDelete } from '@/lib/api'
@@ -17,13 +18,13 @@ import type { PaginatedData } from '@/types/api'
 export type Project = { id: number; name: string; createdAt: string }
 export type ProjectInput = { name: string }
 export const getProjects = (params: Record<string, unknown>) =>
-  apiGet<PaginatedData<Project>>('/api/projects', { params })
+  apiGet<PaginatedData<Project>>('/projects', { params })
 export const createProject = (data: ProjectInput) =>
-  apiPost<Project>('/api/projects', data)
+  apiPost<Project>('/projects', data)
 export const updateProject = (id: number, data: Partial<ProjectInput>) =>
-  apiPatch<Project>(`/api/projects/${id}`, data)
+  apiPatch<Project>(`/projects/${id}`, data)
 export const deleteProject = (id: number) =>
-  apiDelete<void>(`/api/projects/${id}`)
+  apiDelete<void>(`/projects/${id}`)
 ```
 
 ## 2. Shared Query and URL state

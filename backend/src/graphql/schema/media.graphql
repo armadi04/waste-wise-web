@@ -23,7 +23,7 @@ extend type Query {
   """
   List media (paginated). Requires `media.read`; scoped to the caller's own
   media unless they hold `media.read_all` or the `superadmin` role. Uploads are
-  REST-only (`POST /api/media/upload`).
+  REST-only (`POST /api/v1/media/upload`).
   """
   media(pagination: PaginationInput): MediaConnection!
   """Fetch a single media item. Owner, `media.read_all`, or `superadmin`."""

@@ -10,7 +10,7 @@ Guards authorize, DTOs validate, entities define persistence. Business resources
 ## Bootstrap and request lifecycle
 
 `main.ts` validates env before initialization, installs cookie parsing, CORS, global exception
-handling, class-validator DI, the `/api` prefix and transforming/whitelisting ValidationPipe.
+handling, class-validator DI, the `/api` global prefix, URI versioning with default version `1`, and transforming/whitelisting ValidationPipe.
 Swagger `/api/docs` is non-production. Middleware precedes guards, DTO pipes and services.
 Global throttling defaults to 100 requests/minute; credential/upload routes use tighter limits.
 Health probes skip throttling. Permission metadata needs a matching guard.

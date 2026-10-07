@@ -9,7 +9,7 @@ name: Release
 # It does NOT commit anything back to `master`. The release notes live on the
 # GitHub Release, so `master` stays free of `chore(release)` bot commits. The
 # in-app Changelog page reads those notes at runtime through
-# `GET /api/changelog`, which proxies the GitHub Releases API — see RELEASING.md.
+# `GET /api/v1/changelog`, which proxies the GitHub Releases API — see RELEASING.md.
 #
 # Deployment is deliberately not wired here: this repo is a template, so how a
 # fork ships its tags is its own business.

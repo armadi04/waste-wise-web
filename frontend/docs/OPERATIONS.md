@@ -21,10 +21,11 @@ docker run --rm -p 3001:3000 \
 Keep browser API URL empty for same-origin deployment. Use HTTPS at the deployment edge.
 Absolute backend origins require matching CORS/cookie configuration.
 
-Caddy routes `/api`, `/api/*`, `/socket.io`, `/socket.io/*`, and `/graphql` to the backend
+Caddy routes `/api`, `/api/*`, `/socket.io`, `/socket.io/*`, and `/graphql` to the backend.
+The `/api/*` matcher includes Swagger `/api/docs`, its assets, and OpenAPI documents
 before SPA fallback. Socket upgrades are handled by reverse_proxy. It preserves request paths.
 Fingerprint assets are immutable; index HTML is no-cache. Deep links return index HTML.
-The production service worker excludes API/socket/GraphQL navigation fallback; dev workers
+The production service worker excludes API/Swagger/socket/GraphQL navigation fallback; dev workers
 are disabled. Update public values by rebuilding, runtime target by updating BACKEND_URL.
 
 ## Acceptance and rollback
@@ -49,3 +50,17 @@ Rollback static image and its build configuration together; coordinate backend c
 | Old UI after release            | index cache headers, PWA update and available fingerprint assets  |
 
 Integration diagnostics: [backend operations](../../backend/docs/OPERATIONS.md).
+
+REST consumers use `/api/v1/*`, including health and SSO. Existing `/api/*` proxy
+matching covers these paths without rewriting. `VITE_API_URL` is an origin only;
+never append `/api/v1` there because the shared URL builder adds it. Rebuild the
+frontend alongside the backend migration. External probe and IdP changes are listed
+in [backend operations](../../backend/docs/OPERATIONS.md#deploying-rest-uri-version-1).
+
+`VITE_API_URL` is validated during Vite startup/build and client initialization.
+Only empty (same-origin) or an HTTP(S) origin is accepted. A root trailing slash is
+normalized; credentials, other paths, query strings and fragments are rejected.
+REST services pass resource paths such as `/users`; the shared builder supplies
+`/api/v1` once. Socket navigation uses the normalized origin without the REST prefix.
+For deployment integration evidence, follow the backend
+[staging acceptance procedure](../../backend/docs/OPERATIONS.md#staging-acceptance-procedure).

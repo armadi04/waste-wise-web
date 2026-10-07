@@ -10,7 +10,7 @@ Read repo-wide [working rules](../../CLAUDE.md), [Architecture](ARCHITECTURE.md)
 - Reuse shared query options for loaders/hooks. Keep keys, URL filters and mutation invalidation
   aligned. Permission-gate preload and primary queries; backend still authorizes every request.
 - Cookies are the session source; do not decode/store JWT or make Axios read the auth store.
-  Identity comes from backend `/api/auth/me`, not the readable authenticated flag alone.
+  Identity comes from backend `/api/v1/auth/me`, not the readable authenticated flag alone.
 - Keep routes thin; page hooks orchestrate prop bundles. Reuse `useAppMutation`, `useDataTable`,
   `useConfirmation`, `useUserPermission` and `createCrudModalStore`.
 - Keep route views in feature `pages/`; organize reusable views, owned child sections,
@@ -34,7 +34,7 @@ Read repo-wide [working rules](../../CLAUDE.md), [Architecture](ARCHITECTURE.md)
 ## Change recipe
 
 1. Confirm the backend contract/types; regenerate OpenAPI types when routes/DTOs change.
-2. Add typed service functions with `/api/...` paths through the shared Axios helpers.
+2. Add typed service functions with resource paths such as `/users` through the shared Axios helpers, which add `/api/v1` once.
 3. Add Zod form/search schemas and query options. Preserve paginated `{ data, meta }` contracts,
    `keepPreviousData`, stable resource keys and any resource-specific staleness/polling.
 4. Add permission-gated loader mapping, route guard, search validation and loaderDeps. Hooks
