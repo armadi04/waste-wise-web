@@ -1,18 +1,15 @@
 import {
-  Button,
-  Checkbox,
-  Input,
-  Modal,
   ModalBody,
   ModalContent,
   ModalFooter,
   ModalHeader,
   ScrollShadow,
-  addToast,
 } from '@heroui/react'
 import { Check, Copy, Mail, Search, UserPlus } from 'lucide-react'
 import { useEffect, useMemo, useState } from 'react'
 import type { InviteModalProps } from '@/components/features/invitations/modal/invite-modal/types'
+import { Button, Checkbox, Input, Modal } from '@/components/shared/controls'
+import { addToast } from '@/components/shared/controls/toast'
 import { inviteSchema } from '@/lib/schemas/invitations'
 
 export function InviteModal({
@@ -82,7 +79,6 @@ export function InviteModal({
     <Modal
       isOpen={isOpen}
       onOpenChange={onOpenChange}
-      backdrop="blur"
       size="2xl"
       scrollBehavior="inside"
     >
@@ -90,7 +86,7 @@ export function InviteModal({
         {(onClose) => (
           <>
             <ModalHeader className="flex gap-2 items-center">
-              <UserPlus size={20} className="text-primary" />
+              <UserPlus size={20} className="text-[var(--app-link)]" />
               <span>{inviteUrl ? 'Invitation Sent' : 'Invite User'}</span>
             </ModalHeader>
 
@@ -111,7 +107,7 @@ export function InviteModal({
                       <button
                         type="button"
                         onClick={handleCopy}
-                        className="focus:outline-none text-default-400 hover:text-primary"
+                        className="focus-visible:outline-2 focus-visible:outline-focus focus-visible:outline-offset-2 text-default-400 hover:text-[var(--app-link)]"
                       >
                         {copied ? <Check size={16} /> : <Copy size={16} />}
                       </button>
@@ -143,6 +139,7 @@ export function InviteModal({
                       Roles
                     </span>
                     <Input
+                      aria-label="Search roles..."
                       placeholder="Search roles..."
                       startContent={
                         <Search size={16} className="text-default-400" />
@@ -159,7 +156,7 @@ export function InviteModal({
                             key={role.id}
                             className={`flex items-start gap-2 p-3 rounded-large border-2 cursor-pointer transition-colors ${
                               selectedRoles.has(role.id)
-                                ? 'border-secondary border-1 bg-secondary-50'
+                                ? 'app-selected border border-[var(--app-selected-border)]'
                                 : 'border-transparent bg-default-100 hover:bg-default-200'
                             }`}
                             onClick={() => toggleRole(role.id)}

@@ -1,4 +1,3 @@
-import { Chip } from '@heroui/react'
 import {
   Eye,
   KeyRound,
@@ -11,6 +10,7 @@ import {
 import type { GetColumnsParams } from '@/components/features/users/components/table-columns/types'
 import type { Column } from '@/components/shared/datatable'
 import type { UserProfile } from '@/types/auth'
+import { Chip } from '@/components/shared/controls'
 import { ActionMenu } from '@/components/shared/action-menu'
 import {
   REGISTER_METHOD_COLOR,

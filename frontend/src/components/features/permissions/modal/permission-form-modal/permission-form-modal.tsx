@@ -1,12 +1,8 @@
 import {
-  Button,
-  Input,
-  Modal,
   ModalBody,
   ModalContent,
   ModalFooter,
   ModalHeader,
-  Textarea,
 } from '@heroui/react'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Key } from 'lucide-react'
@@ -14,6 +10,7 @@ import { useEffect } from 'react'
 import { useForm } from 'react-hook-form'
 import type { PermissionFormData } from '@/lib/schemas/permissions'
 import type { PermissionFormModalProps } from '@/components/features/permissions/modal/permission-form-modal/types'
+import { Button, Input, Modal, Textarea } from '@/components/shared/controls'
 import { permissionSchema } from '@/lib/schemas/permissions'
 
 import { DetailRow } from '@/components/features/permissions/modal/permission-form-modal/child/detail-row'
@@ -59,7 +56,7 @@ export function PermissionFormModal({
         {(onClose) => (
           <>
             <ModalHeader className="flex gap-2 items-center">
-              <Key size={20} className="text-primary" />
+              <Key size={20} className="text-[var(--app-link)]" />
               <span>
                 {isReadOnly
                   ? 'Permission Details'
@@ -85,10 +82,10 @@ export function PermissionFormModal({
                     }
                   />
                   <div className="flex items-center justify-between py-3 px-4 rounded-large bg-default-50 border border-default-100">
-                    <span className="text-[10px] font-bold text-default-400 uppercase tracking-widest">
+                    <span className="text-[10px] font-semibold text-default-400 uppercase tracking-widest">
                       Internal ID
                     </span>
-                    <span className="text-sm font-mono font-bold text-primary">
+                    <span className="text-sm font-mono font-semibold text-[var(--app-link)]">
                       #{editingPermission?.id}
                     </span>
                   </div>

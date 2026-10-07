@@ -1,8 +1,4 @@
 import {
-  Button,
-  Checkbox,
-  Input,
-  Modal,
   ModalBody,
   ModalContent,
   ModalFooter,
@@ -12,6 +8,7 @@ import {
 import { Search } from 'lucide-react'
 import { useMemo } from 'react'
 import type { UserRolesModalProps } from '@/components/features/users/modal/user-roles-modal/types'
+import { Button, Checkbox, Input, Modal } from '@/components/shared/controls'
 import { useUsersUiStore } from '@/lib/stores/users-ui.store'
 
 export function UserRolesModal({
@@ -58,7 +55,6 @@ export function UserRolesModal({
     <Modal
       isOpen={isOpen}
       onOpenChange={onOpenChange}
-      backdrop="blur"
       size="2xl"
       scrollBehavior="inside"
     >
@@ -70,6 +66,7 @@ export function UserRolesModal({
             </ModalHeader>
             <ModalBody>
               <Input
+                aria-label="Search roles..."
                 placeholder="Search roles..."
                 startContent={<Search size={16} className="text-default-400" />}
                 value={search}
@@ -102,13 +99,14 @@ export function UserRolesModal({
                         flex items-start gap-2 p-3 rounded-large border-2 cursor-pointer transition-colors
                         ${
                           selectedRoles.has(role.id)
-                            ? 'border-secondary border-1 bg-secondary-50'
+                            ? 'app-selected border border-[var(--app-selected-border)]'
                             : 'border-transparent bg-default-100 hover:bg-default-200'
                         }
                       `}
                       onClick={() => handleToggleRole(role.id)}
                     >
                       <Checkbox
+                        aria-label={role.name}
                         isSelected={selectedRoles.has(role.id)}
                         onValueChange={() => handleToggleRole(role.id)}
                         classNames={{

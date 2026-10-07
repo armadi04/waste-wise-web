@@ -1,14 +1,9 @@
 import {
-  Button,
-  Chip,
   Divider,
-  Input,
-  Modal,
   ModalBody,
   ModalContent,
   ModalFooter,
   ModalHeader,
-  Textarea,
 } from '@heroui/react'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Shield } from 'lucide-react'
@@ -16,6 +11,13 @@ import { useEffect } from 'react'
 import { useForm } from 'react-hook-form'
 import type { RoleFormData } from '@/lib/schemas/roles'
 import type { RoleFormModalProps } from '@/components/features/roles/modal/role-form-modal/types'
+import {
+  Button,
+  Chip,
+  Input,
+  Modal,
+  Textarea,
+} from '@/components/shared/controls'
 import { roleSchema } from '@/lib/schemas/roles'
 
 import { DetailRow } from '@/components/features/roles/modal/role-form-modal/child/detail-row'
@@ -61,7 +63,7 @@ export function RoleFormModal({
         {(onClose) => (
           <>
             <ModalHeader className="flex gap-2 items-center">
-              <Shield size={20} className="text-primary" />
+              <Shield size={20} className="text-[var(--app-link)]" />
               <span>
                 {isReadOnly
                   ? 'Role Details'
@@ -85,7 +87,7 @@ export function RoleFormModal({
                   {editingRole?.permissions?.length ? (
                     <div className="flex flex-col gap-2">
                       <div className="flex items-center gap-2">
-                        <span className="text-[10px] font-bold text-default-400 uppercase tracking-widest whitespace-nowrap">
+                        <span className="text-[10px] font-semibold text-default-400 uppercase tracking-widest whitespace-nowrap">
                           Assigned Permissions
                         </span>
                         <Divider className="flex-1" />

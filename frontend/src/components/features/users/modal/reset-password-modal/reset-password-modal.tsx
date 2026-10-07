@@ -1,7 +1,4 @@
 import {
-  Button,
-  Input,
-  Modal,
   ModalBody,
   ModalContent,
   ModalFooter,
@@ -13,6 +10,7 @@ import { useEffect } from 'react'
 import { useForm } from 'react-hook-form'
 import type { ResetPasswordFormData } from '@/lib/schemas/users'
 import type { ResetPasswordModalProps } from '@/components/features/users/modal/reset-password-modal/types'
+import { Button, Input, Modal } from '@/components/shared/controls'
 import { resetPasswordSchema } from '@/lib/schemas/users'
 
 export function ResetPasswordModal({
@@ -49,7 +47,6 @@ export function ResetPasswordModal({
       onOpenChange={onOpenChange}
       size="sm"
       radius="lg"
-      backdrop="opaque"
       classNames={{
         base: 'border border-default-200 shadow-xl',
         header: 'border-b border-default-100',
@@ -60,7 +57,7 @@ export function ResetPasswordModal({
         {(onClose) => (
           <form onSubmit={handleSubmit(handleFormSubmit)}>
             <ModalHeader className="flex gap-2 items-center text-default-800">
-              <KeyRound size={20} className="text-primary" />
+              <KeyRound size={20} className="text-[var(--app-link)]" />
               <span>Reset Password</span>
             </ModalHeader>
             <ModalBody className="py-6">
@@ -87,7 +84,7 @@ export function ResetPasswordModal({
                 variant="flat"
                 onPress={onClose}
                 size="sm"
-                className="font-bold"
+                className="font-semibold"
               >
                 Cancel
               </Button>
@@ -96,7 +93,7 @@ export function ResetPasswordModal({
                 type="submit"
                 isLoading={isLoading}
                 size="sm"
-                className="font-bold"
+                className="font-semibold"
               >
                 Reset Password
               </Button>

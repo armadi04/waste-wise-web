@@ -1,9 +1,5 @@
 import {
-  Button,
-  Chip,
   Divider,
-  Input,
-  Modal,
   ModalBody,
   ModalContent,
   ModalFooter,
@@ -15,6 +11,7 @@ import { useEffect } from 'react'
 import { useForm } from 'react-hook-form'
 import type { UserFormData } from '@/lib/schemas/users'
 import type { UserFormModalProps } from '@/components/features/users/modal/user-form-modal/types'
+import { Button, Chip, Input, Modal } from '@/components/shared/controls'
 import { updateUserSchema } from '@/lib/schemas/users'
 
 import { DetailRow } from '@/components/features/users/modal/user-form-modal/child/detail-row'
@@ -57,7 +54,7 @@ export function UserFormModal({
         {(onClose) => (
           <>
             <ModalHeader className="flex gap-2 items-center">
-              <User size={20} className="text-primary" />
+              <User size={20} className="text-[var(--app-link)]" />
               <span>{isReadOnly ? 'User Details' : 'Edit User'}</span>
             </ModalHeader>
 
@@ -85,7 +82,7 @@ export function UserFormModal({
                   {editingUser?.roles?.length ? (
                     <div className="flex flex-col gap-2">
                       <div className="flex items-center gap-2">
-                        <span className="text-[10px] font-bold text-default-400 uppercase tracking-widest whitespace-nowrap">
+                        <span className="text-[10px] font-semibold text-default-400 uppercase tracking-widest whitespace-nowrap">
                           User Roles
                         </span>
                         <Divider className="flex-1" />
@@ -109,7 +106,7 @@ export function UserFormModal({
                   {editingUser?.permissions?.length ? (
                     <div className="flex flex-col gap-2">
                       <div className="flex items-center gap-2">
-                        <span className="text-[10px] font-bold text-default-400 uppercase tracking-widest whitespace-nowrap">
+                        <span className="text-[10px] font-semibold text-default-400 uppercase tracking-widest whitespace-nowrap">
                           Active Permissions
                         </span>
                         <Divider className="flex-1" />

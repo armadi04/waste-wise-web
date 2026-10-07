@@ -1,5 +1,5 @@
-import { Button } from '@heroui/react'
 import { UserCog } from 'lucide-react'
+import { Button } from '@/components/shared/controls'
 import { useAuth } from '@/hooks/auth'
 import { useImpersonation } from '@/hooks/users'
 
@@ -23,9 +23,11 @@ export function ImpersonationBanner() {
           Signed in as {user?.email}
         </p>
         <Button
+          color="default"
           size="sm"
           radius="full"
-          className="bg-primary-foreground font-medium text-primary"
+          variant="bordered"
+          className="font-medium"
           isLoading={isSwitching}
           onPress={() => void stop()}
         >

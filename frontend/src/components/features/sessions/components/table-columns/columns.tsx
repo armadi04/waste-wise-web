@@ -1,8 +1,8 @@
-import { Chip } from '@heroui/react'
 import { LogOut } from 'lucide-react'
 import type { GetColumnsParams } from '@/components/features/sessions/components/table-columns/types'
 import type { Column } from '@/components/shared/datatable'
 import type { UserSession } from '@/lib/services/session.service'
+import { Chip } from '@/components/shared/controls'
 import { ActionMenu } from '@/components/shared/action-menu'
 import { formatBusinessDate as format } from '@/lib/utils/format'
 import { describeUserAgent } from '@/lib/utils/user-agent'
@@ -36,11 +36,7 @@ export const getColumns = ({
     render: (item) => (
       <div className="flex items-center gap-2">
         <span className="text-sm">{describeUserAgent(item.userAgent)}</span>
-        <Chip
-          size="sm"
-          variant="flat"
-          color="default"
-        >
+        <Chip size="sm" variant="flat" color="default">
           {item.audience === 'admin' ? 'Admin' : item.audience}
         </Chip>
         {item.isSso && (

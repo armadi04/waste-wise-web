@@ -25,7 +25,7 @@ export function UsersFilters({
         Zona laporan
         <select
           aria-label="Zona laporan"
-          className="rounded-lg border border-default-200 bg-default-50 px-2 py-1"
+          className="app-field-control rounded-lg px-2 py-1"
           value={value.timeZone ?? 'Asia/Jakarta'}
           onChange={(event) =>
             onChange({

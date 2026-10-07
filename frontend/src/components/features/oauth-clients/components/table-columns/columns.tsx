@@ -1,7 +1,7 @@
-import { Chip } from '@heroui/react'
 import { Eye, Pencil, Trash2 } from 'lucide-react'
 import type { Column } from '@/components/shared/datatable'
 import type { OAuthClient } from '@/lib/services/oauth-client.service'
+import { Chip } from '@/components/shared/controls'
 import { ActionMenu } from '@/components/shared/action-menu'
 import { formatBusinessDate as format } from '@/lib/utils/format'
 

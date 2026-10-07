@@ -1,23 +1,26 @@
 import {
-  Button,
-  Chip,
   Divider,
-  Input,
-  Modal,
   ModalBody,
   ModalContent,
   ModalFooter,
   ModalHeader,
-  Select,
-  SelectItem,
-  Switch,
 } from '@heroui/react'
+
 import { zodResolver } from '@hookform/resolvers/zod'
 import { AlertTriangle, KeyRound } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { Controller, useForm } from 'react-hook-form'
 import type { OAuthClientFormData } from '@/lib/schemas/oauth-clients'
 import type { OAuthClientFormModalProps } from '@/components/features/oauth-clients/modal/oauth-client-form-modal/types'
+import {
+  Button,
+  Chip,
+  Input,
+  Modal,
+  Select,
+  SelectItem,
+  Switch,
+} from '@/components/shared/controls'
 import { oauthClientSchema } from '@/lib/schemas/oauth-clients'
 
 import {
@@ -82,14 +85,14 @@ export function OAuthClientFormModal({
         {(onClose) => (
           <>
             <ModalHeader className="flex gap-2 items-center">
-              <KeyRound size={20} className="text-primary" />
+              <KeyRound size={20} className="text-[var(--app-link)]" />
               <span>{title}</span>
             </ModalHeader>
 
             <ModalBody className="pb-6">
               {createdSecret ? (
                 <div className="flex flex-col gap-3">
-                  <div className="flex items-start gap-2 py-3 px-4 rounded-large bg-warning-50 border border-warning-200 text-warning-700">
+                  <div className="flex items-start gap-2 py-3 px-4 rounded-large app-status-warning bg-[var(--app-warning-background)] text-[var(--app-warning-foreground)] border border-[var(--app-warning-border)] text-[var(--app-warning-foreground)]">
                     <AlertTriangle size={18} className="mt-0.5 shrink-0" />
                     <span className="text-sm font-medium">
                       Copy this secret now — it is shown only once and cannot be
@@ -117,7 +120,7 @@ export function OAuthClientFormModal({
                   {editingClient?.scopes?.length ? (
                     <div className="flex flex-col gap-2">
                       <div className="flex items-center gap-2">
-                        <span className="text-[10px] font-bold text-default-400 uppercase tracking-widest whitespace-nowrap">
+                        <span className="text-[10px] font-semibold text-default-400 uppercase tracking-widest whitespace-nowrap">
                           Granted Scopes
                         </span>
                         <Divider className="flex-1" />
