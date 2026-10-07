@@ -1,6 +1,6 @@
-import { addToast } from '@heroui/react'
 import { useQueryClient } from '@tanstack/react-query'
 import type { MediaBulkDeleteResult } from '@/lib/services/media.service'
+import { addToast } from '@/components/shared/controls/toast'
 import { useAppMutation } from '@/hooks/global/use-mutations'
 import { bulkDeleteMedia, deleteMedia } from '@/lib/services/media.service'
 

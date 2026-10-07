@@ -36,7 +36,7 @@ export function MediaCard({ media, actions, isSelected, onSelect }: ItemProps) {
       {...handlers}
       className={`group relative flex cursor-pointer flex-col overflow-hidden rounded-large border bg-content1 transition-all select-none hover:shadow-sm ${
         isSelected
-          ? 'border-primary bg-primary/5'
+          ? 'border-primary bg-[var(--app-selected-background)]'
           : 'border-default-100 hover:border-primary/40'
       }`}
     >
@@ -54,7 +54,7 @@ export function MediaCard({ media, actions, isSelected, onSelect }: ItemProps) {
         <div className="flex min-w-0 flex-1 flex-col text-left">
           <div className="flex items-center gap-1">
             {media.isPrivate && (
-              <Lock size={11} className="shrink-0 text-warning" />
+              <Lock size={11} className="shrink-0 text-[var(--app-warning)]" />
             )}
             <span className="min-w-0 truncate text-xs font-medium text-default-700">
               {name}
