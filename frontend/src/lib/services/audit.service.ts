@@ -27,7 +27,7 @@ export const getAuditLogs = (params?: {
   sort?: string
   direction?: string
   action?: string
-}) => apiGet<PaginatedData<AuditLog>>('/api/audit-logs', { params })
+}) => apiGet<PaginatedData<AuditLog>>('/audit-logs', { params })
 
 export const getAuditActions = () =>
-  apiGet<Array<string>>('/api/audit-logs/actions')
+  apiGet<Array<string>>('/audit-logs/actions')

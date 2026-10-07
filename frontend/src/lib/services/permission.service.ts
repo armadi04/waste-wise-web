@@ -19,33 +19,30 @@ export const getPermissions = (params?: {
   direction?: string
   paginated?: boolean
 }) => {
-  return apiGet<PaginatedData<Permission> | Array<Permission>>(
-    '/api/permissions',
-    {
-      params,
-    },
-  )
+  return apiGet<PaginatedData<Permission> | Array<Permission>>('/permissions', {
+    params,
+  })
 }
 
 export const getPermission = (id: number) => {
-  return apiGet<Permission>(`/api/permissions/${id}`)
+  return apiGet<Permission>(`/permissions/${id}`)
 }
 
 export const createPermission = (data: CreatePermissionData) => {
-  return apiPost<Permission>('/api/permissions', data)
+  return apiPost<Permission>('/permissions', data)
 }
 
 export const updatePermission = (
   id: number,
   data: Partial<CreatePermissionData>,
 ) => {
-  return apiPatch<Permission>(`/api/permissions/${id}`, data)
+  return apiPatch<Permission>(`/permissions/${id}`, data)
 }
 
 export const deletePermission = (id: number) => {
-  return apiDelete<void>(`/api/permissions/${id}`)
+  return apiDelete<void>(`/permissions/${id}`)
 }
 
 export const bulkDeletePermissions = (ids: Array<number>) => {
-  return apiPost<{ deleted: number }>('/api/permissions/bulk-delete', { ids })
+  return apiPost<{ deleted: number }>('/permissions/bulk-delete', { ids })
 }

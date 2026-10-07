@@ -6,4 +6,4 @@ import { apiPost } from '@/lib/api'
  * broadcasts it and replays it to clients as they reconnect.
  */
 export const forceClientRefresh = () =>
-  apiPost<{ issuedAt: string }>('/api/app/force-refresh')
+  apiPost<{ issuedAt: string }>('/app/force-refresh')

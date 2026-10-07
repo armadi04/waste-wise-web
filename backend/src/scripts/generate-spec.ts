@@ -1,3 +1,4 @@
+import { configureApiRouting } from '@/config/api-routing';
 import '@/config/env'; // validate process.env before booting
 import { writeFileSync } from 'fs';
 import { join } from 'path';
@@ -9,6 +10,7 @@ import { buildSwaggerConfig } from '@/config/swagger.config';
 async function generateSpec() {
   const app = await NestFactory.create(AppModule, { logger: false });
 
+  configureApiRouting(app);
   const document = SwaggerModule.createDocument(app, buildSwaggerConfig());
   writeFileSync(
     join(process.cwd(), 'swagger.json'),

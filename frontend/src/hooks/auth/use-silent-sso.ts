@@ -1,5 +1,6 @@
 import Cookies from 'js-cookie'
 import { useEffect } from 'react'
+import { apiUrl } from '@/lib/api'
 import { useAuthStore } from '@/lib/stores/auth.store'
 
 const SILENT_ENABLED = import.meta.env.VITE_SSO_SILENT === 'true'
@@ -21,6 +22,6 @@ export function useSilentSso(): void {
     if (!SILENT_ENABLED) return
     if (isAuthenticated) return
     if (Cookies.get('sso_silent')) return
-    window.location.href = '/api/auth/sso/silent'
+    window.location.href = apiUrl('/auth/sso/silent')
   }, [isAuthenticated])
 }

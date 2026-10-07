@@ -1,5 +1,4 @@
 import type { ReleaseNotes } from '@/types/changelog'
 import { apiGet } from '@/lib/api'
 
-export const getReleaseNotes = () =>
-  apiGet<Array<ReleaseNotes>>('/api/changelog')
+export const getReleaseNotes = () => apiGet<Array<ReleaseNotes>>('/changelog')

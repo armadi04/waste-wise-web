@@ -66,7 +66,7 @@ describe('session refresh failures', () => {
       expect(isAuthenticated()).toBe(false)
       expect(refresh).toHaveBeenCalledTimes(1)
       expect(refresh).toHaveBeenCalledWith(
-        `${api.defaults.baseURL ?? ''}/api/auth/refresh`,
+        api.getUri({ url: '/auth/refresh' }),
         {},
         { withCredentials: true, headers: { 'X-CSRF-Token': 'valid-token' } },
       )

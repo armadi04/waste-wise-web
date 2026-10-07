@@ -20,33 +20,33 @@ export const getRoles = (params?: {
   direction?: string
   paginated?: boolean
 }) => {
-  return apiGet<PaginatedData<Role> | Array<Role>>('/api/roles', {
+  return apiGet<PaginatedData<Role> | Array<Role>>('/roles', {
     params,
   })
 }
 
 export const getRole = (id: number) => {
-  return apiGet<Role>(`/api/roles/${id}`)
+  return apiGet<Role>(`/roles/${id}`)
 }
 
 export const createRole = (data: CreateRoleData) => {
-  return apiPost<Role>('/api/roles', data)
+  return apiPost<Role>('/roles', data)
 }
 
 export const updateRole = (id: number, data: Partial<CreateRoleData>) => {
-  return apiPatch<Role>(`/api/roles/${id}`, data)
+  return apiPatch<Role>(`/roles/${id}`, data)
 }
 
 export const deleteRole = (id: number) => {
-  return apiDelete<void>(`/api/roles/${id}`)
+  return apiDelete<void>(`/roles/${id}`)
 }
 
 export const bulkDeleteRoles = (ids: Array<number>) => {
-  return apiPost<{ deleted: number }>('/api/roles/bulk-delete', { ids })
+  return apiPost<{ deleted: number }>('/roles/bulk-delete', { ids })
 }
 
 export const syncRolePermissions = (id: number, permissions: Array<number>) => {
-  return apiPost<Role>(`/api/roles/${id}/permissions/sync`, {
+  return apiPost<Role>(`/roles/${id}/permissions/sync`, {
     permissions,
   })
 }

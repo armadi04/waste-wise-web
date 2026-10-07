@@ -64,11 +64,11 @@ For machine clients with no user. See [`AUTH.md`](./AUTH.md) for the wider auth
 model; the flow:
 
 1. An admin (holding `oauth.clients.create`) registers a client:
-   `POST /api/oauth/clients { "name": "...", "scopes": ["users.read", ...] }`.
+   `POST /api/v1/oauth/clients { "name": "...", "scopes": ["users.read", ...] }`.
    The response contains the `clientSecret` **once** — it is stored only as a
    bcrypt hash and never returned again.
 2. The client exchanges its credentials for a token:
-   `POST /api/oauth/token { "grant_type": "client_credentials", "client_id": "...", "client_secret": "..." }`
+   `POST /api/v1/oauth/token { "grant_type": "client_credentials", "client_id": "...", "client_secret": "..." }`
    → `{ access_token, token_type, expires_in, scope }`. Requested `scope` (space
    -delimited) must be a subset of the client's grant; omit it to get all of them.
 3. The client calls `/graphql` (or REST) with the token as a Bearer header.
@@ -105,9 +105,9 @@ re-checks the client on every request.
 
 ## What stays REST-only
 
-- **Media upload** (`POST /api/media/upload`) — multipart; GraphQL upload is not
+- **Media upload** (`POST /api/v1/media/upload`) — multipart; GraphQL upload is not
   worth the complexity. Media metadata (list/read/delete) is on GraphQL.
-- **Invitation accept** — a public token flow (`/api/invitations/accept`).
+- **Invitation accept** — a public token flow (`/api/v1/invitations/accept`).
 - **Login / OAuth token issuance** — the token endpoints themselves.
 - The four internal auth-token tables are never exposed on GraphQL.
 

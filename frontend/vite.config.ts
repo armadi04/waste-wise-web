@@ -5,11 +5,13 @@ import viteReact from '@vitejs/plugin-react'
 import tailwindcss from '@tailwindcss/vite'
 import { VitePWA } from 'vite-plugin-pwa'
 import { tanstackRouter } from '@tanstack/router-plugin/vite'
+import { normalizeApiOrigin } from './src/lib/config/api-url.ts'
 import { validateTurnstileSiteKey } from './src/lib/config/turnstile.ts'
 
 // https://vitejs.dev/config/
 export default defineConfig(({ mode, command }) => {
   const env = loadEnv(mode, process.cwd(), 'VITE_')
+  normalizeApiOrigin(env.VITE_API_URL)
   validateTurnstileSiteKey(env.VITE_TURNSTILE_SITE_KEY, command === 'build')
   return {
     plugins: [

@@ -1,3 +1,4 @@
+import { API_BASE_PATH } from '@/config/api-routing';
 import { sessionCookieMaxAge } from '@/auth/session-cookies';
 import type { SessionTokens } from '@/auth/auth.service';
 import {
@@ -19,7 +20,7 @@ import { SsoService } from './sso.service';
 import { AuthService } from '../auth/auth.service';
 
 const isProd = () => process.env.NODE_ENV === 'production';
-const SSO_COOKIE_PATH = '/api/auth/sso';
+const SSO_COOKIE_PATH = `${API_BASE_PATH}/auth/sso`;
 
 /**
  * Why an SSO browser navigation failed. Sent to the SPA as `?ssoError=` so the

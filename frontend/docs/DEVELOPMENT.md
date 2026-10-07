@@ -10,14 +10,15 @@ cp .env.example .env
 bun run dev
 ```
 
-Vite uses `http://localhost:3001` (strict port) and proxies `/api` plus `/socket.io` to the
+Vite uses `http://localhost:3001` (strict port) and proxies `/api` (including Swagger `/api/docs`, its assets and OpenAPI documents)
+plus `/socket.io` to the
 backend. Leave `VITE_API_URL` empty. Preserve existing env files.
 
 ## Public build configuration
 
 | Variable                | Purpose                                                            |
 | ----------------------- | ------------------------------------------------------------------ |
-| VITE_API_URL            | Empty for same-origin API/socket; optional absolute backend origin |
+| VITE_API_URL            | Empty for same-origin API/socket; optional absolute backend origin, without `/api` or `/api/v1` |
 | VITE_GOOGLE_CLIENT_ID   | Public Google client ID; optional Google button                    |
 | VITE_TURNSTILE_SITE_KEY | Public CAPTCHA site key                                            |
 | VITE_SSO_SILENT         | true enables one-attempt silent SSO                                |
@@ -60,7 +61,7 @@ still visible on the current page. Do not show unconditional success for partial
 ## Timezone preferences
 
 Backend and database use UTC. Display preference uses account/device timezone through
-`/api/time-zone/preferences`; configuration and explicit-zone preview are under the same
+`/api/v1/time-zone/preferences`; configuration and explicit-zone preview are under the same
 prefix. Report zones currently support Jakarta, Makassar and Jayapura. Date-only values
 remain calendar dates. Preserve explicit offsets on absolute timestamp inputs.
 
@@ -71,3 +72,8 @@ secret/allowed hostnames for deployment. Development keys belong in `.env.develo
 leave the shared `.env` key unset because Bun-forwarded values override mode-specific files.
 Password widgets use action `admin-login`. Challenge expiration/failure clears the token;
 API failure resets the widget. See [Auth](AUTH.md) for the lifecycle and provider policy.
+
+`VITE_API_URL` is validated in Vite and the client. Empty preserves same-origin REST
+requests; configured values must be HTTP(S) origins without credentials, non-root
+paths, queries or fragments. A root trailing slash is normalized. REST services
+use paths such as `/users`; `src/lib/config/api-url.ts` supplies `/api/v1` once.

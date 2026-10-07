@@ -19,7 +19,7 @@ bun run seed
 bun run start:dev
 ```
 
-Preserve an existing `.env`. API: `localhost:3000/api`; frontend: `localhost:3001`.
+Preserve an existing `.env`. API: `localhost:3000/api/v1`; frontend: `localhost:3001`.
 Set `APP_URL` to the browser-facing origin so mail/media links use the frontend proxy.
 Set exact `ALLOWED_ORIGINS` for cookie sessions; wildcard disables credentialed CORS.
 
@@ -99,3 +99,55 @@ Never point it at an active application database. External Mail/Turnstile/storag
 
 The optional `test/integration/fresh-database-migrations.spec.ts` requires an empty database;
 it verifies the baseline, entity columns and live indexes without resetting an existing DB.
+
+## REST URI versioning
+
+The global prefix remains `api`. NestJS URI versioning uses default version `1`,
+so REST operations are under `/api/v1`, including health and SSO. Do not put `v1`
+in controller paths. Old `/api/*` and unsupported `/api/v2/*` REST URLs return 404.
+URI API version and application release version are independent.
+`DocumentBuilder.setVersion()` sets OpenAPI metadata only; routing versioning
+is enabled separately by `app.enableVersioning()`. Swagger UI stays
+at `/api/docs` outside production, with `/api/docs/openapi.json` and `/api/docs/openapi.yaml` documents.
+Its OpenAPI document includes full `/api/v1/*`
+operation paths without a duplicated server prefix. GraphQL `/graphql` and
+Socket.IO are separate interfaces and keep their existing paths.
+NestJS Swagger also adds `_v1` to generated operation IDs; regenerate external
+SDKs if they depend on those identifiers. Request and response schemas are unchanged.
+
+`configureApiRouting` is shared by the application, HTTP test bootstrap, and
+OpenAPI generator. Regenerate contracts with `bun run spec:generate`, then run
+`bun run api:generate` from the frontend package. Use a disposable database for
+contract generation with `DB_SEED=false` and `DB_SKIP_MIGRATIONS=true` after applying
+reviewed migrations; generation boots the application and opens a DB connection.
+
+The opt-in migration test `test/integration/media-url-versioning.spec.ts` requires
+an empty disposable `nestplate_test` database. It applies migrations, seeds 16
+media fixtures and an avatar relation, checks origin filtering, URL preservation,
+idempotency, and guarded rollback, then leaves the database migrated for inspection.
+Run it with the explicit `TEST_DB_*` settings described above:
+
+```bash
+bun --no-env-file test ./test/integration/media-url-versioning.spec.ts --timeout=30000
+```
+
+Create a fresh disposable database before repeating this test; it refuses a
+nonempty database. The test environment pins its application origin to
+`http://localhost:3001`, uses dummy provider credentials, and never uses private env files.
+
+### PostgreSQL health integration checks
+
+`test/integration/health-database.spec.ts` requires an isolated disposable
+`nestplate_test` PostgreSQL on port `55439`, `NESTPLATE_TEST_MODE=integration`, and
+explicit test credentials. Run the spec with the sanitized integration environment
+from `test/utils/test-environment.ts`, without loading private env files:
+
+```sh
+bun --no-env-file test/integration/run-health.ts
+```
+
+The launcher requires `TEST_DB_HOST=127.0.0.1`, `TEST_DB_PORT=55439`,
+`TEST_DB_USERNAME`, and `TEST_DB_PASSWORD`. It checks real server cancellation,
+acquisition timeout under pool exhaustion, concurrent probes, cleanup/recovery,
+and isolation of probe session settings. It does not stop database services or
+change business data. Do not substitute a development or production database.

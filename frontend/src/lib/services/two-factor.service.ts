@@ -17,34 +17,32 @@ export interface TwoFactorEnrollment {
 }
 
 export const getTwoFactorStatus = async (): Promise<TwoFactorStatus> => {
-  const { data } = await api.get<TwoFactorStatus>('/api/auth/2fa')
+  const { data } = await api.get<TwoFactorStatus>('/auth/2fa')
   return data
 }
 
 export const startTwoFactorSetup = async (): Promise<TwoFactorEnrollment> => {
-  const { data } = await api.post<TwoFactorEnrollment>('/api/auth/2fa/setup')
+  const { data } = await api.post<TwoFactorEnrollment>('/auth/2fa/setup')
   return data
 }
 
-export const enableTwoFactor = async (
-  code: string,
-): Promise<Array<string>> => {
+export const enableTwoFactor = async (code: string): Promise<Array<string>> => {
   const { data } = await api.post<{ recoveryCodes: Array<string> }>(
-    '/api/auth/2fa/enable',
+    '/auth/2fa/enable',
     { code },
   )
   return data.recoveryCodes
 }
 
 export const disableTwoFactor = async (code: string): Promise<void> => {
-  await api.post('/api/auth/2fa/disable', { code })
+  await api.post('/auth/2fa/disable', { code })
 }
 
 export const regenerateRecoveryCodes = async (
   code: string,
 ): Promise<Array<string>> => {
   const { data } = await api.post<{ recoveryCodes: Array<string> }>(
-    '/api/auth/2fa/recovery-codes',
+    '/auth/2fa/recovery-codes',
     { code },
   )
   return data.recoveryCodes
@@ -55,7 +53,7 @@ export const verifyTwoFactorLogin = async (
   challengeToken: string,
   code: string,
 ): Promise<LoginResponse> => {
-  const { data } = await api.post<LoginResponse>('/api/auth/2fa/verify', {
+  const { data } = await api.post<LoginResponse>('/auth/2fa/verify', {
     challengeToken,
     code,
   })

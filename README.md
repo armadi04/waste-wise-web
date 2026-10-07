@@ -23,7 +23,8 @@ there is no root package-manager workspace.
 | Audit and sessions | Append-only audit trail, device session management and controlled impersonation |
 | Rate limiting | Global IP throttle (100/min by default), stricter credential/upload endpoints |
 | Configuration | Zod startup validation; Redis optional with in-memory fallback |
-| Health | `GET /api/health`: PostgreSQL ping and heap memory check |
+| API identity | `GET /api/v1`: name, URI API version, documentation URL |
+| Health | `GET /api/v1/health`: PostgreSQL ping and heap memory check |
 | Dashboard and tables | Generic Recharts statistics, sortable/searchable/paginated DataTable, Excel export |
 | PWA | Installable frontend, production service worker and update handling |
 | GraphQL | Optional schema-first API, DataLoaders and OAuth client credentials |
@@ -77,8 +78,9 @@ cp .env.example .env
 bun run dev
 ```
 
-Backend: **localhost:3000**, prefixed `/api`. Frontend: **localhost:3001**; Vite proxies
+Backend: **localhost:3000**, REST base `/api/v1`. Frontend: **localhost:3001**; Vite proxies
 `/api` and `/socket.io` to the backend. Leave `VITE_API_URL` empty for same-origin requests.
+Swagger UI is `/api/docs` outside production; OpenAPI documents are `/api/docs/openapi.json` and `/api/docs/openapi.yaml`.
 Sign in with the admin email/password configured in the backend env.
 
 The starter baseline is for **new databases only**, not an upgrade path for the original

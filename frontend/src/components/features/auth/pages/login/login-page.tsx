@@ -1,6 +1,7 @@
 import { Divider } from '@heroui/react'
 import { Link } from '@tanstack/react-router'
 import { Building2, Eye, EyeOff, Lock, LogIn, User } from 'lucide-react'
+import { apiUrl } from '@/lib/api'
 import { Button, Input } from '@/components/shared/controls'
 import { LoginTwoFactorForm } from '@/components/features/auth/pages/login/child/login-two-factor-form'
 import {
@@ -203,7 +204,7 @@ export function LoginPage() {
           {/* Passport SSO — full-page redirect into the OIDC flow */}
           <Button
             as="a"
-            href="/api/auth/sso/login"
+            href={apiUrl('/auth/sso/login')}
             variant="flat"
             color="primary"
             className="flex-1"

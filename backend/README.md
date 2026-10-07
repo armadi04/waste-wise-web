@@ -16,7 +16,28 @@ bun run start:dev
 ```
 
 GitHub Packages authentication is required for the SDK dependencies. API:
-`localhost:3000/api`; Swagger: `/api/docs` outside production; health: `/api/health`.
+`localhost:3000/api/v1`; Swagger: `/api/docs` outside production; health: `/api/v1/health`.
+
+`GET /api/v1` is public and returns only API identity:
+
+```json
+{ "name": "Nestplate API", "apiVersion": "1", "docs": "/api/docs" }
+```
+
+`apiVersion` follows the shared REST URI version configuration, independently of the
+application release version. `docs` follows the shared Swagger location; the UI is available
+outside production. Use `GET /api/v1/health` for monitoring: HTTP 200 means the PostgreSQL
+connectivity ping and 300 MiB heap check succeeded; HTTP 503 means a check failed.
+Probe connections use a dedicated pool with a 1 second acquisition timeout, a 1 second
+server statement timeout and a 1.5 second transport fallback. Business query timeouts
+are unchanged. Health errors omit internal details; schema and business readiness
+are not tested. See [Operations](docs/OPERATIONS.md#health-and-acceptance).
+
+```sh
+curl http://localhost:3000/api/v1
+curl http://localhost:3000/api/v1/health
+```
+
 Keep `DB_SYNCHRONIZE=false`. Baseline supports new databases only.
 
 `MEDIA_PROVIDER=depot` is default; use `s3` for direct S3-compatible storage. Required env

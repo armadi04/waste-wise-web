@@ -34,7 +34,7 @@ interface GithubRelease {
  *
  * Keeping them out of the repo means `semantic-release` never has to commit a
  * CHANGELOG.md back to `master`, so no `chore(release)` bot commit lands in front
- * of every release. The SPA reads them through `GET /api/changelog` rather than
+ * of every release. The SPA reads them through `GET /api/v1/changelog` rather than
  * calling GitHub directly: the token stays server-side (required for a private
  * fork, and it lifts the anonymous rate limit for a public one), and the
  * response is cached so opening the page can't spend a call each time.

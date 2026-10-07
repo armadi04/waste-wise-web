@@ -42,7 +42,7 @@ describe('Users (e2e)', () => {
   describe('GET /users', () => {
     it('lists users for a caller with users.read', async () => {
       await request(server)
-        .get('/api/users')
+        .get('/api/v1/users')
         .set('Authorization', `Bearer ${admin}`)
         .expect(200);
     });
@@ -50,13 +50,13 @@ describe('Users (e2e)', () => {
     it('forbids a caller without users.read with 403', async () => {
       const user = await createUser(ctx, { email: 'noperm@b.com' });
       await request(server)
-        .get('/api/users')
+        .get('/api/v1/users')
         .set('Authorization', `Bearer ${tokenFor(ctx, user.id, user.email)}`)
         .expect(403);
     });
 
     it('rejects an unauthenticated request with 401', async () => {
-      await request(server).get('/api/users').expect(401);
+      await request(server).get('/api/v1/users').expect(401);
     });
   });
 
@@ -107,7 +107,7 @@ describe('Users (e2e)', () => {
         direction: 'asc',
       };
       const result = await request(server)
-        .get('/api/users')
+        .get('/api/v1/users')
         .query({ ...filters, paginated: true, limit: 1, page: 2 })
         .set('Authorization', `Bearer ${admin}`)
         .expect(200);
@@ -116,7 +116,7 @@ describe('Users (e2e)', () => {
         'filter-second@example.test',
       ]);
       const exported = await request(server)
-        .get('/api/users')
+        .get('/api/v1/users')
         .query({ ...filters, paginated: false })
         .set('Authorization', `Bearer ${admin}`)
         .expect(200);
@@ -131,7 +131,7 @@ describe('Users (e2e)', () => {
       ).toBe(true);
       await repo.softDelete({ email: 'filter-first@example.test' });
       const afterDelete = await request(server)
-        .get('/api/users')
+        .get('/api/v1/users')
         .query({ ...filters, paginated: false, direction: 'desc' })
         .set('Authorization', `Bearer ${admin}`)
         .expect(200);
@@ -144,7 +144,7 @@ describe('Users (e2e)', () => {
         { registerMethod: 'PASSWORD' },
       ]) {
         await request(server)
-          .get('/api/users')
+          .get('/api/v1/users')
           .query(query)
           .set('Authorization', `Bearer ${admin}`)
           .expect(400);
@@ -158,7 +158,7 @@ describe('Users (e2e)', () => {
         registerMethod: RegisterMethodEnum.EMAIL_OTP,
       });
       await request(server)
-        .patch(`/api/users/${user.id}`)
+        .patch(`/api/v1/users/${user.id}`)
         .set('Authorization', `Bearer ${admin}`)
         .field('fullname', 'Updated')
         .field('password', 'new-password')
@@ -234,7 +234,7 @@ describe('Users (e2e)', () => {
     it('lets a user read their own record (owner) without users.read', async () => {
       const user = await createUser(ctx, { email: 'owner@b.com' });
       await request(server)
-        .get(`/api/users/${user.id}`)
+        .get(`/api/v1/users/${user.id}`)
         .set('Authorization', `Bearer ${tokenFor(ctx, user.id, user.email)}`)
         .expect(200);
     });
@@ -243,14 +243,14 @@ describe('Users (e2e)', () => {
       const user = await createUser(ctx, { email: 'owner@b.com' });
       const other = await createUser(ctx, { email: 'other@b.com' });
       await request(server)
-        .get(`/api/users/${other.id}`)
+        .get(`/api/v1/users/${other.id}`)
         .set('Authorization', `Bearer ${tokenFor(ctx, user.id, user.email)}`)
         .expect(403);
     });
 
     it('returns 404 for a missing user (admin)', async () => {
       await request(server)
-        .get('/api/users/999999')
+        .get('/api/v1/users/999999')
         .set('Authorization', `Bearer ${admin}`)
         .expect(404);
     });
@@ -260,7 +260,7 @@ describe('Users (e2e)', () => {
     it('lets an admin update a user', async () => {
       const user = await createUser(ctx, { email: 'patch@b.com' });
       const res = await request(server)
-        .patch(`/api/users/${user.id}`)
+        .patch(`/api/v1/users/${user.id}`)
         .set('Authorization', `Bearer ${admin}`)
         .field('fullname', 'Patched Name')
         .expect(200);
@@ -274,7 +274,7 @@ describe('Users (e2e)', () => {
       const user = await createUser(ctx, { email: 'selfpatch@b.com' });
 
       await request(server)
-        .patch(`/api/users/${user.id}`)
+        .patch(`/api/v1/users/${user.id}`)
         .set('Authorization', `Bearer ${tokenFor(ctx, user.id, user.email)}`)
         .field('fullname', 'Self Name')
         .field('roleIds[]', String(userRole.id))
@@ -291,7 +291,7 @@ describe('Users (e2e)', () => {
     it('rejects an invalid email with 400', async () => {
       const user = await createUser(ctx, { email: 'patch@b.com' });
       await request(server)
-        .patch(`/api/users/${user.id}`)
+        .patch(`/api/v1/users/${user.id}`)
         .set('Authorization', `Bearer ${admin}`)
         .field('email', 'not-an-email')
         .expect(400);
@@ -302,7 +302,7 @@ describe('Users (e2e)', () => {
     it('lets an admin delete a user', async () => {
       const user = await createUser(ctx, { email: 'todelete@b.com' });
       await request(server)
-        .delete(`/api/users/${user.id}`)
+        .delete(`/api/v1/users/${user.id}`)
         .set('Authorization', `Bearer ${admin}`)
         .expect(200);
     });
@@ -311,14 +311,14 @@ describe('Users (e2e)', () => {
       const actor = await createUser(ctx, { email: 'actor@b.com' });
       const victim = await createUser(ctx, { email: 'victim@b.com' });
       await request(server)
-        .delete(`/api/users/${victim.id}`)
+        .delete(`/api/v1/users/${victim.id}`)
         .set('Authorization', `Bearer ${tokenFor(ctx, actor.id, actor.email)}`)
         .expect(403);
     });
 
     it('returns 404 for a missing user', async () => {
       await request(server)
-        .delete('/api/users/999999')
+        .delete('/api/v1/users/999999')
         .set('Authorization', `Bearer ${admin}`)
         .expect(404);
     });
@@ -331,7 +331,7 @@ describe('Users (e2e)', () => {
       const user = await createUser(ctx, { email: 'syncrole@b.com' });
 
       await request(server)
-        .post(`/api/users/${user.id}/roles/sync`)
+        .post(`/api/v1/users/${user.id}/roles/sync`)
         .set('Authorization', `Bearer ${admin}`)
         .send({ roles: [userRole.id] })
         .expect(201);
@@ -348,7 +348,7 @@ describe('Users (e2e)', () => {
       const actor = await createUser(ctx, { email: 'actor2@b.com' });
       const user = await createUser(ctx, { email: 'target@b.com' });
       await request(server)
-        .post(`/api/users/${user.id}/roles/sync`)
+        .post(`/api/v1/users/${user.id}/roles/sync`)
         .set('Authorization', `Bearer ${tokenFor(ctx, actor.id, actor.email)}`)
         .send({ roles: [] })
         .expect(403);
@@ -362,7 +362,7 @@ describe('Users (e2e)', () => {
       const user = await createUser(ctx, { email: 'syncperm@b.com' });
 
       await request(server)
-        .post(`/api/users/${user.id}/permissions/sync`)
+        .post(`/api/v1/users/${user.id}/permissions/sync`)
         .set('Authorization', `Bearer ${admin}`)
         .send({ permissions: [perm.id] })
         .expect(201);
@@ -378,7 +378,7 @@ describe('Users (e2e)', () => {
     it('rejects a malformed roles payload with 400', async () => {
       const user = await createUser(ctx, { email: 'badpayload@b.com' });
       await request(server)
-        .post(`/api/users/${user.id}/roles/sync`)
+        .post(`/api/v1/users/${user.id}/roles/sync`)
         .set('Authorization', `Bearer ${admin}`)
         .send({ roles: ['not-a-number'] })
         .expect(400);

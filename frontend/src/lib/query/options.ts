@@ -245,7 +245,7 @@ export function recentActivityQueryOptions(limit = 8, enabled = true) {
 export function healthQueryOptions(enabled = true) {
   return queryOptions({
     queryKey: ['health'],
-    queryFn: () => apiGet<{ status: string }>('/api/health'),
+    queryFn: () => apiGet<{ status: string }>('/health'),
     enabled,
     staleTime: 1000 * 30,
     retry: false,

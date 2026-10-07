@@ -50,7 +50,7 @@ describe('two-factor login', () => {
     const location = window.location.href
     api.defaults.adapter = vi.fn((config) => {
       if (
-        config.url === '/api/auth/2fa/verify' &&
+        config.url === '/auth/2fa/verify' &&
         JSON.parse(config.data).code === '000000'
       )
         return Promise.reject(
@@ -62,11 +62,11 @@ describe('two-factor login', () => {
             config,
           }),
         )
-      if (config.url === '/api/auth/2fa/verify')
+      if (config.url === '/auth/2fa/verify')
         document.cookie = 'authenticated=1; Path=/'
       return Promise.resolve({
         data:
-          config.url === '/api/auth/me'
+          config.url === '/auth/me'
             ? {
                 userId: 7,
                 email: 'admin@example.test',

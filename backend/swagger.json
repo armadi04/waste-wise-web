@@ -1,24 +1,31 @@
 {
   "openapi": "3.0.0",
   "paths": {
-    "/": {
+    "/api/v1": {
       "get": {
-        "operationId": "AppController_getApiInfo",
+        "operationId": "AppController_getApiInfo_v1",
         "parameters": [],
         "responses": {
           "200": {
-            "description": ""
+            "description": "API identity; use the health endpoint for dependency connectivity.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiInfo"
+                }
+              }
+            }
           }
         },
-        "summary": "API service metadata and health status",
+        "summary": "API identity and documentation location",
         "tags": [
           "Meta"
         ]
       }
     },
-    "/users": {
+    "/api/v1/users": {
       "get": {
-        "operationId": "UsersController_findAll",
+        "operationId": "UsersController_findAll_v1",
         "parameters": [
           {
             "name": "page",
@@ -146,9 +153,9 @@
         ]
       }
     },
-    "/users/{id}": {
+    "/api/v1/users/{id}": {
       "patch": {
-        "operationId": "UsersController_update",
+        "operationId": "UsersController_update_v1",
         "parameters": [
           {
             "name": "id",
@@ -192,7 +199,7 @@
         ]
       },
       "get": {
-        "operationId": "UsersController_findOne",
+        "operationId": "UsersController_findOne_v1",
         "parameters": [
           {
             "name": "id",
@@ -226,7 +233,7 @@
         ]
       },
       "delete": {
-        "operationId": "UsersController_remove",
+        "operationId": "UsersController_remove_v1",
         "parameters": [
           {
             "name": "id",
@@ -253,9 +260,9 @@
         ]
       }
     },
-    "/users/bulk-delete": {
+    "/api/v1/users/bulk-delete": {
       "post": {
-        "operationId": "UsersController_bulkRemove",
+        "operationId": "UsersController_bulkRemove_v1",
         "parameters": [],
         "requestBody": {
           "required": true,
@@ -283,9 +290,9 @@
         ]
       }
     },
-    "/users/{id}/roles/sync": {
+    "/api/v1/users/{id}/roles/sync": {
       "post": {
-        "operationId": "UsersController_syncRoles",
+        "operationId": "UsersController_syncRoles_v1",
         "parameters": [
           {
             "name": "id",
@@ -329,9 +336,9 @@
         ]
       }
     },
-    "/users/{id}/roles/attach": {
+    "/api/v1/users/{id}/roles/attach": {
       "post": {
-        "operationId": "UsersController_attachRoles",
+        "operationId": "UsersController_attachRoles_v1",
         "parameters": [
           {
             "name": "id",
@@ -375,9 +382,9 @@
         ]
       }
     },
-    "/users/{id}/roles/detach": {
+    "/api/v1/users/{id}/roles/detach": {
       "post": {
-        "operationId": "UsersController_detachRoles",
+        "operationId": "UsersController_detachRoles_v1",
         "parameters": [
           {
             "name": "id",
@@ -421,9 +428,9 @@
         ]
       }
     },
-    "/users/{id}/permissions/sync": {
+    "/api/v1/users/{id}/permissions/sync": {
       "post": {
-        "operationId": "UsersController_syncPermissions",
+        "operationId": "UsersController_syncPermissions_v1",
         "parameters": [
           {
             "name": "id",
@@ -467,9 +474,9 @@
         ]
       }
     },
-    "/users/{id}/permissions/attach": {
+    "/api/v1/users/{id}/permissions/attach": {
       "post": {
-        "operationId": "UsersController_attachPermissions",
+        "operationId": "UsersController_attachPermissions_v1",
         "parameters": [
           {
             "name": "id",
@@ -513,9 +520,9 @@
         ]
       }
     },
-    "/users/{id}/permissions/detach": {
+    "/api/v1/users/{id}/permissions/detach": {
       "post": {
-        "operationId": "UsersController_detachPermissions",
+        "operationId": "UsersController_detachPermissions_v1",
         "parameters": [
           {
             "name": "id",
@@ -559,9 +566,9 @@
         ]
       }
     },
-    "/media/upload": {
+    "/api/v1/media/upload": {
       "post": {
-        "operationId": "MediaController_uploadFile",
+        "operationId": "MediaController_uploadFile_v1",
         "parameters": [],
         "requestBody": {
           "required": true,
@@ -602,9 +609,9 @@
         ]
       }
     },
-    "/media": {
+    "/api/v1/media": {
       "get": {
-        "operationId": "MediaController_findAll",
+        "operationId": "MediaController_findAll_v1",
         "parameters": [
           {
             "name": "page",
@@ -687,9 +694,9 @@
         ]
       }
     },
-    "/media/{id}": {
+    "/api/v1/media/{id}": {
       "get": {
-        "operationId": "MediaController_findOne",
+        "operationId": "MediaController_findOne_v1",
         "parameters": [
           {
             "name": "id",
@@ -723,7 +730,7 @@
         ]
       },
       "delete": {
-        "operationId": "MediaController_remove",
+        "operationId": "MediaController_remove_v1",
         "parameters": [
           {
             "name": "id",
@@ -757,9 +764,9 @@
         ]
       }
     },
-    "/media/{id}/view": {
+    "/api/v1/media/{id}/view": {
       "get": {
-        "operationId": "MediaController_viewFile",
+        "operationId": "MediaController_viewFile_v1",
         "parameters": [
           {
             "name": "id",
@@ -786,9 +793,9 @@
         ]
       }
     },
-    "/media/{id}/stream": {
+    "/api/v1/media/{id}/stream": {
       "get": {
-        "operationId": "MediaController_streamFile",
+        "operationId": "MediaController_streamFile_v1",
         "parameters": [
           {
             "name": "id",
@@ -815,9 +822,9 @@
         ]
       }
     },
-    "/media/bulk-delete": {
+    "/api/v1/media/bulk-delete": {
       "post": {
-        "operationId": "MediaController_bulkRemove",
+        "operationId": "MediaController_bulkRemove_v1",
         "parameters": [],
         "requestBody": {
           "required": true,
@@ -852,9 +859,9 @@
         ]
       }
     },
-    "/roles": {
+    "/api/v1/roles": {
       "post": {
-        "operationId": "RolesController_create",
+        "operationId": "RolesController_create_v1",
         "parameters": [],
         "requestBody": {
           "required": true,
@@ -889,7 +896,7 @@
         ]
       },
       "get": {
-        "operationId": "RolesController_findAll",
+        "operationId": "RolesController_findAll_v1",
         "parameters": [
           {
             "name": "page",
@@ -972,9 +979,9 @@
         ]
       }
     },
-    "/roles/{id}": {
+    "/api/v1/roles/{id}": {
       "get": {
-        "operationId": "RolesController_findOne",
+        "operationId": "RolesController_findOne_v1",
         "parameters": [
           {
             "name": "id",
@@ -1008,7 +1015,7 @@
         ]
       },
       "patch": {
-        "operationId": "RolesController_update",
+        "operationId": "RolesController_update_v1",
         "parameters": [
           {
             "name": "id",
@@ -1052,7 +1059,7 @@
         ]
       },
       "delete": {
-        "operationId": "RolesController_remove",
+        "operationId": "RolesController_remove_v1",
         "parameters": [
           {
             "name": "id",
@@ -1079,9 +1086,9 @@
         ]
       }
     },
-    "/roles/bulk-delete": {
+    "/api/v1/roles/bulk-delete": {
       "post": {
-        "operationId": "RolesController_bulkRemove",
+        "operationId": "RolesController_bulkRemove_v1",
         "parameters": [],
         "requestBody": {
           "required": true,
@@ -1109,9 +1116,9 @@
         ]
       }
     },
-    "/roles/{id}/permissions/sync": {
+    "/api/v1/roles/{id}/permissions/sync": {
       "post": {
-        "operationId": "RolesController_syncPermissions",
+        "operationId": "RolesController_syncPermissions_v1",
         "parameters": [
           {
             "name": "id",
@@ -1155,9 +1162,9 @@
         ]
       }
     },
-    "/roles/{id}/permissions/attach": {
+    "/api/v1/roles/{id}/permissions/attach": {
       "post": {
-        "operationId": "RolesController_attachPermissions",
+        "operationId": "RolesController_attachPermissions_v1",
         "parameters": [
           {
             "name": "id",
@@ -1201,9 +1208,9 @@
         ]
       }
     },
-    "/roles/{id}/permissions/detach": {
+    "/api/v1/roles/{id}/permissions/detach": {
       "post": {
-        "operationId": "RolesController_detachPermissions",
+        "operationId": "RolesController_detachPermissions_v1",
         "parameters": [
           {
             "name": "id",
@@ -1247,9 +1254,9 @@
         ]
       }
     },
-    "/invitations": {
+    "/api/v1/invitations": {
       "post": {
-        "operationId": "InvitationsController_create",
+        "operationId": "InvitationsController_create_v1",
         "parameters": [],
         "requestBody": {
           "required": true,
@@ -1277,7 +1284,7 @@
         ]
       },
       "get": {
-        "operationId": "InvitationsController_findAll",
+        "operationId": "InvitationsController_findAll_v1",
         "parameters": [
           {
             "name": "page",
@@ -1363,9 +1370,9 @@
         ]
       }
     },
-    "/invitations/{id}/resend": {
+    "/api/v1/invitations/{id}/resend": {
       "post": {
-        "operationId": "InvitationsController_resend",
+        "operationId": "InvitationsController_resend_v1",
         "parameters": [
           {
             "name": "id",
@@ -1399,9 +1406,9 @@
         ]
       }
     },
-    "/invitations/bulk-delete": {
+    "/api/v1/invitations/bulk-delete": {
       "post": {
-        "operationId": "InvitationsController_bulkRemove",
+        "operationId": "InvitationsController_bulkRemove_v1",
         "parameters": [],
         "requestBody": {
           "required": true,
@@ -1429,9 +1436,9 @@
         ]
       }
     },
-    "/invitations/{id}": {
+    "/api/v1/invitations/{id}": {
       "delete": {
-        "operationId": "InvitationsController_remove",
+        "operationId": "InvitationsController_remove_v1",
         "parameters": [
           {
             "name": "id",
@@ -1458,9 +1465,9 @@
         ]
       }
     },
-    "/invitations/accept": {
+    "/api/v1/invitations/accept": {
       "get": {
-        "operationId": "InvitationsController_getByToken",
+        "operationId": "InvitationsController_getByToken_v1",
         "parameters": [
           {
             "name": "token",
@@ -1493,7 +1500,7 @@
         ]
       },
       "post": {
-        "operationId": "InvitationsController_accept",
+        "operationId": "InvitationsController_accept_v1",
         "parameters": [],
         "requestBody": {
           "required": true,
@@ -1527,9 +1534,9 @@
         ]
       }
     },
-    "/auth/login": {
+    "/api/v1/auth/login": {
       "post": {
-        "operationId": "AuthController_login",
+        "operationId": "AuthController_login_v1",
         "parameters": [
           {
             "name": "user-agent",
@@ -1578,9 +1585,9 @@
         ]
       }
     },
-    "/auth/google": {
+    "/api/v1/auth/google": {
       "post": {
-        "operationId": "AuthController_googleLogin",
+        "operationId": "AuthController_googleLogin_v1",
         "parameters": [
           {
             "name": "user-agent",
@@ -1623,9 +1630,9 @@
         ]
       }
     },
-    "/auth/2fa/verify": {
+    "/api/v1/auth/2fa/verify": {
       "post": {
-        "operationId": "AuthController_verifyTwoFactor",
+        "operationId": "AuthController_verifyTwoFactor_v1",
         "parameters": [
           {
             "name": "user-agent",
@@ -1668,9 +1675,9 @@
         ]
       }
     },
-    "/auth/2fa": {
+    "/api/v1/auth/2fa": {
       "get": {
-        "operationId": "AuthController_twoFactorStatus",
+        "operationId": "AuthController_twoFactorStatus_v1",
         "parameters": [],
         "responses": {
           "200": {
@@ -1702,9 +1709,9 @@
         ]
       }
     },
-    "/auth/2fa/setup": {
+    "/api/v1/auth/2fa/setup": {
       "post": {
-        "operationId": "AuthController_startTwoFactorSetup",
+        "operationId": "AuthController_startTwoFactorSetup_v1",
         "parameters": [],
         "responses": {
           "201": {
@@ -1739,9 +1746,9 @@
         ]
       }
     },
-    "/auth/2fa/enable": {
+    "/api/v1/auth/2fa/enable": {
       "post": {
-        "operationId": "AuthController_enableTwoFactor",
+        "operationId": "AuthController_enableTwoFactor_v1",
         "parameters": [],
         "requestBody": {
           "required": true,
@@ -1783,9 +1790,9 @@
         ]
       }
     },
-    "/auth/2fa/disable": {
+    "/api/v1/auth/2fa/disable": {
       "post": {
-        "operationId": "AuthController_disableTwoFactor",
+        "operationId": "AuthController_disableTwoFactor_v1",
         "parameters": [],
         "requestBody": {
           "required": true,
@@ -1824,9 +1831,9 @@
         ]
       }
     },
-    "/auth/2fa/recovery-codes": {
+    "/api/v1/auth/2fa/recovery-codes": {
       "post": {
-        "operationId": "AuthController_regenerateRecoveryCodes",
+        "operationId": "AuthController_regenerateRecoveryCodes_v1",
         "parameters": [],
         "requestBody": {
           "required": true,
@@ -1868,9 +1875,9 @@
         ]
       }
     },
-    "/auth/impersonate/{id}": {
+    "/api/v1/auth/impersonate/{id}": {
       "post": {
-        "operationId": "AuthController_impersonate",
+        "operationId": "AuthController_impersonate_v1",
         "parameters": [
           {
             "name": "id",
@@ -1916,9 +1923,9 @@
         ]
       }
     },
-    "/auth/stop-impersonating": {
+    "/api/v1/auth/stop-impersonating": {
       "post": {
-        "operationId": "AuthController_stopImpersonating",
+        "operationId": "AuthController_stopImpersonating_v1",
         "parameters": [
           {
             "name": "user-agent",
@@ -1956,9 +1963,9 @@
         ]
       }
     },
-    "/auth/refresh": {
+    "/api/v1/auth/refresh": {
       "post": {
-        "operationId": "AuthController_refresh",
+        "operationId": "AuthController_refresh_v1",
         "parameters": [
           {
             "name": "user-agent",
@@ -1991,9 +1998,9 @@
         ]
       }
     },
-    "/auth/logout": {
+    "/api/v1/auth/logout": {
       "post": {
-        "operationId": "AuthController_logout",
+        "operationId": "AuthController_logout_v1",
         "parameters": [],
         "responses": {
           "200": {
@@ -2022,9 +2029,9 @@
         ]
       }
     },
-    "/auth/forgot-password": {
+    "/api/v1/auth/forgot-password": {
       "post": {
-        "operationId": "AuthController_forgotPassword",
+        "operationId": "AuthController_forgotPassword_v1",
         "parameters": [],
         "requestBody": {
           "required": true,
@@ -2058,9 +2065,9 @@
         ]
       }
     },
-    "/auth/reset-password": {
+    "/api/v1/auth/reset-password": {
       "post": {
-        "operationId": "AuthController_resetPassword",
+        "operationId": "AuthController_resetPassword_v1",
         "parameters": [],
         "requestBody": {
           "required": true,
@@ -2094,9 +2101,9 @@
         ]
       }
     },
-    "/auth/resend-verification": {
+    "/api/v1/auth/resend-verification": {
       "post": {
-        "operationId": "AuthController_resendVerification",
+        "operationId": "AuthController_resendVerification_v1",
         "parameters": [],
         "requestBody": {
           "required": true,
@@ -2130,9 +2137,9 @@
         ]
       }
     },
-    "/auth/verify-email": {
+    "/api/v1/auth/verify-email": {
       "get": {
-        "operationId": "AuthController_verifyEmail",
+        "operationId": "AuthController_verifyEmail_v1",
         "parameters": [
           {
             "name": "token",
@@ -2165,9 +2172,9 @@
         ]
       }
     },
-    "/auth/profile": {
+    "/api/v1/auth/profile": {
       "get": {
-        "operationId": "AuthController_getProfile",
+        "operationId": "AuthController_getProfile_v1",
         "parameters": [],
         "responses": {
           "200": {
@@ -2192,9 +2199,9 @@
         ]
       }
     },
-    "/auth/switch-role": {
+    "/api/v1/auth/switch-role": {
       "post": {
-        "operationId": "AuthController_switchRole",
+        "operationId": "AuthController_switchRole_v1",
         "parameters": [],
         "requestBody": {
           "required": true,
@@ -2233,9 +2240,9 @@
         ]
       }
     },
-    "/auth/me": {
+    "/api/v1/auth/me": {
       "get": {
-        "operationId": "AuthController_me",
+        "operationId": "AuthController_me_v1",
         "parameters": [],
         "responses": {
           "200": {
@@ -2285,9 +2292,9 @@
         ]
       }
     },
-    "/oauth/token": {
+    "/api/v1/oauth/token": {
       "post": {
-        "operationId": "OAuthController_token",
+        "operationId": "OAuthController_token_v1",
         "parameters": [],
         "requestBody": {
           "required": true,
@@ -2310,9 +2317,9 @@
         ]
       }
     },
-    "/oauth/clients": {
+    "/api/v1/oauth/clients": {
       "post": {
-        "operationId": "OAuthController_create",
+        "operationId": "OAuthController_create_v1",
         "parameters": [],
         "requestBody": {
           "required": true,
@@ -2340,7 +2347,7 @@
         ]
       },
       "get": {
-        "operationId": "OAuthController_findAll",
+        "operationId": "OAuthController_findAll_v1",
         "parameters": [
           {
             "name": "page",
@@ -2416,9 +2423,9 @@
         ]
       }
     },
-    "/oauth/clients/{id}": {
+    "/api/v1/oauth/clients/{id}": {
       "get": {
-        "operationId": "OAuthController_findOne",
+        "operationId": "OAuthController_findOne_v1",
         "parameters": [
           {
             "name": "id",
@@ -2445,7 +2452,7 @@
         ]
       },
       "patch": {
-        "operationId": "OAuthController_update",
+        "operationId": "OAuthController_update_v1",
         "parameters": [
           {
             "name": "id",
@@ -2482,7 +2489,7 @@
         ]
       },
       "delete": {
-        "operationId": "OAuthController_remove",
+        "operationId": "OAuthController_remove_v1",
         "parameters": [
           {
             "name": "id",
@@ -2509,9 +2516,9 @@
         ]
       }
     },
-    "/oauth/clients/bulk-delete": {
+    "/api/v1/oauth/clients/bulk-delete": {
       "post": {
-        "operationId": "OAuthController_bulkRemove",
+        "operationId": "OAuthController_bulkRemove_v1",
         "parameters": [],
         "requestBody": {
           "required": true,
@@ -2539,9 +2546,9 @@
         ]
       }
     },
-    "/sessions/me": {
+    "/api/v1/sessions/me": {
       "get": {
-        "operationId": "SessionsController_findMine",
+        "operationId": "SessionsController_findMine_v1",
         "parameters": [],
         "responses": {
           "200": {
@@ -2569,9 +2576,9 @@
         ]
       }
     },
-    "/sessions/me/revoke-others": {
+    "/api/v1/sessions/me/revoke-others": {
       "post": {
-        "operationId": "SessionsController_revokeOthers",
+        "operationId": "SessionsController_revokeOthers_v1",
         "parameters": [],
         "responses": {
           "201": {
@@ -2600,9 +2607,9 @@
         ]
       }
     },
-    "/sessions/me/{id}": {
+    "/api/v1/sessions/me/{id}": {
       "delete": {
-        "operationId": "SessionsController_revokeMine",
+        "operationId": "SessionsController_revokeMine_v1",
         "parameters": [
           {
             "name": "id",
@@ -2636,9 +2643,9 @@
         ]
       }
     },
-    "/sessions": {
+    "/api/v1/sessions": {
       "get": {
-        "operationId": "SessionsController_findAll",
+        "operationId": "SessionsController_findAll_v1",
         "parameters": [
           {
             "name": "page",
@@ -2721,9 +2728,9 @@
         ]
       }
     },
-    "/sessions/{id}": {
+    "/api/v1/sessions/{id}": {
       "delete": {
-        "operationId": "SessionsController_revoke",
+        "operationId": "SessionsController_revoke_v1",
         "parameters": [
           {
             "name": "id",
@@ -2757,9 +2764,9 @@
         ]
       }
     },
-    "/permissions": {
+    "/api/v1/permissions": {
       "post": {
-        "operationId": "PermissionsController_create",
+        "operationId": "PermissionsController_create_v1",
         "parameters": [],
         "requestBody": {
           "required": true,
@@ -2794,7 +2801,7 @@
         ]
       },
       "get": {
-        "operationId": "PermissionsController_findAll",
+        "operationId": "PermissionsController_findAll_v1",
         "parameters": [
           {
             "name": "page",
@@ -2877,9 +2884,9 @@
         ]
       }
     },
-    "/permissions/{id}": {
+    "/api/v1/permissions/{id}": {
       "get": {
-        "operationId": "PermissionsController_findOne",
+        "operationId": "PermissionsController_findOne_v1",
         "parameters": [
           {
             "name": "id",
@@ -2913,7 +2920,7 @@
         ]
       },
       "patch": {
-        "operationId": "PermissionsController_update",
+        "operationId": "PermissionsController_update_v1",
         "parameters": [
           {
             "name": "id",
@@ -2957,7 +2964,7 @@
         ]
       },
       "delete": {
-        "operationId": "PermissionsController_remove",
+        "operationId": "PermissionsController_remove_v1",
         "parameters": [
           {
             "name": "id",
@@ -2984,9 +2991,9 @@
         ]
       }
     },
-    "/permissions/bulk-delete": {
+    "/api/v1/permissions/bulk-delete": {
       "post": {
-        "operationId": "PermissionsController_bulkRemove",
+        "operationId": "PermissionsController_bulkRemove_v1",
         "parameters": [],
         "requestBody": {
           "required": true,
@@ -3014,9 +3021,9 @@
         ]
       }
     },
-    "/notifications": {
+    "/api/v1/notifications": {
       "get": {
-        "operationId": "NotificationsController_findAll",
+        "operationId": "NotificationsController_findAll_v1",
         "parameters": [
           {
             "name": "page",
@@ -3102,9 +3109,9 @@
         ]
       }
     },
-    "/notifications/unread-count": {
+    "/api/v1/notifications/unread-count": {
       "get": {
-        "operationId": "NotificationsController_getUnreadCount",
+        "operationId": "NotificationsController_getUnreadCount_v1",
         "parameters": [],
         "responses": {
           "200": {
@@ -3129,9 +3136,9 @@
         ]
       }
     },
-    "/notifications/{id}/read": {
+    "/api/v1/notifications/{id}/read": {
       "patch": {
-        "operationId": "NotificationsController_markAsRead",
+        "operationId": "NotificationsController_markAsRead_v1",
         "parameters": [
           {
             "name": "id",
@@ -3158,9 +3165,9 @@
         ]
       }
     },
-    "/notifications/read-all": {
+    "/api/v1/notifications/read-all": {
       "post": {
-        "operationId": "NotificationsController_markAllAsRead",
+        "operationId": "NotificationsController_markAllAsRead_v1",
         "parameters": [],
         "responses": {
           "200": {
@@ -3178,9 +3185,9 @@
         ]
       }
     },
-    "/app/force-refresh": {
+    "/api/v1/app/force-refresh": {
       "post": {
-        "operationId": "AppRefreshController_forceRefresh",
+        "operationId": "AppRefreshController_forceRefresh_v1",
         "parameters": [],
         "responses": {
           "201": {
@@ -3210,9 +3217,10 @@
         ]
       }
     },
-    "/health": {
+    "/api/v1/health": {
       "get": {
-        "operationId": "HealthController_check",
+        "description": "Checks PostgreSQL connectivity with a dedicated pool (1 second acquisition timeout, 1 second server statement timeout, 1.5 second transport fallback) and a 300 MiB heap limit. This does not validate schema or business operations. Returns HTTP 200 when both checks succeed, otherwise HTTP 503 with sanitized dependency status.",
+        "operationId": "HealthController_check_v1",
         "parameters": [],
         "responses": {
           "200": {
@@ -3441,15 +3449,15 @@
             }
           }
         },
-        "summary": "Application health check",
+        "summary": "Service health and PostgreSQL connectivity",
         "tags": [
           "Health"
         ]
       }
     },
-    "/audit-logs": {
+    "/api/v1/audit-logs": {
       "get": {
-        "operationId": "AuditController_findAll",
+        "operationId": "AuditController_findAll_v1",
         "parameters": [
           {
             "name": "page",
@@ -3541,9 +3549,9 @@
         ]
       }
     },
-    "/audit-logs/actions": {
+    "/api/v1/audit-logs/actions": {
       "get": {
-        "operationId": "AuditController_findActions",
+        "operationId": "AuditController_findActions_v1",
         "parameters": [],
         "responses": {
           "200": {
@@ -3571,9 +3579,9 @@
         ]
       }
     },
-    "/stats/overview": {
+    "/api/v1/stats/overview": {
       "get": {
-        "operationId": "StatsController_overview",
+        "operationId": "StatsController_overview_v1",
         "parameters": [],
         "responses": {
           "200": {
@@ -3591,9 +3599,9 @@
         ]
       }
     },
-    "/stats/signups": {
+    "/api/v1/stats/signups": {
       "get": {
-        "operationId": "StatsController_signups",
+        "operationId": "StatsController_signups_v1",
         "parameters": [
           {
             "name": "days",
@@ -3629,9 +3637,9 @@
         ]
       }
     },
-    "/changelog": {
+    "/api/v1/changelog": {
       "get": {
-        "operationId": "ChangelogController_findAll",
+        "operationId": "ChangelogController_findAll_v1",
         "parameters": [],
         "responses": {
           "200": {
@@ -3649,9 +3657,9 @@
         ]
       }
     },
-    "/time-zone/config": {
+    "/api/v1/time-zone/config": {
       "get": {
-        "operationId": "TimeZoneController_config",
+        "operationId": "TimeZoneController_config_v1",
         "parameters": [],
         "responses": {
           "200": {
@@ -3670,9 +3678,9 @@
         ]
       }
     },
-    "/time-zone/preferences": {
+    "/api/v1/time-zone/preferences": {
       "get": {
-        "operationId": "TimeZoneController_preferences",
+        "operationId": "TimeZoneController_preferences_v1",
         "parameters": [],
         "responses": {
           "200": {
@@ -3696,7 +3704,7 @@
         ]
       },
       "patch": {
-        "operationId": "TimeZoneController_update",
+        "operationId": "TimeZoneController_update_v1",
         "parameters": [],
         "requestBody": {
           "required": true,
@@ -3730,9 +3738,9 @@
         ]
       }
     },
-    "/time-zone/preview": {
+    "/api/v1/time-zone/preview": {
       "post": {
-        "operationId": "TimeZoneController_preview",
+        "operationId": "TimeZoneController_preview_v1",
         "parameters": [],
         "requestBody": {
           "required": true,
@@ -3769,7 +3777,7 @@
   },
   "info": {
     "title": "Nestplate API",
-    "description": "Nestplate Starter API",
+    "description": "Nestplate Starter API. REST URI version: v1; application releases are versioned independently.",
     "version": "1.0",
     "contact": {}
   },
@@ -3784,6 +3792,28 @@
       }
     },
     "schemas": {
+      "ApiInfo": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "example": "Nestplate API"
+          },
+          "apiVersion": {
+            "type": "string",
+            "example": "1"
+          },
+          "docs": {
+            "type": "string",
+            "example": "/api/docs"
+          }
+        },
+        "required": [
+          "name",
+          "apiVersion",
+          "docs"
+        ]
+      },
       "PaginationMetaDto": {
         "type": "object",
         "properties": {

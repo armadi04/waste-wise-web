@@ -1,3 +1,4 @@
+import { configureApiRouting } from './config/api-routing';
 import './config/env'; // validates process.env — throws on missing/invalid vars
 import { NestFactory } from '@nestjs/core';
 import type { NestExpressApplication } from '@nestjs/platform-express';
@@ -5,12 +6,11 @@ import { parseTrustProxy } from './common/utils/request-logging';
 import { AppModule } from './app.module';
 
 import { ValidationPipe } from '@nestjs/common';
-import { SwaggerModule } from '@nestjs/swagger';
 import cookieParser from 'cookie-parser';
 import { Logger } from 'nestjs-pino';
 
 import { useContainer } from 'class-validator';
-import { buildSwaggerConfig } from './config/swagger.config';
+import { setupSwagger, SWAGGER_UI_PATH } from './config/swagger.config';
 import { AllExceptionsFilter } from './common/filters/all-exceptions.filter';
 
 async function bootstrap() {
@@ -71,7 +71,7 @@ async function bootstrap() {
     ],
   });
 
-  app.setGlobalPrefix('api');
+  configureApiRouting(app);
   app.useGlobalPipes(
     new ValidationPipe({
       transform: true,
@@ -80,11 +80,12 @@ async function bootstrap() {
   );
 
   if (process.env.NODE_ENV !== 'production') {
-    const config = buildSwaggerConfig({ apiPrefix: true });
-    const documentFactory = () => SwaggerModule.createDocument(app, config);
-    SwaggerModule.setup('api/docs', app, documentFactory);
+    setupSwagger(app);
   }
 
   await app.listen(process.env.PORT ?? 3000);
+  if (process.env.NODE_ENV !== 'production') {
+    app.get(Logger).log(`Swagger UI: ${await app.getUrl()}${SWAGGER_UI_PATH}`);
+  }
 }
 void bootstrap();

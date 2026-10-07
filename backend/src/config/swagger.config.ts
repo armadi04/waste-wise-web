@@ -1,23 +1,31 @@
 import { DocumentBuilder } from '@nestjs/swagger';
+import { SwaggerModule } from '@nestjs/swagger';
+import type { INestApplication } from '@nestjs/common';
 
-export interface SwaggerConfigOptions {
-  /** Add the global `/api` prefix as a server entry (used by the live docs). */
-  apiPrefix?: boolean;
+export const SWAGGER_UI_PATH = '/api/docs';
+
+/** Shared metadata. Operation paths include the REST prefix and URI version. */
+export function buildSwaggerConfig() {
+  return new DocumentBuilder()
+    .setTitle('Nestplate API')
+    .setDescription(
+      'Nestplate Starter API. REST URI version: v1; application releases are versioned independently.',
+    )
+    .setVersion('1.0')
+    .addBearerAuth()
+    .build();
 }
 
-/**
- * Single source of truth for the OpenAPI document metadata, shared by the live
- * Swagger UI (`main.ts`) and the static spec generator (`scripts/generate-spec.ts`).
- */
-export function buildSwaggerConfig(options: SwaggerConfigOptions = {}) {
-  const builder = new DocumentBuilder()
-    .setTitle('Nestplate API')
-    .setDescription('Nestplate Starter API')
-    .setVersion('1.0');
-
-  if (options.apiPrefix) {
-    builder.addServer('/api', 'API prefix');
-  }
-
-  return builder.addBearerAuth().build();
+/** Call after configureApiRouting; docs are mounted outside REST versioning. */
+export function setupSwagger(app: INestApplication): void {
+  SwaggerModule.setup(
+    SWAGGER_UI_PATH,
+    app,
+    () => SwaggerModule.createDocument(app, buildSwaggerConfig()),
+    {
+      useGlobalPrefix: false,
+      jsonDocumentUrl: `${SWAGGER_UI_PATH}/openapi.json`,
+      yamlDocumentUrl: `${SWAGGER_UI_PATH}/openapi.yaml`,
+    },
+  );
 }

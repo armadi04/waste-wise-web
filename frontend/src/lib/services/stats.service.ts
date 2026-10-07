@@ -18,10 +18,9 @@ export interface TrendPoint {
   value: number
 }
 
-export const getStatsOverview = () =>
-  apiGet<StatsOverview>('/api/stats/overview')
+export const getStatsOverview = () => apiGet<StatsOverview>('/stats/overview')
 
 export const getSignupsTrend = (days = 30, timeZone = 'Asia/Jakarta') =>
-  apiGet<Array<TrendPoint>>('/api/stats/signups', {
+  apiGet<Array<TrendPoint>>('/stats/signups', {
     params: { days, timeZone },
   })

@@ -14,9 +14,9 @@ describe('Health (e2e)', () => {
     await ctx.app.close();
   });
 
-  it('GET /api/health reports the database as up', async () => {
+  it('GET /api/v1/health reports the database as up', async () => {
     const res = await request(ctx.app.getHttpServer() as App)
-      .get('/api/health')
+      .get('/api/v1/health')
       .expect(200);
 
     expect(res.body.status).toBe('ok');

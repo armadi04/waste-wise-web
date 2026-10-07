@@ -3,6 +3,7 @@ import { useNavigate } from '@tanstack/react-router'
 import { useEffect } from 'react'
 import { io } from 'socket.io-client'
 import type { Notification as NotificationEntity } from '@/types/api'
+import { normalizeApiOrigin } from '@/lib/config/api-url'
 import { addToast } from '@/components/shared/controls/toast'
 import {
   clearCachesAndReload,
@@ -48,7 +49,7 @@ export function SocketBridge() {
     // (withCredentials) — the gateway reads access_token from the handshake
     // cookie. No token is available to JS to pass explicitly.
     const newSocket = io(
-      `${import.meta.env.VITE_API_URL || 'http://localhost:3000'}/notifications`,
+      `${normalizeApiOrigin(import.meta.env.VITE_API_URL) || 'http://localhost:3000'}/notifications`,
       { withCredentials: true },
     )
 

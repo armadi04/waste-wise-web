@@ -42,27 +42,27 @@ export const getOAuthClients = (params?: {
   paginated?: boolean
 }) => {
   return apiGet<PaginatedData<OAuthClient> | Array<OAuthClient>>(
-    '/api/oauth/clients',
+    '/oauth/clients',
     { params },
   )
 }
 
 export const getOAuthClient = (id: number) => {
-  return apiGet<OAuthClient>(`/api/oauth/clients/${id}`)
+  return apiGet<OAuthClient>(`/oauth/clients/${id}`)
 }
 
 export const createOAuthClient = (data: CreateOAuthClientData) => {
-  return apiPost<IssuedOAuthClient>('/api/oauth/clients', data)
+  return apiPost<IssuedOAuthClient>('/oauth/clients', data)
 }
 
 export const updateOAuthClient = (id: number, data: UpdateOAuthClientData) => {
-  return apiPatch<OAuthClient>(`/api/oauth/clients/${id}`, data)
+  return apiPatch<OAuthClient>(`/oauth/clients/${id}`, data)
 }
 
 export const deleteOAuthClient = (id: number) => {
-  return apiDelete<void>(`/api/oauth/clients/${id}`)
+  return apiDelete<void>(`/oauth/clients/${id}`)
 }
 
 export const bulkDeleteOAuthClients = (ids: Array<number>) => {
-  return apiPost<{ deleted: number }>('/api/oauth/clients/bulk-delete', { ids })
+  return apiPost<{ deleted: number }>('/oauth/clients/bulk-delete', { ids })
 }

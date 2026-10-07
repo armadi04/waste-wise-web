@@ -36,15 +36,15 @@ export interface OwnSession extends UserSession {
 }
 
 export const getMySessions = () => {
-  return apiGet<Array<OwnSession>>('/api/sessions/me')
+  return apiGet<Array<OwnSession>>('/sessions/me')
 }
 
 export const revokeMySession = (id: number) => {
-  return apiDelete<UserSession>(`/api/sessions/me/${id}`)
+  return apiDelete<UserSession>(`/sessions/me/${id}`)
 }
 
 export const revokeMyOtherSessions = () => {
-  return apiPost<{ revoked: number }>('/api/sessions/me/revoke-others', {})
+  return apiPost<{ revoked: number }>('/sessions/me/revoke-others', {})
 }
 
 export const getSessions = (params?: {
@@ -54,9 +54,9 @@ export const getSessions = (params?: {
   sort?: string
   direction?: string
 }) => {
-  return apiGet<PaginatedData<UserSession>>('/api/sessions', { params })
+  return apiGet<PaginatedData<UserSession>>('/sessions', { params })
 }
 
 export const revokeSession = (id: number) => {
-  return apiDelete<UserSession>(`/api/sessions/${id}`)
+  return apiDelete<UserSession>(`/sessions/${id}`)
 }

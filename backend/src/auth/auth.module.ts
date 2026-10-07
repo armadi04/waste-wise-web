@@ -1,3 +1,4 @@
+import { API_VERSION } from '@/config/api-routing';
 import { ACCESS_TOKEN_TTL } from '@/sessions/session-policy';
 import {
   MiddlewareConsumer,
@@ -62,12 +63,22 @@ import { SessionsModule } from '../sessions/sessions.module';
 })
 export class AuthModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {
-    consumer
-      .apply(CsrfMiddleware)
-      .forRoutes(
-        { path: 'auth/refresh', method: RequestMethod.POST },
-        { path: 'auth/logout', method: RequestMethod.POST },
-        { path: 'auth/switch-role', method: RequestMethod.POST },
-      );
+    consumer.apply(CsrfMiddleware).forRoutes(
+      {
+        path: 'auth/refresh',
+        method: RequestMethod.POST,
+        version: API_VERSION,
+      },
+      {
+        path: 'auth/logout',
+        method: RequestMethod.POST,
+        version: API_VERSION,
+      },
+      {
+        path: 'auth/switch-role',
+        method: RequestMethod.POST,
+        version: API_VERSION,
+      },
+    );
   }
 }

@@ -54,11 +54,11 @@ TOTP and optional SSO; the helper is not a public email-OTP login endpoint.
 Request logs carry method, path (no query string) and status — never
 headers or cookies. Set `TRUST_PROXY` (hop count or proxy addresses/subnets) when the API sits
 behind Caddy or another proxy so throttling and sessions see client IPs. Browser identity
-is read through `/api/auth/me`. Mobile/machine clients may use explicit Bearer authorization.
+is read through `/api/v1/auth/me`. Mobile/machine clients may use explicit Bearer authorization.
 
 ## Endpoints
 
-All under `/api/auth`. Tighter throttles protect the credential routes.
+All under `/api/v1/auth`. Tighter throttles protect the credential routes.
 
 | Method & path | Guard | Throttle | Purpose |
 |---------------|-------|----------|---------|
@@ -146,7 +146,7 @@ pair it with `PermissionsGuard` or `OwnerOrPermissionGuard`.
 - **Effective permissions** are direct grants plus permissions of the valid active role,
   computed from the database on every request. A single-role user is scoped to that role.
   A multi-role user without a selected role gets no role-derived permissions or role claims.
-  Use `/api/auth/switch-role` to select a held role and issue a new session view.
+  Use `/api/v1/auth/switch-role` to select a held role and issue a new session view.
 - `superadmin` is special-cased in `OwnerOrPermissionGuard` and seeded with the full
   permission set.
 
@@ -205,11 +205,11 @@ keeps only the app-specific provisioning. It's optional: leave `SSO_ISSUER` unse
 routes return `503` while `SsoService.enabled` is `false`.
 
 ```text
-GET /api/auth/sso/login
+GET /api/v1/auth/sso/login
    │  PKCE verifier+state → short-lived httpOnly cookies (sameSite=lax)
    ▼  302 → IdP /auth
 IdP authenticates the user, 302s back →
-GET /api/auth/sso/callback?code&state
+GET /api/v1/auth/sso/callback?code&state
    │  exchange code (client_secret_post) → verified id_token (sub, sid)
    │  fetch identity from UserInfo (email, name, roles) — see note below
    │  provision-or-update local user (SsoService.provisionUser)
@@ -248,7 +248,7 @@ GET /api/auth/sso/callback?code&state
 **Env** (all optional; set in `src/config/env.ts`): `SSO_ISSUER`, `SSO_CLIENT_ID`,
 `SSO_CLIENT_SECRET`, `SSO_REDIRECT_URI`, `SSO_POST_LOGOUT_URI`, `SSO_SUCCESS_REDIRECT`
 (default `/`), `SSO_DEFAULT_ROLE` (default `user`). The redirect URI is browser-facing and
-proxied to the API — e.g. `http://localhost:3001/api/auth/sso/callback`. If the IdP sits
+proxied to the API — e.g. `http://localhost:3001/api/v1/auth/sso/callback`. If the IdP sits
 behind a bot-protection proxy (Cloudflare), add a WAF skip for its `/oidc/*` machine endpoints.
 
 ## Supporting token entities
@@ -277,7 +277,7 @@ Recorded today: `auth.login`, `auth.login_failed`, `auth.logout`, `auth.locked`,
 Rows keep `actorEmail` alongside `actorId`: the account may later be renamed or deleted, and
 the trail should still say who did it at the time. There is no update or delete path anywhere
 in the module — an audit trail you can edit isn't one. Reading it needs `audit.read`
-(`GET /api/audit-logs`, plus `/actions` for the filter).
+(`GET /api/v1/audit-logs`, plus `/actions` for the filter).
 
 ## Sign-in lockout
 
@@ -345,11 +345,11 @@ SSO logins are flagged `isSso`.
 
 | Method & path | Guard | Purpose |
 |---------------|-------|---------|
-| `GET /api/sessions/me` | `AuthGuard('jwt')` | The caller's live sessions, with `isCurrent` |
-| `DELETE /api/sessions/me/:id` | `AuthGuard('jwt')` | Revoke one of the caller's own sessions |
-| `POST /api/sessions/me/revoke-others` | `AuthGuard('jwt')` | Sign out every other device |
-| `GET /api/sessions` | `sessions.read` | Paginated admin listing (searches user, IP, device) |
-| `DELETE /api/sessions/:id` | `sessions.delete` | Revoke anyone's session |
+| `GET /api/v1/sessions/me` | `AuthGuard('jwt')` | The caller's live sessions, with `isCurrent` |
+| `DELETE /api/v1/sessions/me/:id` | `AuthGuard('jwt')` | Revoke one of the caller's own sessions |
+| `POST /api/v1/sessions/me/revoke-others` | `AuthGuard('jwt')` | Sign out every other device |
+| `GET /api/v1/sessions` | `sessions.read` | Paginated admin listing (searches user, IP, device) |
+| `DELETE /api/v1/sessions/:id` | `sessions.delete` | Revoke anyone's session |
 
 The self-service routes scope every lookup by `req.user.userId`, so they can never touch
 another user's session — the admin routes are the only cross-user path, and they're gated by
@@ -390,7 +390,7 @@ SSO provisioning, and new seeded identities supply this value internally. `EMAIL
 an enum value for extensions; starter has no email-OTP login route.
 Later login, verification, or profile/password changes do not overwrite it.
 
-`GET /api/users` accepts `createdIn=today|7d|1m|3m` and `registerMethod` for both paginated
+`GET /api/v1/users` accepts `createdIn=today|7d|1m|3m` and `registerMethod` for both paginated
 and unpaginated lists, combined with email/name search. Invalid values return 400.
 Creation windows use server time and WIB (Asia/Jakarta): today begins at midnight;
 7d begins six days ago; 1m/3m begin 30/90 days ago, ending at now.
