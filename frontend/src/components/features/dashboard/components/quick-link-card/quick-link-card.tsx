@@ -22,9 +22,12 @@ export function QuickLinkCard({
   className = '',
 }: QuickLinkCardProps) {
   const colorMap: Record<string, string> = {
-    primary: 'bg-primary/5 text-primary hover:bg-primary/10',
-    secondary: 'bg-secondary/40 text-foreground hover:bg-secondary/70',
-    warning: 'bg-warning/5 text-warning hover:bg-warning/10',
+    primary:
+      'bg-[var(--app-selected-background)] text-[var(--app-link)] hover:bg-[var(--app-selected-background)]',
+    secondary:
+      'bg-[var(--app-selected-background)] text-[var(--app-selected-foreground)] hover:bg-[var(--app-selected-hover)]',
+    warning:
+      'app-status-warning bg-[var(--app-warning-background)] text-[var(--app-warning-foreground)] hover:bg-[var(--app-warning-background)]',
   }
 
   // Providing safe defaults
@@ -46,7 +49,7 @@ export function QuickLinkCard({
         </div>
         <div className="flex flex-col gap-1 mt-auto w-full">
           <div className="flex items-center justify-between w-full">
-            <h4 className="font-semibold text-lg text-foreground group-hover:text-primary transition-colors">
+            <h4 className="font-semibold text-lg text-foreground group-hover:text-[var(--app-link)] transition-colors">
               {title}
             </h4>
             <ArrowRight

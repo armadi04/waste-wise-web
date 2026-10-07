@@ -33,7 +33,7 @@ export function RecentActivity({
         </div>
         <Link
           to="/audit-logs"
-          className="shrink-0 text-xs text-primary underline-offset-2 hover:underline"
+          className="shrink-0 text-xs text-[var(--app-link)] underline-offset-2 hover:underline"
         >
           View all
         </Link>
@@ -53,7 +53,7 @@ export function RecentActivity({
         <ul className="flex flex-col divide-y divide-default-100">
           {data.map((entry) => (
             <li key={entry.id} className="flex items-center gap-3 py-2.5">
-              <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-medium bg-primary/10 text-primary">
+              <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-medium bg-[var(--app-selected-background)] text-[var(--app-link)]">
                 <Activity size={15} />
               </div>
               <div className="min-w-0 flex-1">
