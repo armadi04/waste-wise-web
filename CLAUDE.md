@@ -16,7 +16,7 @@ workflow and release policy. User instructions take precedence.
 - Confirm before destructive/hard-to-reverse operations, including database resets, force-push
   and irreversible deletion outside the authorized scope. Routine authorized work can proceed.
 - All tests belong in each project's test/. Backend integration uses a separate disposable
-  kuponmalam_test database; do not point the harness at development/production data.
+  nestplate_test database; do not point the harness at development/production data.
 - Run the changed project's required checks before reporting completion. If unavailable or
   failing, report the exact limitation. Docs-only work requires link/headings and diff checks.
 - E2E coverage and execution are optional. Run E2E only when explicitly requested by the user,
@@ -36,8 +36,7 @@ or recordings for UI changes. Follow [Releasing](RELEASING.md) for release confi
 ## Cross-project changes
 
 Backend owns auth/RBAC/schema; admin uses services, shared Query options/loaders, UI stores
-and validated URL table state. Portal SSR/transport boundaries are documented in the sibling
-[portal architecture](../kuponmalam/docs/ARCHITECTURE.md).
+and validated URL table state. This starter has no sibling application dependency.
 
 Permission changes must synchronize backend PermissionType/seeder and applicable admin
 MENU_PERMISSIONS/sidebarData. Follow [permission sync](backend/docs/AUTH.md#permission-sync).

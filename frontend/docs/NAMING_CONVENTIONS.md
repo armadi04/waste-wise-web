@@ -52,9 +52,9 @@ Shared page/search configuration belongs in a pure module, not in an imported ro
 
 ## Hook organization
 
-Keep custom hooks in `src/hooks/<domain>/`, following the portal/ototop grouping pattern.
+Keep custom hooks in `src/hooks/<domain>/`.
 Domains are `auth`, `profile`, `users`, `invitations`, `roles`, `permissions`, `oauth-clients`,
-`media`, `notifications`, `sessions`, `audit`, `dashboard`, `changelog`, and `portal`.
+`media`, `notifications`, `sessions`, `audit`, and `dashboard`, plus `global/` helpers.
 Use `global/` for cross-feature mutation, table, export, confirmation, navigation,
 appearance, PWA, and utility hooks. Do not embed custom hook declarations in view modules.
 

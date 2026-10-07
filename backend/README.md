@@ -1,36 +1,36 @@
-# KuponMalam backend
+# Nestplate backend
 
-NestJS 12 on Bun/PostgreSQL/TypeORM. Serves admin and portal REST APIs, session/RBAC,
-OTP/Google/OIDC, transactional portal resources, Depot media, SMTP outbox, notifications,
-audit, cache and optional GraphQL.
+NestJS 12 on Bun, PostgreSQL and TypeORM. Owns auth/RBAC, users, invitations, 2FA,
+sessions, media (Depot/direct S3), SMTP outbox, notifications, audit, health, generic
+dashboard statistics and optional GraphQL.
 
 ## Quick start
 
 ```bash
 bun install --frozen-lockfile
 cp .env.example .env
+# Fill required credentials and point DB_NAME at a new database.
 bun run migration:run
 bun run seed
 bun run start:dev
 ```
 
-Fill required configuration; preserve an existing .env. API localhost:3000/api; Swagger
-localhost:3000/api/docs outside production; health localhost:3000/api/health.
-Migration-first: DB_SYNCHRONIZE=false. Production uses reviewed migrations and no demo seed.
-Use bun run build before start:prod so tsc-alias rewrites imports.
+GitHub Packages authentication is required for the SDK dependencies. API:
+`localhost:3000/api`; Swagger: `/api/docs` outside production; health: `/api/health`.
+Keep `DB_SYNCHRONIZE=false`. Baseline supports new databases only.
 
-Default test commands run unit tests in test/unit/. E2E (`bun run test:e2e`) is optional and
-runs only when explicitly requested by the user, using a separate kuponmalam_test database.
-Never run the integration harness against active application data. See Development before
-running tests.
+`MEDIA_PROVIDER=depot` is default; use `s3` for direct S3-compatible storage. Required env
+and optional integrations are listed in [Development](docs/DEVELOPMENT.md#environment).
+Run `bun run build` before `start:prod` so imports are rewritten by tsc-alias.
+Default tests are unit-only; requested integration/E2E work uses `nestplate_test`.
 
 ## Documentation
 
-- [Ai Agent Guide](docs/AI_AGENT_GUIDE.md) — Agent rules and change recipes.
-- [Architecture](docs/ARCHITECTURE.md) — Boundaries, layers and data flow.
-- [Naming Conventions](docs/NAMING_CONVENTIONS.md) — Identifier, route and schema conventions.
-- [Development](docs/DEVELOPMENT.md) — Local setup, environment, commands and tests.
-- [Operations](docs/OPERATIONS.md) — Deploy, diagnose, monitor and roll back.
-- [Auth](docs/AUTH.md) — Session and permission contracts.
-- [Portal Api](docs/PORTAL_API.md) — Portal REST contract.
-- [Graphql](docs/GRAPHQL.md) — Optional GraphQL and machine clients.
+- [Architecture](docs/ARCHITECTURE.md) — Layers, code map, request lifecycle and integrations.
+- [Development](docs/DEVELOPMENT.md) — Setup, environment, migrations and checks.
+- [Auth](docs/AUTH.md) — Sessions, providers, verification, RBAC and security contracts.
+- [Adding features](docs/ADDING_FEATURES.md) — CRUD recipe.
+- [Operations](docs/OPERATIONS.md) — Storage providers, SMTP, Docker and diagnostics.
+- [GraphQL](docs/GRAPHQL.md) — Optional API and machine clients.
+- [Naming conventions](docs/NAMING_CONVENTIONS.md) — Files, identifiers and schema names.
+- [AI agent guide](docs/AI_AGENT_GUIDE.md) — Rules and verification.

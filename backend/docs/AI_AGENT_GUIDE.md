@@ -2,16 +2,14 @@
 
 Read repo-wide [working rules](../../CLAUDE.md), [Architecture](ARCHITECTURE.md) and
 [Naming conventions](NAMING_CONVENTIONS.md). [Auth](AUTH.md) owns the guard/permission contract;
-[Portal API](PORTAL_API.md) and [GraphQL](GRAPHQL.md) own those interfaces.
+[GraphQL](GRAPHQL.md) owns the optional GraphQL interface.
 
 ## Rules
 
 - Keep controllers HTTP-only. Business queries/writes live in services; generic CRUD extends
   BaseService. Do not hard-delete business resources or bypass their soft-delete semantics.
-- Place portal services, DTOs, entities, and helpers in the owning domain folder described
-  in [Architecture](ARCHITECTURE.md#portal-service-boundaries). Register domain providers once
-  in PortalModule and inject collaborators directly. Keep PortalService as a delegation facade;
-  pass the current transaction manager through transactional helpers.
+- Place feature services, DTOs, entities and helpers in the owning feature folder.
+  Register providers once and pass the transaction manager through transactional helpers.
 - Use DTO validation, guarded routes, typed permission strings and the existing cache
   invalidation pattern. A permission decorator without the matching guard is inert.
 - Keep `.entity.ts` names, explicit nullable column types, database naming and immutable

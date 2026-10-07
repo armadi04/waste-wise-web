@@ -1,6 +1,6 @@
 # Releasing
 
-Kupon Malam API (backend + frontend) is released **automatically** by
+Nestplate Starter (backend + frontend) is released **automatically** by
 `semantic-release` from your Conventional Commit messages — you never tag it by
 hand.
 

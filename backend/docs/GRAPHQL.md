@@ -44,7 +44,7 @@ the nest-cli `assets` glob.
 
 REST and GraphQL share JwtStrategy and domain permission checks. Bearer tokens are supported
 for mobile/third-party clients; the strategy also accepts backend accessToken cookies.
-The existing portal/admin browser applications use REST with HttpOnly cookies, not a decoded
+The browser application uses REST with HttpOnly cookies, not a decoded
 JWT sent from JavaScript. Do not document a browser token extraction flow.
 
 Machine clients use the OAuth2 client-credentials grant below. Bearer-only requests do not
@@ -110,3 +110,12 @@ re-checks the client on every request.
 - **Invitation accept** — a public token flow (`/api/invitations/accept`).
 - **Login / OAuth token issuance** — the token endpoints themselves.
 - The four internal auth-token tables are never exposed on GraphQL.
+
+## Media deletion lifecycle
+
+Use `deleteMediaWithResult(id:) { id status code }` for durable outcomes. `queued` means
+metadata is hidden and remote cleanup will retry; `deleted` and `already-deleted` mean
+completion. Authorization remains ownership or `media.delete_all`/superadmin with `media.delete`.
+The existing Boolean `deleteMedia` is deprecated but retained for compatibility; true means
+acceptance, not necessarily completed remote removal. Upload limits, storage profiles and
+recovery semantics are shared with REST; see [Operations](OPERATIONS.md#media-providers).

@@ -3,8 +3,7 @@
 ## Runtime and boundaries
 
 Admin is a React 19 SPA built with Vite/TanStack Router, TanStack Query, HeroUI 2.8,
-Tailwind 4 and Zustand. It remains CSR; the separate portal uses selective SSR through
-TanStack Start. Both use the same NestJS backend. Backend owns sessions, RBAC, business
+Tailwind 4 and Zustand. It remains CSR and uses the NestJS backend. Backend owns sessions, RBAC, business
 rules and persistence. Frontend permissions control presentation and preload, not authority.
 
 ## Data flow
@@ -68,7 +67,7 @@ SocketBridge and separates auth pages from app layout/EmailVerificationGate.
 | `src/types/`                | API/domain types, including generated OpenAPI types                                             |
 | `test/`                     | Vitest unit tests and `test/e2e/` browser specs                                                 |
 
-Route groups include auth, users, media, content, databases, audit, sessions and portal.
+Route groups include auth, users, media, content, databases, audit and sessions.
 `/profile?section=` owns profile/security/sessions/appearance/preferences; there is no separate
 settings route. `src/routeTree.gen.ts` is Vite-generated and must not be manually edited.
 The PWA production worker excludes API/socket navigation fallback; dev workers are disabled.
