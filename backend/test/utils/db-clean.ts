@@ -27,26 +27,17 @@ export async function cleanDatabase(
 ): Promise<void> {
   if (
     dataSource.options.type !== 'postgres' ||
-    dataSource.options.database !== 'kuponmalam_test'
+    dataSource.options.database !== 'nestplate_test'
   )
-    throw new Error('Cleanup requires the dedicated kuponmalam_test database');
+    throw new Error('Cleanup requires the dedicated nestplate_test database');
   await dataSource.query('UPDATE users SET "avatarId" = NULL');
   await dataSource.query('DELETE FROM media');
   await dataSource.query('DELETE FROM notifications');
-  // Append-only business records are removed only in this guarded test cleanup.
-  // Delete dependants before RESTRICT-linked orders, items and users.
-  await dataSource.query('DELETE FROM portal_campaign_ledger');
-  await dataSource.query('DELETE FROM portal_referrals');
-  await dataSource.query(
-    'DELETE FROM portal_promo_codes WHERE "campaignId" IS NOT NULL OR "ownerUserId" IS NOT NULL',
-  );
-  await dataSource.query('DELETE FROM portal_tickets');
-  await dataSource.query('DELETE FROM portal_vouchers');
-  await dataSource.query('DELETE FROM portal_order_items');
-  await dataSource.query('DELETE FROM portal_orders');
-  await dataSource.query('DELETE FROM portal_follows');
-  await dataSource.query('DELETE FROM portal_campaign_progress');
-  await dataSource.query('DELETE FROM portal_email_otp_challenges');
+  await dataSource.query('DELETE FROM user_sessions');
+  await dataSource.query('DELETE FROM audit_logs');
+  await dataSource.query('DELETE FROM outbound_emails');
+  await dataSource.query('DELETE FROM two_factor_recovery_codes');
+  await dataSource.query('DELETE FROM revoked_sso_sessions');
   await dataSource.query('DELETE FROM invitations');
   await dataSource.query('DELETE FROM blacklisted_tokens');
   await dataSource.query('DELETE FROM password_reset_tokens');
