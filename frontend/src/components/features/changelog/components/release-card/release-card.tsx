@@ -1,7 +1,7 @@
-import { Chip } from '@heroui/react'
 import { formatDistanceToNow } from 'date-fns'
 import { ExternalLink } from 'lucide-react'
 import type { ChangelogRelease } from '@/lib/utils/changelog'
+import { Chip } from '@/components/shared/controls'
 import { SectionBlock } from '@/components/features/changelog/components/release-card/child/section-block'
 import { useTimeZone } from '@/lib/stores/time-zone'
 import { repoUrlFrom } from '@/lib/utils/changelog'
@@ -48,7 +48,7 @@ export function ReleaseCard({
             href={release.compareUrl}
             target="_blank"
             rel="noreferrer"
-            className="ml-auto flex items-center gap-1 text-xs text-default-400 transition-colors hover:text-primary"
+            className="ml-auto flex items-center gap-1 text-xs text-default-400 transition-colors hover:text-[var(--app-link)]"
           >
             Compare <ExternalLink size={12} />
           </a>

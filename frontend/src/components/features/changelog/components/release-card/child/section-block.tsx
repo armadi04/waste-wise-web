@@ -52,7 +52,7 @@ export function SectionBlock({ section }: { section: ChangelogSection }) {
                         target="_blank"
                         rel="noreferrer"
                         title="View the code change"
-                        className="ml-2 font-mono text-[11px] text-default-300 transition-colors hover:text-primary"
+                        className="ml-2 font-mono text-[11px] text-default-500 transition-colors hover:text-[var(--app-link)]"
                       >
                         {entry.commit.slice(0, 7)}
                       </a>
