@@ -3,7 +3,7 @@ on:
   pull_request:
     paths: ['frontend/**', '.github/workflows/frontend-ci.yml']
   push:
-    branches: [master]
+    branches: [main, master]
     paths: ['frontend/**', '.github/workflows/frontend-ci.yml']
   workflow_dispatch:
     inputs:
