@@ -1,6 +1,7 @@
-import { Button, Chip, addToast } from '@heroui/react'
 import { Link } from '@tanstack/react-router'
 import { RefreshCw, Sparkles } from 'lucide-react'
+import { addToast } from '@/components/shared/controls/toast'
+import { Button, Chip } from '@/components/shared/controls'
 import {
   SettingRow,
   SettingsCard,
@@ -78,7 +79,7 @@ export function UpdateSection() {
           )}
           <Link
             to="/changelog"
-            className="text-xs text-primary underline-offset-2 hover:underline"
+            className="text-xs text-[var(--app-link)] underline-offset-2 hover:underline"
           >
             View the changelog
           </Link>

@@ -1,15 +1,12 @@
 import {
-  Button,
-  Input,
-  Modal,
   ModalBody,
   ModalContent,
   ModalFooter,
   ModalHeader,
-  Snippet,
 } from '@heroui/react'
 import { ShieldCheck, ShieldOff } from 'lucide-react'
 import type { TwoFactorModalProps } from '@/components/features/profile/modal/two-factor-modal/types'
+import { Button, Input, Modal, Snippet } from '@/components/shared/controls'
 
 import { COPY } from '@/components/features/profile/modal/two-factor-modal/lib/two-factor-modal-helpers'
 
@@ -50,9 +47,9 @@ export function TwoFactorModal({
       <ModalContent>
         <ModalHeader className="flex items-center gap-2">
           {copy.danger ? (
-            <ShieldOff size={18} className="text-danger" />
+            <ShieldOff size={18} className="text-[var(--app-danger)]" />
           ) : (
-            <ShieldCheck size={18} className="text-primary" />
+            <ShieldCheck size={18} className="text-[var(--app-link)]" />
           )}
           {copy.title}
         </ModalHeader>

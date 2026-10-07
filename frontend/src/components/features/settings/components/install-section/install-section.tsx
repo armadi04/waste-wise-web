@@ -1,5 +1,5 @@
-import { Button, Chip } from '@heroui/react'
 import { Download, MonitorSmartphone } from 'lucide-react'
+import { Button, Chip } from '@/components/shared/controls'
 import {
   SettingRow,
   SettingsCard,

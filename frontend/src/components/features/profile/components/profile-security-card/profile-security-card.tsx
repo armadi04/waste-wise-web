@@ -1,6 +1,7 @@
-import { Button, Chip, Skeleton } from '@heroui/react'
+import { Skeleton } from '@heroui/react'
 import { useNavigate } from '@tanstack/react-router'
 import { KeyRound, LogOut, ShieldCheck } from 'lucide-react'
+import { Button, Chip } from '@/components/shared/controls'
 import { TwoFactorModal } from '@/components/features/profile/modal/two-factor-modal'
 import { useAuth } from '@/hooks/auth'
 import { useTwoFactor } from '@/hooks/profile'
@@ -18,8 +19,8 @@ export function ProfileSecurityCard() {
 
       <div className="flex flex-col divide-y divide-default-100">
         <div className="flex items-center gap-3 pb-3">
-          <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-medium bg-primary/10">
-            <KeyRound size={16} className="text-primary" />
+          <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-medium bg-[var(--app-selected-background)]">
+            <KeyRound size={16} className="text-[var(--app-link)]" />
           </div>
           <div className="min-w-0 flex-1">
             <p className="text-sm font-semibold text-foreground">Password</p>
@@ -39,8 +40,8 @@ export function ProfileSecurityCard() {
         </div>
 
         <div className="flex items-center gap-3 py-3">
-          <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-medium bg-primary/10">
-            <ShieldCheck size={16} className="text-primary" />
+          <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-medium bg-[var(--app-selected-background)]">
+            <ShieldCheck size={16} className="text-[var(--app-link)]" />
           </div>
           <div className="min-w-0 flex-1">
             <div className="flex items-center gap-2">
@@ -90,8 +91,8 @@ export function ProfileSecurityCard() {
         </div>
 
         <div className="flex items-center gap-3 pt-3">
-          <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-medium bg-danger/10">
-            <LogOut size={16} className="text-danger" />
+          <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-medium app-status-danger bg-[var(--app-danger-background)] text-[var(--app-danger-foreground)]">
+            <LogOut size={16} className="text-[var(--app-danger)]" />
           </div>
           <div className="min-w-0 flex-1">
             <p className="text-sm font-semibold text-foreground">Sign out</p>

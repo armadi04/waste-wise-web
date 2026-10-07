@@ -1,7 +1,7 @@
-import { Chip, Switch } from '@heroui/react'
 import { AlertTriangle } from 'lucide-react'
 import React from 'react'
 import type { BrowserNotificationPermission } from '@/hooks/notifications'
+import { Chip, Switch } from '@/components/shared/controls'
 import { useBrowserNotification } from '@/hooks/notifications'
 import {
   SettingRow,
@@ -59,9 +59,12 @@ export function NotificationsSection() {
         }
       >
         {isDenied && (
-          <div className="flex items-start gap-2 mt-2 p-3 rounded-large bg-danger/5 border border-danger/10">
-            <AlertTriangle size={14} className="text-danger shrink-0 mt-0.5" />
-            <p className="text-xs text-danger">
+          <div className="flex items-start gap-2 mt-2 p-3 rounded-large app-status-danger bg-[var(--app-danger-background)] text-[var(--app-danger-foreground)] border border-danger/10">
+            <AlertTriangle
+              size={14}
+              className="text-[var(--app-danger)] shrink-0 mt-0.5"
+            />
+            <p className="text-xs text-[var(--app-danger)]">
               Notifications are blocked by your browser. To enable, click the
               lock icon in your address bar and allow notifications for this
               site.

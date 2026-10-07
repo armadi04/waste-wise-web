@@ -22,7 +22,7 @@ export function TimeZonePreference() {
       </label>
       <select
         id="display-timezone"
-        className="mt-3 w-full rounded-lg border border-default-300 bg-default-50 p-3"
+        className="app-field-control mt-3 w-full rounded-lg p-3"
         disabled={!query.data || mutation.isPending}
         value={query.data?.timeZone ?? ''}
         onChange={(event) =>
@@ -43,11 +43,10 @@ export function TimeZonePreference() {
           )}
       </select>
       <p className="mt-2 text-sm">
-        Mengatur zona waktu tampilan akun. Laporan tetap mengikuti zona
-        bisnis.
+        Mengatur zona waktu tampilan akun. Laporan tetap mengikuti zona bisnis.
       </p>
       {(query.isError || mutation.isError) && (
-        <p role="alert" className="mt-2 text-sm text-red-500">
+        <p role="alert" className="mt-2 text-sm text-[var(--app-danger)]">
           Preferensi gagal dimuat atau disimpan. Coba lagi.
         </p>
       )}

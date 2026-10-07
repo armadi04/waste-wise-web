@@ -42,7 +42,7 @@ export function AppearanceSection() {
                 aria-pressed={o.active}
                 className={`flex items-center gap-1.5 rounded-small px-3 py-1.5 text-sm font-medium transition-colors ${
                   o.active
-                    ? 'bg-primary text-primary-foreground'
+                    ? 'app-selected'
                     : 'text-default-500 hover:bg-default-100'
                 }`}
               >

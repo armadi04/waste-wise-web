@@ -1,6 +1,7 @@
-import { Avatar, Button, Chip, Skeleton } from '@heroui/react'
+import { Avatar, Skeleton } from '@heroui/react'
 import { BadgeCheck, Pencil } from 'lucide-react'
 import type { UserProfile } from '@/types/auth'
+import { Button, Chip } from '@/components/shared/controls'
 
 interface ProfileHeroCardProps {
   profile: UserProfile | undefined
@@ -31,11 +32,14 @@ export function ProfileHeroCard({
 
       <div className="min-w-0 flex-1 text-center sm:text-left">
         <div className="flex items-center justify-center gap-2 sm:justify-start">
-          <h1 className="truncate text-xl font-bold tracking-tight text-foreground">
+          <h1 className="truncate text-xl font-semibold tracking-tight text-foreground">
             {profile?.fullname || '—'}
           </h1>
           {verified && (
-            <BadgeCheck size={18} className="shrink-0 text-success" />
+            <BadgeCheck
+              size={18}
+              className="shrink-0 text-[var(--app-success)]"
+            />
           )}
         </div>
         <p className="mt-0.5 truncate text-sm text-default-500">
