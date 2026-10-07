@@ -27,7 +27,7 @@ workflow and release policy. User instructions take precedence.
 
 ## Releases and review
 
-Use type(scope):description. Semantic-release cuts versions from main; do not tag manually
+Use type(scope):description. Semantic-release cuts versions from master; do not tag manually
 or create CHANGELOG.md. Commit descriptions for feat/fix appear to users, so describe the
 resulting behavior and choose established frontend changelog scopes when applicable.
 PRs explain the behavior, validation and affected routes/search states; include screenshots

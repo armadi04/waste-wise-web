@@ -4,9 +4,9 @@ Nestplate Starter (backend + frontend) is released **automatically** by
 `semantic-release` from your Conventional Commit messages — you never tag it by
 hand.
 
-| Scope | Tag pattern | How it's cut | What a merge to `main` triggers |
+| Scope | Tag pattern | How it's cut | What a merge to `master` triggers |
 |-------|-------------|--------------|---------------------------------|
-| **App** (backend + frontend) | `v*` (e.g. `v1.2.0`) | **auto** — semantic-release on merge to `main` | a `v<version>` tag + a GitHub Release ([`release.yml`](./.github/workflows/release.yml)) |
+| **App** (backend + frontend) | `v*` (e.g. `v1.2.0`) | **auto** — semantic-release on merge to `master` | a `v<version>` tag + a GitHub Release ([`release.yml`](./.github/workflows/release.yml)) |
 
 The backend and frontend version together under one tag. They ship as one
 product, so a split scheme would only create ambiguity about which pair is live.
@@ -16,7 +16,7 @@ deployed is a separate concern.
 
 ## App release (`v*`) — automated, commit-driven
 
-You don't tag the app. When commits land on `main`,
+You don't tag the app. When commits land on `master`,
 [`release.yml`](./.github/workflows/release.yml) runs `semantic-release`, which
 reads every Conventional Commit since the last release and:
 
@@ -24,7 +24,7 @@ reads every Conventional Commit since the last release and:
 2. creates the `v<version>` git tag,
 3. cuts a GitHub Release whose notes are generated from those commits.
 
-Nothing is committed back to `main` — the notes live on the Release, so the
+Nothing is committed back to `master` — the notes live on the Release, so the
 history stays free of `chore(release)` bot commits, and the repo carries no
 `CHANGELOG.md` to keep in sync. The Releases page *is* the changelog.
 
@@ -88,8 +88,8 @@ raw scope.
 
 ## Branch flow
 
-Releases are cut on **`main`** only. Work flows `feat/* → main`; the `v*` tag
-happens when a change reaches `main`.
+Releases are cut on **`master`** only. Work flows `feat/* → master`; the `v*` tag
+happens when a change reaches `master`.
 
 ## Database migrations
 

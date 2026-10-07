@@ -33,7 +33,7 @@ interface GithubRelease {
  * Release notes come from the GitHub Releases API, not from a file in the repo.
  *
  * Keeping them out of the repo means `semantic-release` never has to commit a
- * CHANGELOG.md back to `main`, so no `chore(release)` bot commit lands in front
+ * CHANGELOG.md back to `master`, so no `chore(release)` bot commit lands in front
  * of every release. The SPA reads them through `GET /api/changelog` rather than
  * calling GitHub directly: the token stays server-side (required for a private
  * fork, and it lifts the anonymous rate limit for a public one), and the
