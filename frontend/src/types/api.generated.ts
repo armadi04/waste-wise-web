@@ -4,15 +4,15 @@
  */
 
 export interface paths {
-    "/": {
+    "/api/v1": {
         parameters: {
             query?: never;
             header?: never;
             path?: never;
             cookie?: never;
         };
-        /** API service metadata and health status */
-        get: operations["AppController_getApiInfo"];
+        /** API identity and documentation location */
+        get: operations["AppController_getApiInfo_v1"];
         put?: never;
         post?: never;
         delete?: never;
@@ -21,7 +21,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/users": {
+    "/api/v1/users": {
         parameters: {
             query?: never;
             header?: never;
@@ -29,7 +29,7 @@ export interface paths {
             cookie?: never;
         };
         /** Get all users */
-        get: operations["UsersController_findAll"];
+        get: operations["UsersController_findAll_v1"];
         put?: never;
         post?: never;
         delete?: never;
@@ -38,7 +38,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/users/{id}": {
+    "/api/v1/users/{id}": {
         parameters: {
             query?: never;
             header?: never;
@@ -46,18 +46,18 @@ export interface paths {
             cookie?: never;
         };
         /** Get a user by ID */
-        get: operations["UsersController_findOne"];
+        get: operations["UsersController_findOne_v1"];
         put?: never;
         post?: never;
         /** Delete a user */
-        delete: operations["UsersController_remove"];
+        delete: operations["UsersController_remove_v1"];
         options?: never;
         head?: never;
         /** Update a user */
-        patch: operations["UsersController_update"];
+        patch: operations["UsersController_update_v1"];
         trace?: never;
     };
-    "/users/bulk-delete": {
+    "/api/v1/users/bulk-delete": {
         parameters: {
             query?: never;
             header?: never;
@@ -67,14 +67,14 @@ export interface paths {
         get?: never;
         put?: never;
         /** Delete multiple users */
-        post: operations["UsersController_bulkRemove"];
+        post: operations["UsersController_bulkRemove_v1"];
         delete?: never;
         options?: never;
         head?: never;
         patch?: never;
         trace?: never;
     };
-    "/users/{id}/roles/sync": {
+    "/api/v1/users/{id}/roles/sync": {
         parameters: {
             query?: never;
             header?: never;
@@ -84,14 +84,14 @@ export interface paths {
         get?: never;
         put?: never;
         /** Sync user roles */
-        post: operations["UsersController_syncRoles"];
+        post: operations["UsersController_syncRoles_v1"];
         delete?: never;
         options?: never;
         head?: never;
         patch?: never;
         trace?: never;
     };
-    "/users/{id}/roles/attach": {
+    "/api/v1/users/{id}/roles/attach": {
         parameters: {
             query?: never;
             header?: never;
@@ -101,14 +101,14 @@ export interface paths {
         get?: never;
         put?: never;
         /** Attach roles to user */
-        post: operations["UsersController_attachRoles"];
+        post: operations["UsersController_attachRoles_v1"];
         delete?: never;
         options?: never;
         head?: never;
         patch?: never;
         trace?: never;
     };
-    "/users/{id}/roles/detach": {
+    "/api/v1/users/{id}/roles/detach": {
         parameters: {
             query?: never;
             header?: never;
@@ -118,14 +118,14 @@ export interface paths {
         get?: never;
         put?: never;
         /** Detach roles from user */
-        post: operations["UsersController_detachRoles"];
+        post: operations["UsersController_detachRoles_v1"];
         delete?: never;
         options?: never;
         head?: never;
         patch?: never;
         trace?: never;
     };
-    "/users/{id}/permissions/sync": {
+    "/api/v1/users/{id}/permissions/sync": {
         parameters: {
             query?: never;
             header?: never;
@@ -135,14 +135,14 @@ export interface paths {
         get?: never;
         put?: never;
         /** Sync user permissions */
-        post: operations["UsersController_syncPermissions"];
+        post: operations["UsersController_syncPermissions_v1"];
         delete?: never;
         options?: never;
         head?: never;
         patch?: never;
         trace?: never;
     };
-    "/users/{id}/permissions/attach": {
+    "/api/v1/users/{id}/permissions/attach": {
         parameters: {
             query?: never;
             header?: never;
@@ -152,14 +152,14 @@ export interface paths {
         get?: never;
         put?: never;
         /** Attach permissions to user */
-        post: operations["UsersController_attachPermissions"];
+        post: operations["UsersController_attachPermissions_v1"];
         delete?: never;
         options?: never;
         head?: never;
         patch?: never;
         trace?: never;
     };
-    "/users/{id}/permissions/detach": {
+    "/api/v1/users/{id}/permissions/detach": {
         parameters: {
             query?: never;
             header?: never;
@@ -169,14 +169,14 @@ export interface paths {
         get?: never;
         put?: never;
         /** Detach permissions from user */
-        post: operations["UsersController_detachPermissions"];
+        post: operations["UsersController_detachPermissions_v1"];
         delete?: never;
         options?: never;
         head?: never;
         patch?: never;
         trace?: never;
     };
-    "/media/upload": {
+    "/api/v1/media/upload": {
         parameters: {
             query?: never;
             header?: never;
@@ -186,14 +186,14 @@ export interface paths {
         get?: never;
         put?: never;
         /** Upload a new media file */
-        post: operations["MediaController_uploadFile"];
+        post: operations["MediaController_uploadFile_v1"];
         delete?: never;
         options?: never;
         head?: never;
         patch?: never;
         trace?: never;
     };
-    "/media": {
+    "/api/v1/media": {
         parameters: {
             query?: never;
             header?: never;
@@ -201,7 +201,7 @@ export interface paths {
             cookie?: never;
         };
         /** Get all media */
-        get: operations["MediaController_findAll"];
+        get: operations["MediaController_findAll_v1"];
         put?: never;
         post?: never;
         delete?: never;
@@ -210,7 +210,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/media/{id}": {
+    "/api/v1/media/{id}": {
         parameters: {
             query?: never;
             header?: never;
@@ -218,17 +218,17 @@ export interface paths {
             cookie?: never;
         };
         /** Get a media by ID */
-        get: operations["MediaController_findOne"];
+        get: operations["MediaController_findOne_v1"];
         put?: never;
         post?: never;
         /** Delete a media */
-        delete: operations["MediaController_remove"];
+        delete: operations["MediaController_remove_v1"];
         options?: never;
         head?: never;
         patch?: never;
         trace?: never;
     };
-    "/media/{id}/view": {
+    "/api/v1/media/{id}/view": {
         parameters: {
             query?: never;
             header?: never;
@@ -236,7 +236,7 @@ export interface paths {
             cookie?: never;
         };
         /** View a public (non-private) media file */
-        get: operations["MediaController_viewFile"];
+        get: operations["MediaController_viewFile_v1"];
         put?: never;
         post?: never;
         delete?: never;
@@ -245,7 +245,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/media/{id}/stream": {
+    "/api/v1/media/{id}/stream": {
         parameters: {
             query?: never;
             header?: never;
@@ -253,7 +253,7 @@ export interface paths {
             cookie?: never;
         };
         /** Stream a media file */
-        get: operations["MediaController_streamFile"];
+        get: operations["MediaController_streamFile_v1"];
         put?: never;
         post?: never;
         delete?: never;
@@ -262,7 +262,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/media/bulk-delete": {
+    "/api/v1/media/bulk-delete": {
         parameters: {
             query?: never;
             header?: never;
@@ -272,14 +272,14 @@ export interface paths {
         get?: never;
         put?: never;
         /** Delete multiple media */
-        post: operations["MediaController_bulkRemove"];
+        post: operations["MediaController_bulkRemove_v1"];
         delete?: never;
         options?: never;
         head?: never;
         patch?: never;
         trace?: never;
     };
-    "/roles": {
+    "/api/v1/roles": {
         parameters: {
             query?: never;
             header?: never;
@@ -287,17 +287,17 @@ export interface paths {
             cookie?: never;
         };
         /** Get all roles */
-        get: operations["RolesController_findAll"];
+        get: operations["RolesController_findAll_v1"];
         put?: never;
         /** Create a new role */
-        post: operations["RolesController_create"];
+        post: operations["RolesController_create_v1"];
         delete?: never;
         options?: never;
         head?: never;
         patch?: never;
         trace?: never;
     };
-    "/roles/{id}": {
+    "/api/v1/roles/{id}": {
         parameters: {
             query?: never;
             header?: never;
@@ -305,18 +305,18 @@ export interface paths {
             cookie?: never;
         };
         /** Get a role by ID */
-        get: operations["RolesController_findOne"];
+        get: operations["RolesController_findOne_v1"];
         put?: never;
         post?: never;
         /** Delete a role */
-        delete: operations["RolesController_remove"];
+        delete: operations["RolesController_remove_v1"];
         options?: never;
         head?: never;
         /** Update a role */
-        patch: operations["RolesController_update"];
+        patch: operations["RolesController_update_v1"];
         trace?: never;
     };
-    "/roles/bulk-delete": {
+    "/api/v1/roles/bulk-delete": {
         parameters: {
             query?: never;
             header?: never;
@@ -326,14 +326,14 @@ export interface paths {
         get?: never;
         put?: never;
         /** Delete multiple roles */
-        post: operations["RolesController_bulkRemove"];
+        post: operations["RolesController_bulkRemove_v1"];
         delete?: never;
         options?: never;
         head?: never;
         patch?: never;
         trace?: never;
     };
-    "/roles/{id}/permissions/sync": {
+    "/api/v1/roles/{id}/permissions/sync": {
         parameters: {
             query?: never;
             header?: never;
@@ -343,14 +343,14 @@ export interface paths {
         get?: never;
         put?: never;
         /** Sync role permissions */
-        post: operations["RolesController_syncPermissions"];
+        post: operations["RolesController_syncPermissions_v1"];
         delete?: never;
         options?: never;
         head?: never;
         patch?: never;
         trace?: never;
     };
-    "/roles/{id}/permissions/attach": {
+    "/api/v1/roles/{id}/permissions/attach": {
         parameters: {
             query?: never;
             header?: never;
@@ -360,14 +360,14 @@ export interface paths {
         get?: never;
         put?: never;
         /** Attach permissions to role */
-        post: operations["RolesController_attachPermissions"];
+        post: operations["RolesController_attachPermissions_v1"];
         delete?: never;
         options?: never;
         head?: never;
         patch?: never;
         trace?: never;
     };
-    "/roles/{id}/permissions/detach": {
+    "/api/v1/roles/{id}/permissions/detach": {
         parameters: {
             query?: never;
             header?: never;
@@ -377,14 +377,14 @@ export interface paths {
         get?: never;
         put?: never;
         /** Detach permissions from role */
-        post: operations["RolesController_detachPermissions"];
+        post: operations["RolesController_detachPermissions_v1"];
         delete?: never;
         options?: never;
         head?: never;
         patch?: never;
         trace?: never;
     };
-    "/invitations": {
+    "/api/v1/invitations": {
         parameters: {
             query?: never;
             header?: never;
@@ -392,17 +392,17 @@ export interface paths {
             cookie?: never;
         };
         /** List invitations */
-        get: operations["InvitationsController_findAll"];
+        get: operations["InvitationsController_findAll_v1"];
         put?: never;
         /** Generate and send an invite link */
-        post: operations["InvitationsController_create"];
+        post: operations["InvitationsController_create_v1"];
         delete?: never;
         options?: never;
         head?: never;
         patch?: never;
         trace?: never;
     };
-    "/invitations/{id}/resend": {
+    "/api/v1/invitations/{id}/resend": {
         parameters: {
             query?: never;
             header?: never;
@@ -412,14 +412,14 @@ export interface paths {
         get?: never;
         put?: never;
         /** Resend an invitation email */
-        post: operations["InvitationsController_resend"];
+        post: operations["InvitationsController_resend_v1"];
         delete?: never;
         options?: never;
         head?: never;
         patch?: never;
         trace?: never;
     };
-    "/invitations/bulk-delete": {
+    "/api/v1/invitations/bulk-delete": {
         parameters: {
             query?: never;
             header?: never;
@@ -429,14 +429,14 @@ export interface paths {
         get?: never;
         put?: never;
         /** Revoke multiple invitations */
-        post: operations["InvitationsController_bulkRemove"];
+        post: operations["InvitationsController_bulkRemove_v1"];
         delete?: never;
         options?: never;
         head?: never;
         patch?: never;
         trace?: never;
     };
-    "/invitations/{id}": {
+    "/api/v1/invitations/{id}": {
         parameters: {
             query?: never;
             header?: never;
@@ -447,13 +447,13 @@ export interface paths {
         put?: never;
         post?: never;
         /** Revoke an invitation */
-        delete: operations["InvitationsController_remove"];
+        delete: operations["InvitationsController_remove_v1"];
         options?: never;
         head?: never;
         patch?: never;
         trace?: never;
     };
-    "/invitations/accept": {
+    "/api/v1/invitations/accept": {
         parameters: {
             query?: never;
             header?: never;
@@ -461,17 +461,17 @@ export interface paths {
             cookie?: never;
         };
         /** Resolve an invitation by token (prefill) */
-        get: operations["InvitationsController_getByToken"];
+        get: operations["InvitationsController_getByToken_v1"];
         put?: never;
         /** Accept an invitation and create the account */
-        post: operations["InvitationsController_accept"];
+        post: operations["InvitationsController_accept_v1"];
         delete?: never;
         options?: never;
         head?: never;
         patch?: never;
         trace?: never;
     };
-    "/auth/login": {
+    "/api/v1/auth/login": {
         parameters: {
             query?: never;
             header?: never;
@@ -481,14 +481,14 @@ export interface paths {
         get?: never;
         put?: never;
         /** Login with email and password */
-        post: operations["AuthController_login"];
+        post: operations["AuthController_login_v1"];
         delete?: never;
         options?: never;
         head?: never;
         patch?: never;
         trace?: never;
     };
-    "/auth/google": {
+    "/api/v1/auth/google": {
         parameters: {
             query?: never;
             header?: never;
@@ -498,14 +498,14 @@ export interface paths {
         get?: never;
         put?: never;
         /** Login with Google */
-        post: operations["AuthController_googleLogin"];
+        post: operations["AuthController_googleLogin_v1"];
         delete?: never;
         options?: never;
         head?: never;
         patch?: never;
         trace?: never;
     };
-    "/auth/2fa/verify": {
+    "/api/v1/auth/2fa/verify": {
         parameters: {
             query?: never;
             header?: never;
@@ -515,14 +515,14 @@ export interface paths {
         get?: never;
         put?: never;
         /** Finish a login by verifying the second factor */
-        post: operations["AuthController_verifyTwoFactor"];
+        post: operations["AuthController_verifyTwoFactor_v1"];
         delete?: never;
         options?: never;
         head?: never;
         patch?: never;
         trace?: never;
     };
-    "/auth/2fa": {
+    "/api/v1/auth/2fa": {
         parameters: {
             query?: never;
             header?: never;
@@ -530,7 +530,7 @@ export interface paths {
             cookie?: never;
         };
         /** Two-factor status for the current user */
-        get: operations["AuthController_twoFactorStatus"];
+        get: operations["AuthController_twoFactorStatus_v1"];
         put?: never;
         post?: never;
         delete?: never;
@@ -539,7 +539,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/auth/2fa/setup": {
+    "/api/v1/auth/2fa/setup": {
         parameters: {
             query?: never;
             header?: never;
@@ -549,14 +549,14 @@ export interface paths {
         get?: never;
         put?: never;
         /** Start two-factor enrollment (QR + secret) */
-        post: operations["AuthController_startTwoFactorSetup"];
+        post: operations["AuthController_startTwoFactorSetup_v1"];
         delete?: never;
         options?: never;
         head?: never;
         patch?: never;
         trace?: never;
     };
-    "/auth/2fa/enable": {
+    "/api/v1/auth/2fa/enable": {
         parameters: {
             query?: never;
             header?: never;
@@ -566,14 +566,14 @@ export interface paths {
         get?: never;
         put?: never;
         /** Confirm enrollment; returns the recovery codes */
-        post: operations["AuthController_enableTwoFactor"];
+        post: operations["AuthController_enableTwoFactor_v1"];
         delete?: never;
         options?: never;
         head?: never;
         patch?: never;
         trace?: never;
     };
-    "/auth/2fa/disable": {
+    "/api/v1/auth/2fa/disable": {
         parameters: {
             query?: never;
             header?: never;
@@ -583,14 +583,14 @@ export interface paths {
         get?: never;
         put?: never;
         /** Turn the second factor off (needs a valid code) */
-        post: operations["AuthController_disableTwoFactor"];
+        post: operations["AuthController_disableTwoFactor_v1"];
         delete?: never;
         options?: never;
         head?: never;
         patch?: never;
         trace?: never;
     };
-    "/auth/2fa/recovery-codes": {
+    "/api/v1/auth/2fa/recovery-codes": {
         parameters: {
             query?: never;
             header?: never;
@@ -600,14 +600,14 @@ export interface paths {
         get?: never;
         put?: never;
         /** Replace the recovery codes (needs a valid code) */
-        post: operations["AuthController_regenerateRecoveryCodes"];
+        post: operations["AuthController_regenerateRecoveryCodes_v1"];
         delete?: never;
         options?: never;
         head?: never;
         patch?: never;
         trace?: never;
     };
-    "/auth/impersonate/{id}": {
+    "/api/v1/auth/impersonate/{id}": {
         parameters: {
             query?: never;
             header?: never;
@@ -617,14 +617,14 @@ export interface paths {
         get?: never;
         put?: never;
         /** Open a session as another user */
-        post: operations["AuthController_impersonate"];
+        post: operations["AuthController_impersonate_v1"];
         delete?: never;
         options?: never;
         head?: never;
         patch?: never;
         trace?: never;
     };
-    "/auth/stop-impersonating": {
+    "/api/v1/auth/stop-impersonating": {
         parameters: {
             query?: never;
             header?: never;
@@ -634,14 +634,14 @@ export interface paths {
         get?: never;
         put?: never;
         /** Return to your own account */
-        post: operations["AuthController_stopImpersonating"];
+        post: operations["AuthController_stopImpersonating_v1"];
         delete?: never;
         options?: never;
         head?: never;
         patch?: never;
         trace?: never;
     };
-    "/auth/refresh": {
+    "/api/v1/auth/refresh": {
         parameters: {
             query?: never;
             header?: never;
@@ -651,14 +651,14 @@ export interface paths {
         get?: never;
         put?: never;
         /** Refresh access token using refresh token cookie */
-        post: operations["AuthController_refresh"];
+        post: operations["AuthController_refresh_v1"];
         delete?: never;
         options?: never;
         head?: never;
         patch?: never;
         trace?: never;
     };
-    "/auth/logout": {
+    "/api/v1/auth/logout": {
         parameters: {
             query?: never;
             header?: never;
@@ -668,14 +668,14 @@ export interface paths {
         get?: never;
         put?: never;
         /** Logout and clear refresh token cookie */
-        post: operations["AuthController_logout"];
+        post: operations["AuthController_logout_v1"];
         delete?: never;
         options?: never;
         head?: never;
         patch?: never;
         trace?: never;
     };
-    "/auth/forgot-password": {
+    "/api/v1/auth/forgot-password": {
         parameters: {
             query?: never;
             header?: never;
@@ -685,14 +685,14 @@ export interface paths {
         get?: never;
         put?: never;
         /** Request a password reset email */
-        post: operations["AuthController_forgotPassword"];
+        post: operations["AuthController_forgotPassword_v1"];
         delete?: never;
         options?: never;
         head?: never;
         patch?: never;
         trace?: never;
     };
-    "/auth/reset-password": {
+    "/api/v1/auth/reset-password": {
         parameters: {
             query?: never;
             header?: never;
@@ -702,14 +702,14 @@ export interface paths {
         get?: never;
         put?: never;
         /** Reset password using token from email */
-        post: operations["AuthController_resetPassword"];
+        post: operations["AuthController_resetPassword_v1"];
         delete?: never;
         options?: never;
         head?: never;
         patch?: never;
         trace?: never;
     };
-    "/auth/resend-verification": {
+    "/api/v1/auth/resend-verification": {
         parameters: {
             query?: never;
             header?: never;
@@ -719,14 +719,14 @@ export interface paths {
         get?: never;
         put?: never;
         /** Resend email verification link */
-        post: operations["AuthController_resendVerification"];
+        post: operations["AuthController_resendVerification_v1"];
         delete?: never;
         options?: never;
         head?: never;
         patch?: never;
         trace?: never;
     };
-    "/auth/verify-email": {
+    "/api/v1/auth/verify-email": {
         parameters: {
             query?: never;
             header?: never;
@@ -734,7 +734,7 @@ export interface paths {
             cookie?: never;
         };
         /** Verify email address using token from email */
-        get: operations["AuthController_verifyEmail"];
+        get: operations["AuthController_verifyEmail_v1"];
         put?: never;
         post?: never;
         delete?: never;
@@ -743,7 +743,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/auth/profile": {
+    "/api/v1/auth/profile": {
         parameters: {
             query?: never;
             header?: never;
@@ -751,7 +751,7 @@ export interface paths {
             cookie?: never;
         };
         /** Get current user profile */
-        get: operations["AuthController_getProfile"];
+        get: operations["AuthController_getProfile_v1"];
         put?: never;
         post?: never;
         delete?: never;
@@ -760,7 +760,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/auth/switch-role": {
+    "/api/v1/auth/switch-role": {
         parameters: {
             query?: never;
             header?: never;
@@ -770,14 +770,14 @@ export interface paths {
         get?: never;
         put?: never;
         /** Re-issue tokens scoped to a role the user holds */
-        post: operations["AuthController_switchRole"];
+        post: operations["AuthController_switchRole_v1"];
         delete?: never;
         options?: never;
         head?: never;
         patch?: never;
         trace?: never;
     };
-    "/auth/me": {
+    "/api/v1/auth/me": {
         parameters: {
             query?: never;
             header?: never;
@@ -785,7 +785,7 @@ export interface paths {
             cookie?: never;
         };
         /** Current session identity (flattened roles + permissions) */
-        get: operations["AuthController_me"];
+        get: operations["AuthController_me_v1"];
         put?: never;
         post?: never;
         delete?: never;
@@ -794,7 +794,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/oauth/token": {
+    "/api/v1/oauth/token": {
         parameters: {
             query?: never;
             header?: never;
@@ -804,14 +804,14 @@ export interface paths {
         get?: never;
         put?: never;
         /** Issue an access token (client_credentials grant) */
-        post: operations["OAuthController_token"];
+        post: operations["OAuthController_token_v1"];
         delete?: never;
         options?: never;
         head?: never;
         patch?: never;
         trace?: never;
     };
-    "/oauth/clients": {
+    "/api/v1/oauth/clients": {
         parameters: {
             query?: never;
             header?: never;
@@ -819,17 +819,17 @@ export interface paths {
             cookie?: never;
         };
         /** List OAuth clients */
-        get: operations["OAuthController_findAll"];
+        get: operations["OAuthController_findAll_v1"];
         put?: never;
         /** Register an OAuth client (returns the secret once) */
-        post: operations["OAuthController_create"];
+        post: operations["OAuthController_create_v1"];
         delete?: never;
         options?: never;
         head?: never;
         patch?: never;
         trace?: never;
     };
-    "/oauth/clients/{id}": {
+    "/api/v1/oauth/clients/{id}": {
         parameters: {
             query?: never;
             header?: never;
@@ -837,18 +837,18 @@ export interface paths {
             cookie?: never;
         };
         /** Get an OAuth client by id */
-        get: operations["OAuthController_findOne"];
+        get: operations["OAuthController_findOne_v1"];
         put?: never;
         post?: never;
         /** Revoke (soft-delete) an OAuth client */
-        delete: operations["OAuthController_remove"];
+        delete: operations["OAuthController_remove_v1"];
         options?: never;
         head?: never;
         /** Update an OAuth client */
-        patch: operations["OAuthController_update"];
+        patch: operations["OAuthController_update_v1"];
         trace?: never;
     };
-    "/oauth/clients/bulk-delete": {
+    "/api/v1/oauth/clients/bulk-delete": {
         parameters: {
             query?: never;
             header?: never;
@@ -858,14 +858,14 @@ export interface paths {
         get?: never;
         put?: never;
         /** Revoke (soft-delete) multiple OAuth clients */
-        post: operations["OAuthController_bulkRemove"];
+        post: operations["OAuthController_bulkRemove_v1"];
         delete?: never;
         options?: never;
         head?: never;
         patch?: never;
         trace?: never;
     };
-    "/sessions/me": {
+    "/api/v1/sessions/me": {
         parameters: {
             query?: never;
             header?: never;
@@ -873,7 +873,7 @@ export interface paths {
             cookie?: never;
         };
         /** List the current user's active sessions */
-        get: operations["SessionsController_findMine"];
+        get: operations["SessionsController_findMine_v1"];
         put?: never;
         post?: never;
         delete?: never;
@@ -882,7 +882,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/sessions/me/revoke-others": {
+    "/api/v1/sessions/me/revoke-others": {
         parameters: {
             query?: never;
             header?: never;
@@ -892,14 +892,14 @@ export interface paths {
         get?: never;
         put?: never;
         /** Sign out of every other device */
-        post: operations["SessionsController_revokeOthers"];
+        post: operations["SessionsController_revokeOthers_v1"];
         delete?: never;
         options?: never;
         head?: never;
         patch?: never;
         trace?: never;
     };
-    "/sessions/me/{id}": {
+    "/api/v1/sessions/me/{id}": {
         parameters: {
             query?: never;
             header?: never;
@@ -910,13 +910,13 @@ export interface paths {
         put?: never;
         post?: never;
         /** Revoke one of the current user's sessions */
-        delete: operations["SessionsController_revokeMine"];
+        delete: operations["SessionsController_revokeMine_v1"];
         options?: never;
         head?: never;
         patch?: never;
         trace?: never;
     };
-    "/sessions": {
+    "/api/v1/sessions": {
         parameters: {
             query?: never;
             header?: never;
@@ -924,7 +924,7 @@ export interface paths {
             cookie?: never;
         };
         /** List every session (admin) */
-        get: operations["SessionsController_findAll"];
+        get: operations["SessionsController_findAll_v1"];
         put?: never;
         post?: never;
         delete?: never;
@@ -933,7 +933,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/sessions/{id}": {
+    "/api/v1/sessions/{id}": {
         parameters: {
             query?: never;
             header?: never;
@@ -944,13 +944,13 @@ export interface paths {
         put?: never;
         post?: never;
         /** Revoke any session (admin) */
-        delete: operations["SessionsController_revoke"];
+        delete: operations["SessionsController_revoke_v1"];
         options?: never;
         head?: never;
         patch?: never;
         trace?: never;
     };
-    "/permissions": {
+    "/api/v1/permissions": {
         parameters: {
             query?: never;
             header?: never;
@@ -958,17 +958,17 @@ export interface paths {
             cookie?: never;
         };
         /** Get all permissions */
-        get: operations["PermissionsController_findAll"];
+        get: operations["PermissionsController_findAll_v1"];
         put?: never;
         /** Create a new permission */
-        post: operations["PermissionsController_create"];
+        post: operations["PermissionsController_create_v1"];
         delete?: never;
         options?: never;
         head?: never;
         patch?: never;
         trace?: never;
     };
-    "/permissions/{id}": {
+    "/api/v1/permissions/{id}": {
         parameters: {
             query?: never;
             header?: never;
@@ -976,18 +976,18 @@ export interface paths {
             cookie?: never;
         };
         /** Get a permission by ID */
-        get: operations["PermissionsController_findOne"];
+        get: operations["PermissionsController_findOne_v1"];
         put?: never;
         post?: never;
         /** Delete a permission */
-        delete: operations["PermissionsController_remove"];
+        delete: operations["PermissionsController_remove_v1"];
         options?: never;
         head?: never;
         /** Update a permission */
-        patch: operations["PermissionsController_update"];
+        patch: operations["PermissionsController_update_v1"];
         trace?: never;
     };
-    "/permissions/bulk-delete": {
+    "/api/v1/permissions/bulk-delete": {
         parameters: {
             query?: never;
             header?: never;
@@ -997,14 +997,14 @@ export interface paths {
         get?: never;
         put?: never;
         /** Delete multiple permissions */
-        post: operations["PermissionsController_bulkRemove"];
+        post: operations["PermissionsController_bulkRemove_v1"];
         delete?: never;
         options?: never;
         head?: never;
         patch?: never;
         trace?: never;
     };
-    "/notifications": {
+    "/api/v1/notifications": {
         parameters: {
             query?: never;
             header?: never;
@@ -1012,7 +1012,7 @@ export interface paths {
             cookie?: never;
         };
         /** Get current user notifications */
-        get: operations["NotificationsController_findAll"];
+        get: operations["NotificationsController_findAll_v1"];
         put?: never;
         post?: never;
         delete?: never;
@@ -1021,7 +1021,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/notifications/unread-count": {
+    "/api/v1/notifications/unread-count": {
         parameters: {
             query?: never;
             header?: never;
@@ -1029,7 +1029,7 @@ export interface paths {
             cookie?: never;
         };
         /** Get unread notifications count */
-        get: operations["NotificationsController_getUnreadCount"];
+        get: operations["NotificationsController_getUnreadCount_v1"];
         put?: never;
         post?: never;
         delete?: never;
@@ -1038,7 +1038,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/notifications/{id}/read": {
+    "/api/v1/notifications/{id}/read": {
         parameters: {
             query?: never;
             header?: never;
@@ -1052,10 +1052,10 @@ export interface paths {
         options?: never;
         head?: never;
         /** Mark a notification as read */
-        patch: operations["NotificationsController_markAsRead"];
+        patch: operations["NotificationsController_markAsRead_v1"];
         trace?: never;
     };
-    "/notifications/read-all": {
+    "/api/v1/notifications/read-all": {
         parameters: {
             query?: never;
             header?: never;
@@ -1065,14 +1065,14 @@ export interface paths {
         get?: never;
         put?: never;
         /** Mark all notifications as read */
-        post: operations["NotificationsController_markAllAsRead"];
+        post: operations["NotificationsController_markAllAsRead_v1"];
         delete?: never;
         options?: never;
         head?: never;
         patch?: never;
         trace?: never;
     };
-    "/app/force-refresh": {
+    "/api/v1/app/force-refresh": {
         parameters: {
             query?: never;
             header?: never;
@@ -1082,22 +1082,25 @@ export interface paths {
         get?: never;
         put?: never;
         /** Tell every connected client to drop its cache and reload */
-        post: operations["AppRefreshController_forceRefresh"];
+        post: operations["AppRefreshController_forceRefresh_v1"];
         delete?: never;
         options?: never;
         head?: never;
         patch?: never;
         trace?: never;
     };
-    "/health": {
+    "/api/v1/health": {
         parameters: {
             query?: never;
             header?: never;
             path?: never;
             cookie?: never;
         };
-        /** Application health check */
-        get: operations["HealthController_check"];
+        /**
+         * Service health and PostgreSQL connectivity
+         * @description Checks PostgreSQL connectivity with a dedicated pool (1 second acquisition timeout, 1 second server statement timeout, 1.5 second transport fallback) and a 300 MiB heap limit. This does not validate schema or business operations. Returns HTTP 200 when both checks succeed, otherwise HTTP 503 with sanitized dependency status.
+         */
+        get: operations["HealthController_check_v1"];
         put?: never;
         post?: never;
         delete?: never;
@@ -1106,7 +1109,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/audit-logs": {
+    "/api/v1/audit-logs": {
         parameters: {
             query?: never;
             header?: never;
@@ -1114,7 +1117,7 @@ export interface paths {
             cookie?: never;
         };
         /** Read the audit trail */
-        get: operations["AuditController_findAll"];
+        get: operations["AuditController_findAll_v1"];
         put?: never;
         post?: never;
         delete?: never;
@@ -1123,7 +1126,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/audit-logs/actions": {
+    "/api/v1/audit-logs/actions": {
         parameters: {
             query?: never;
             header?: never;
@@ -1131,7 +1134,7 @@ export interface paths {
             cookie?: never;
         };
         /** The distinct actions recorded so far */
-        get: operations["AuditController_findActions"];
+        get: operations["AuditController_findActions_v1"];
         put?: never;
         post?: never;
         delete?: never;
@@ -1140,7 +1143,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/stats/overview": {
+    "/api/v1/stats/overview": {
         parameters: {
             query?: never;
             header?: never;
@@ -1148,7 +1151,7 @@ export interface paths {
             cookie?: never;
         };
         /** Counters for the dashboard */
-        get: operations["StatsController_overview"];
+        get: operations["StatsController_overview_v1"];
         put?: never;
         post?: never;
         delete?: never;
@@ -1157,7 +1160,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/stats/signups": {
+    "/api/v1/stats/signups": {
         parameters: {
             query?: never;
             header?: never;
@@ -1165,7 +1168,7 @@ export interface paths {
             cookie?: never;
         };
         /** Accounts created per day */
-        get: operations["StatsController_signups"];
+        get: operations["StatsController_signups_v1"];
         put?: never;
         post?: never;
         delete?: never;
@@ -1174,7 +1177,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/changelog": {
+    "/api/v1/changelog": {
         parameters: {
             query?: never;
             header?: never;
@@ -1182,7 +1185,7 @@ export interface paths {
             cookie?: never;
         };
         /** Published release notes, newest first */
-        get: operations["ChangelogController_findAll"];
+        get: operations["ChangelogController_findAll_v1"];
         put?: never;
         post?: never;
         delete?: never;
@@ -1191,14 +1194,14 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/time-zone/config": {
+    "/api/v1/time-zone/config": {
         parameters: {
             query?: never;
             header?: never;
             path?: never;
             cookie?: never;
         };
-        get: operations["TimeZoneController_config"];
+        get: operations["TimeZoneController_config_v1"];
         put?: never;
         post?: never;
         delete?: never;
@@ -1207,23 +1210,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/time-zone/preferences": {
+    "/api/v1/time-zone/preferences": {
         parameters: {
             query?: never;
             header?: never;
             path?: never;
             cookie?: never;
         };
-        get: operations["TimeZoneController_preferences"];
+        get: operations["TimeZoneController_preferences_v1"];
         put?: never;
         post?: never;
         delete?: never;
         options?: never;
         head?: never;
-        patch: operations["TimeZoneController_update"];
+        patch: operations["TimeZoneController_update_v1"];
         trace?: never;
     };
-    "/time-zone/preview": {
+    "/api/v1/time-zone/preview": {
         parameters: {
             query?: never;
             header?: never;
@@ -1232,7 +1235,7 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        post: operations["TimeZoneController_preview"];
+        post: operations["TimeZoneController_preview_v1"];
         delete?: never;
         options?: never;
         head?: never;
@@ -1243,6 +1246,14 @@ export interface paths {
 export type webhooks = Record<string, never>;
 export interface components {
     schemas: {
+        ApiInfo: {
+            /** @example Nestplate API */
+            name: string;
+            /** @example 1 */
+            apiVersion: string;
+            /** @example /api/docs */
+            docs: string;
+        };
         PaginationMetaDto: {
             total: number;
             page: number;
@@ -1562,7 +1573,7 @@ export interface components {
 }
 export type $defs = Record<string, never>;
 export interface operations {
-    AppController_getApiInfo: {
+    AppController_getApiInfo_v1: {
         parameters: {
             query?: never;
             header?: never;
@@ -1571,15 +1582,18 @@ export interface operations {
         };
         requestBody?: never;
         responses: {
+            /** @description API identity; use the health endpoint for dependency connectivity. */
             200: {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
+                content: {
+                    "application/json": components["schemas"]["ApiInfo"];
+                };
             };
         };
     };
-    UsersController_findAll: {
+    UsersController_findAll_v1: {
         parameters: {
             query?: {
                 page?: number;
@@ -1610,7 +1624,7 @@ export interface operations {
             };
         };
     };
-    UsersController_findOne: {
+    UsersController_findOne_v1: {
         parameters: {
             query?: never;
             header?: never;
@@ -1631,7 +1645,7 @@ export interface operations {
             };
         };
     };
-    UsersController_remove: {
+    UsersController_remove_v1: {
         parameters: {
             query?: never;
             header?: never;
@@ -1650,7 +1664,7 @@ export interface operations {
             };
         };
     };
-    UsersController_update: {
+    UsersController_update_v1: {
         parameters: {
             query?: never;
             header?: never;
@@ -1675,7 +1689,7 @@ export interface operations {
             };
         };
     };
-    UsersController_bulkRemove: {
+    UsersController_bulkRemove_v1: {
         parameters: {
             query?: never;
             header?: never;
@@ -1696,7 +1710,7 @@ export interface operations {
             };
         };
     };
-    UsersController_syncRoles: {
+    UsersController_syncRoles_v1: {
         parameters: {
             query?: never;
             header?: never;
@@ -1721,7 +1735,7 @@ export interface operations {
             };
         };
     };
-    UsersController_attachRoles: {
+    UsersController_attachRoles_v1: {
         parameters: {
             query?: never;
             header?: never;
@@ -1746,7 +1760,7 @@ export interface operations {
             };
         };
     };
-    UsersController_detachRoles: {
+    UsersController_detachRoles_v1: {
         parameters: {
             query?: never;
             header?: never;
@@ -1771,7 +1785,7 @@ export interface operations {
             };
         };
     };
-    UsersController_syncPermissions: {
+    UsersController_syncPermissions_v1: {
         parameters: {
             query?: never;
             header?: never;
@@ -1796,7 +1810,7 @@ export interface operations {
             };
         };
     };
-    UsersController_attachPermissions: {
+    UsersController_attachPermissions_v1: {
         parameters: {
             query?: never;
             header?: never;
@@ -1821,7 +1835,7 @@ export interface operations {
             };
         };
     };
-    UsersController_detachPermissions: {
+    UsersController_detachPermissions_v1: {
         parameters: {
             query?: never;
             header?: never;
@@ -1846,7 +1860,7 @@ export interface operations {
             };
         };
     };
-    MediaController_uploadFile: {
+    MediaController_uploadFile_v1: {
         parameters: {
             query?: never;
             header?: never;
@@ -1872,7 +1886,7 @@ export interface operations {
             };
         };
     };
-    MediaController_findAll: {
+    MediaController_findAll_v1: {
         parameters: {
             query?: {
                 page?: number;
@@ -1898,7 +1912,7 @@ export interface operations {
             };
         };
     };
-    MediaController_findOne: {
+    MediaController_findOne_v1: {
         parameters: {
             query?: never;
             header?: never;
@@ -1919,7 +1933,7 @@ export interface operations {
             };
         };
     };
-    MediaController_remove: {
+    MediaController_remove_v1: {
         parameters: {
             query?: never;
             header?: never;
@@ -1940,7 +1954,7 @@ export interface operations {
             };
         };
     };
-    MediaController_viewFile: {
+    MediaController_viewFile_v1: {
         parameters: {
             query?: never;
             header?: never;
@@ -1959,7 +1973,7 @@ export interface operations {
             };
         };
     };
-    MediaController_streamFile: {
+    MediaController_streamFile_v1: {
         parameters: {
             query?: never;
             header?: never;
@@ -1978,7 +1992,7 @@ export interface operations {
             };
         };
     };
-    MediaController_bulkRemove: {
+    MediaController_bulkRemove_v1: {
         parameters: {
             query?: never;
             header?: never;
@@ -2001,7 +2015,7 @@ export interface operations {
             };
         };
     };
-    RolesController_findAll: {
+    RolesController_findAll_v1: {
         parameters: {
             query?: {
                 page?: number;
@@ -2027,7 +2041,7 @@ export interface operations {
             };
         };
     };
-    RolesController_create: {
+    RolesController_create_v1: {
         parameters: {
             query?: never;
             header?: never;
@@ -2050,7 +2064,7 @@ export interface operations {
             };
         };
     };
-    RolesController_findOne: {
+    RolesController_findOne_v1: {
         parameters: {
             query?: never;
             header?: never;
@@ -2071,7 +2085,7 @@ export interface operations {
             };
         };
     };
-    RolesController_remove: {
+    RolesController_remove_v1: {
         parameters: {
             query?: never;
             header?: never;
@@ -2090,7 +2104,7 @@ export interface operations {
             };
         };
     };
-    RolesController_update: {
+    RolesController_update_v1: {
         parameters: {
             query?: never;
             header?: never;
@@ -2115,7 +2129,7 @@ export interface operations {
             };
         };
     };
-    RolesController_bulkRemove: {
+    RolesController_bulkRemove_v1: {
         parameters: {
             query?: never;
             header?: never;
@@ -2136,7 +2150,7 @@ export interface operations {
             };
         };
     };
-    RolesController_syncPermissions: {
+    RolesController_syncPermissions_v1: {
         parameters: {
             query?: never;
             header?: never;
@@ -2161,7 +2175,7 @@ export interface operations {
             };
         };
     };
-    RolesController_attachPermissions: {
+    RolesController_attachPermissions_v1: {
         parameters: {
             query?: never;
             header?: never;
@@ -2186,7 +2200,7 @@ export interface operations {
             };
         };
     };
-    RolesController_detachPermissions: {
+    RolesController_detachPermissions_v1: {
         parameters: {
             query?: never;
             header?: never;
@@ -2211,7 +2225,7 @@ export interface operations {
             };
         };
     };
-    InvitationsController_findAll: {
+    InvitationsController_findAll_v1: {
         parameters: {
             query?: {
                 page?: number;
@@ -2237,7 +2251,7 @@ export interface operations {
             };
         };
     };
-    InvitationsController_create: {
+    InvitationsController_create_v1: {
         parameters: {
             query?: never;
             header?: never;
@@ -2258,7 +2272,7 @@ export interface operations {
             };
         };
     };
-    InvitationsController_resend: {
+    InvitationsController_resend_v1: {
         parameters: {
             query?: never;
             header?: never;
@@ -2279,7 +2293,7 @@ export interface operations {
             };
         };
     };
-    InvitationsController_bulkRemove: {
+    InvitationsController_bulkRemove_v1: {
         parameters: {
             query?: never;
             header?: never;
@@ -2300,7 +2314,7 @@ export interface operations {
             };
         };
     };
-    InvitationsController_remove: {
+    InvitationsController_remove_v1: {
         parameters: {
             query?: never;
             header?: never;
@@ -2319,7 +2333,7 @@ export interface operations {
             };
         };
     };
-    InvitationsController_getByToken: {
+    InvitationsController_getByToken_v1: {
         parameters: {
             query: {
                 token: string;
@@ -2342,7 +2356,7 @@ export interface operations {
             };
         };
     };
-    InvitationsController_accept: {
+    InvitationsController_accept_v1: {
         parameters: {
             query?: never;
             header?: never;
@@ -2367,7 +2381,7 @@ export interface operations {
             };
         };
     };
-    AuthController_login: {
+    AuthController_login_v1: {
         parameters: {
             query?: never;
             header: {
@@ -2408,7 +2422,7 @@ export interface operations {
             };
         };
     };
-    AuthController_googleLogin: {
+    AuthController_googleLogin_v1: {
         parameters: {
             query?: never;
             header: {
@@ -2435,7 +2449,7 @@ export interface operations {
             };
         };
     };
-    AuthController_verifyTwoFactor: {
+    AuthController_verifyTwoFactor_v1: {
         parameters: {
             query?: never;
             header: {
@@ -2462,7 +2476,7 @@ export interface operations {
             };
         };
     };
-    AuthController_twoFactorStatus: {
+    AuthController_twoFactorStatus_v1: {
         parameters: {
             query?: never;
             header?: never;
@@ -2484,7 +2498,7 @@ export interface operations {
             };
         };
     };
-    AuthController_startTwoFactorSetup: {
+    AuthController_startTwoFactorSetup_v1: {
         parameters: {
             query?: never;
             header?: never;
@@ -2507,7 +2521,7 @@ export interface operations {
             };
         };
     };
-    AuthController_enableTwoFactor: {
+    AuthController_enableTwoFactor_v1: {
         parameters: {
             query?: never;
             header?: never;
@@ -2532,7 +2546,7 @@ export interface operations {
             };
         };
     };
-    AuthController_disableTwoFactor: {
+    AuthController_disableTwoFactor_v1: {
         parameters: {
             query?: never;
             header?: never;
@@ -2557,7 +2571,7 @@ export interface operations {
             };
         };
     };
-    AuthController_regenerateRecoveryCodes: {
+    AuthController_regenerateRecoveryCodes_v1: {
         parameters: {
             query?: never;
             header?: never;
@@ -2582,7 +2596,7 @@ export interface operations {
             };
         };
     };
-    AuthController_impersonate: {
+    AuthController_impersonate_v1: {
         parameters: {
             query?: never;
             header: {
@@ -2607,7 +2621,7 @@ export interface operations {
             };
         };
     };
-    AuthController_stopImpersonating: {
+    AuthController_stopImpersonating_v1: {
         parameters: {
             query?: never;
             header: {
@@ -2630,7 +2644,7 @@ export interface operations {
             };
         };
     };
-    AuthController_refresh: {
+    AuthController_refresh_v1: {
         parameters: {
             query?: never;
             header: {
@@ -2653,7 +2667,7 @@ export interface operations {
             };
         };
     };
-    AuthController_logout: {
+    AuthController_logout_v1: {
         parameters: {
             query?: never;
             header?: never;
@@ -2674,7 +2688,7 @@ export interface operations {
             };
         };
     };
-    AuthController_forgotPassword: {
+    AuthController_forgotPassword_v1: {
         parameters: {
             query?: never;
             header?: never;
@@ -2699,7 +2713,7 @@ export interface operations {
             };
         };
     };
-    AuthController_resetPassword: {
+    AuthController_resetPassword_v1: {
         parameters: {
             query?: never;
             header?: never;
@@ -2724,7 +2738,7 @@ export interface operations {
             };
         };
     };
-    AuthController_resendVerification: {
+    AuthController_resendVerification_v1: {
         parameters: {
             query?: never;
             header?: never;
@@ -2749,7 +2763,7 @@ export interface operations {
             };
         };
     };
-    AuthController_verifyEmail: {
+    AuthController_verifyEmail_v1: {
         parameters: {
             query: {
                 token: string;
@@ -2772,7 +2786,7 @@ export interface operations {
             };
         };
     };
-    AuthController_getProfile: {
+    AuthController_getProfile_v1: {
         parameters: {
             query?: never;
             header?: never;
@@ -2791,7 +2805,7 @@ export interface operations {
             };
         };
     };
-    AuthController_switchRole: {
+    AuthController_switchRole_v1: {
         parameters: {
             query?: never;
             header?: never;
@@ -2816,7 +2830,7 @@ export interface operations {
             };
         };
     };
-    AuthController_me: {
+    AuthController_me_v1: {
         parameters: {
             query?: never;
             header?: never;
@@ -2842,7 +2856,7 @@ export interface operations {
             };
         };
     };
-    OAuthController_token: {
+    OAuthController_token_v1: {
         parameters: {
             query?: never;
             header?: never;
@@ -2863,7 +2877,7 @@ export interface operations {
             };
         };
     };
-    OAuthController_findAll: {
+    OAuthController_findAll_v1: {
         parameters: {
             query?: {
                 page?: number;
@@ -2887,7 +2901,7 @@ export interface operations {
             };
         };
     };
-    OAuthController_create: {
+    OAuthController_create_v1: {
         parameters: {
             query?: never;
             header?: never;
@@ -2908,7 +2922,7 @@ export interface operations {
             };
         };
     };
-    OAuthController_findOne: {
+    OAuthController_findOne_v1: {
         parameters: {
             query?: never;
             header?: never;
@@ -2927,7 +2941,7 @@ export interface operations {
             };
         };
     };
-    OAuthController_remove: {
+    OAuthController_remove_v1: {
         parameters: {
             query?: never;
             header?: never;
@@ -2946,7 +2960,7 @@ export interface operations {
             };
         };
     };
-    OAuthController_update: {
+    OAuthController_update_v1: {
         parameters: {
             query?: never;
             header?: never;
@@ -2969,7 +2983,7 @@ export interface operations {
             };
         };
     };
-    OAuthController_bulkRemove: {
+    OAuthController_bulkRemove_v1: {
         parameters: {
             query?: never;
             header?: never;
@@ -2990,7 +3004,7 @@ export interface operations {
             };
         };
     };
-    SessionsController_findMine: {
+    SessionsController_findMine_v1: {
         parameters: {
             query?: never;
             header?: never;
@@ -3009,7 +3023,7 @@ export interface operations {
             };
         };
     };
-    SessionsController_revokeOthers: {
+    SessionsController_revokeOthers_v1: {
         parameters: {
             query?: never;
             header?: never;
@@ -3030,7 +3044,7 @@ export interface operations {
             };
         };
     };
-    SessionsController_revokeMine: {
+    SessionsController_revokeMine_v1: {
         parameters: {
             query?: never;
             header?: never;
@@ -3051,7 +3065,7 @@ export interface operations {
             };
         };
     };
-    SessionsController_findAll: {
+    SessionsController_findAll_v1: {
         parameters: {
             query?: {
                 page?: number;
@@ -3077,7 +3091,7 @@ export interface operations {
             };
         };
     };
-    SessionsController_revoke: {
+    SessionsController_revoke_v1: {
         parameters: {
             query?: never;
             header?: never;
@@ -3098,7 +3112,7 @@ export interface operations {
             };
         };
     };
-    PermissionsController_findAll: {
+    PermissionsController_findAll_v1: {
         parameters: {
             query?: {
                 page?: number;
@@ -3124,7 +3138,7 @@ export interface operations {
             };
         };
     };
-    PermissionsController_create: {
+    PermissionsController_create_v1: {
         parameters: {
             query?: never;
             header?: never;
@@ -3147,7 +3161,7 @@ export interface operations {
             };
         };
     };
-    PermissionsController_findOne: {
+    PermissionsController_findOne_v1: {
         parameters: {
             query?: never;
             header?: never;
@@ -3168,7 +3182,7 @@ export interface operations {
             };
         };
     };
-    PermissionsController_remove: {
+    PermissionsController_remove_v1: {
         parameters: {
             query?: never;
             header?: never;
@@ -3187,7 +3201,7 @@ export interface operations {
             };
         };
     };
-    PermissionsController_update: {
+    PermissionsController_update_v1: {
         parameters: {
             query?: never;
             header?: never;
@@ -3212,7 +3226,7 @@ export interface operations {
             };
         };
     };
-    PermissionsController_bulkRemove: {
+    PermissionsController_bulkRemove_v1: {
         parameters: {
             query?: never;
             header?: never;
@@ -3233,7 +3247,7 @@ export interface operations {
             };
         };
     };
-    NotificationsController_findAll: {
+    NotificationsController_findAll_v1: {
         parameters: {
             query?: {
                 page?: number;
@@ -3259,7 +3273,7 @@ export interface operations {
             };
         };
     };
-    NotificationsController_getUnreadCount: {
+    NotificationsController_getUnreadCount_v1: {
         parameters: {
             query?: never;
             header?: never;
@@ -3278,7 +3292,7 @@ export interface operations {
             };
         };
     };
-    NotificationsController_markAsRead: {
+    NotificationsController_markAsRead_v1: {
         parameters: {
             query?: never;
             header?: never;
@@ -3297,7 +3311,7 @@ export interface operations {
             };
         };
     };
-    NotificationsController_markAllAsRead: {
+    NotificationsController_markAllAsRead_v1: {
         parameters: {
             query?: never;
             header?: never;
@@ -3314,7 +3328,7 @@ export interface operations {
             };
         };
     };
-    AppRefreshController_forceRefresh: {
+    AppRefreshController_forceRefresh_v1: {
         parameters: {
             query?: never;
             header?: never;
@@ -3336,7 +3350,7 @@ export interface operations {
             };
         };
     };
-    HealthController_check: {
+    HealthController_check_v1: {
         parameters: {
             query?: never;
             header?: never;
@@ -3484,7 +3498,7 @@ export interface operations {
             };
         };
     };
-    AuditController_findAll: {
+    AuditController_findAll_v1: {
         parameters: {
             query?: {
                 page?: number;
@@ -3512,7 +3526,7 @@ export interface operations {
             };
         };
     };
-    AuditController_findActions: {
+    AuditController_findActions_v1: {
         parameters: {
             query?: never;
             header?: never;
@@ -3531,7 +3545,7 @@ export interface operations {
             };
         };
     };
-    StatsController_overview: {
+    StatsController_overview_v1: {
         parameters: {
             query?: never;
             header?: never;
@@ -3548,7 +3562,7 @@ export interface operations {
             };
         };
     };
-    StatsController_signups: {
+    StatsController_signups_v1: {
         parameters: {
             query: {
                 days?: string;
@@ -3568,7 +3582,7 @@ export interface operations {
             };
         };
     };
-    ChangelogController_findAll: {
+    ChangelogController_findAll_v1: {
         parameters: {
             query?: never;
             header?: never;
@@ -3585,7 +3599,7 @@ export interface operations {
             };
         };
     };
-    TimeZoneController_config: {
+    TimeZoneController_config_v1: {
         parameters: {
             query?: never;
             header?: never;
@@ -3604,7 +3618,7 @@ export interface operations {
             };
         };
     };
-    TimeZoneController_preferences: {
+    TimeZoneController_preferences_v1: {
         parameters: {
             query?: never;
             header?: never;
@@ -3623,7 +3637,7 @@ export interface operations {
             };
         };
     };
-    TimeZoneController_update: {
+    TimeZoneController_update_v1: {
         parameters: {
             query?: never;
             header?: never;
@@ -3646,7 +3660,7 @@ export interface operations {
             };
         };
     };
-    TimeZoneController_preview: {
+    TimeZoneController_preview_v1: {
         parameters: {
             query?: never;
             header?: never;
