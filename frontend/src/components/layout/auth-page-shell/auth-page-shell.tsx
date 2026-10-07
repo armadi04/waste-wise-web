@@ -57,7 +57,7 @@ export function AuthPageShell({ children, morph = true }: AuthPageShellProps) {
       </main>
 
       <footer className="relative z-10 flex items-center justify-between px-6 pb-6 text-xs text-white/80 drop-shadow-sm">
-        <p>© {formatBusinessDate(new Date(), 'yyyy')} KuponMalam Admin.</p>
+        <p>© {formatBusinessDate(new Date(), 'yyyy')} Nestplate Starter.</p>
         <a
           href="https://armadii.my.id"
           target="_blank"

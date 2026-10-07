@@ -24,7 +24,7 @@ export function ActivityChart({
   title,
   description,
   data,
-  color = 'var(--km-primary)',
+  color = 'var(--app-primary)',
   loading = false,
   className,
 }: ActivityChartProps) {

@@ -64,8 +64,8 @@ export function LoginPage() {
       {/* Header */}
       <div className="space-y-3 text-center">
         <h1 className="text-3xl font-bold tracking-tight text-foreground sm:text-4xl">
-          Welcome back to <span className="text-primary italic">Kupon</span>
-          <span className="text-foreground italic">Malam </span>
+          Welcome back to <span className="text-primary italic">Nest</span>
+          <span className="text-foreground italic">plate </span>
           <span className="text-primary italic">Admin</span>
         </h1>
         <p className="text-sm text-default-500">

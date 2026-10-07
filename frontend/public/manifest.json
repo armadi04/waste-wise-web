@@ -1,7 +1,7 @@
 {
-  "name": "Kupon Malam",
-  "short_name": "Kupon Malam",
-  "description": "Kupon Malam API",
+  "name": "Nestplate Starter",
+  "short_name": "Nestplate",
+  "description": "Nestplate Starter dashboard",
   "start_url": "/",
   "display": "standalone",
   "theme_color": "#002855",

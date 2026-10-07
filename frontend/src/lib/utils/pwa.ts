@@ -5,7 +5,7 @@
  * reload idempotent: the same signal replayed on every socket reconnect must
  * not put the tab into a reload loop.
  */
-const APPLIED_KEY = 'kuponmalam.refresh-applied-at'
+const APPLIED_KEY = 'nestplate.refresh-applied-at'
 
 export function getAppliedRefreshAt(): string | null {
   try {

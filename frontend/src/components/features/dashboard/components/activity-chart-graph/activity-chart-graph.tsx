@@ -56,12 +56,12 @@ export default function ActivityChartGraph({
         </defs>
         <CartesianGrid
           strokeDasharray="3 3"
-          stroke="var(--km-border)"
+          stroke="var(--app-border)"
           vertical={false}
         />
         <XAxis
           dataKey="name"
-          tick={{ fontSize: 12, fill: 'var(--km-muted-foreground)' }}
+          tick={{ fontSize: 12, fill: 'var(--app-muted-foreground)' }}
           axisLine={false}
           tickLine={false}
         />

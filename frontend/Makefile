@@ -1,6 +1,6 @@
 .PHONY: build run stop rebuild
 
-APP_NAME = kuponmalam-frontend
+APP_NAME = nestplate-frontend
 PORT = 3001
 INTERNAL_PORT = 3000
 

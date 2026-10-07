@@ -41,7 +41,7 @@ export function UpdateSection() {
         description={
           updateAvailable
             ? 'A new version is ready. Update to get the latest features and fixes.'
-            : 'Check whether a newer version of Kupon Malam is available.'
+            : 'Check whether a newer version of Nestplate is available.'
         }
         action={
           updateAvailable ? (

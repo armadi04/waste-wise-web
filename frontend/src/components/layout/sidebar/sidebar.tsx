@@ -85,8 +85,8 @@ export const Sidebar = () => {
               className="flex items-center gap-0"
             >
               <div className="font-bold text-2xl tracking-tight italic">
-                <span className="text-primary">Kupon</span>
-                <span className="text-foreground">Malam</span>
+                <span className="text-primary">Nest</span>
+                <span className="text-foreground">plate</span>
               </div>
             </motion.div>
           )}

@@ -1,7 +1,7 @@
 import { heroui } from '@heroui/react'
 
 /**
- * KuponMalam design system colors.
+ * Nestplate design system colors.
  *
  * The semantic values mirror DESIGN.md. The ramps preserve the existing
  * HeroUI shade utilities used throughout the app while keeping the default

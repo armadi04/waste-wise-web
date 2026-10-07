@@ -40,8 +40,8 @@ export function RouterPendingOverlay() {
           }}
         >
           <div className="font-bold text-7xl tracking-tight italic select-none">
-            <span className="text-foreground">Kupon</span>
-            <span className="text-primary">Malam</span>
+            <span className="text-foreground">Nest</span>
+            <span className="text-primary">plate</span>
           </div>
         </motion.div>
 
