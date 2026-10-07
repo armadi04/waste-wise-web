@@ -13,7 +13,8 @@ import { MediaMenu } from '@/components/features/media/components/media-item/chi
 
 export function MediaRow({ media, actions, isSelected, onSelect }: ItemProps) {
   useTimeZone((s) => s.timeZone)
-  const info = getFileType(media.originalName, media.mimetype)
+  const name = media.originalName ?? media.filename
+  const info = getFileType(name, media.mimetype)
   const isImage = info.kind === 'image' && media.url
   const handlers = useItemHandlers(media, actions, onSelect)
 
@@ -39,11 +40,7 @@ export function MediaRow({ media, actions, isSelected, onSelect }: ItemProps) {
     >
       {isImage ? (
         <span className="size-9 shrink-0 overflow-hidden rounded-medium">
-          <MediaThumbnail
-            url={media.url!}
-            alt={media.originalName}
-            fallback={icon}
-          />
+          <MediaThumbnail url={media.url!} alt={name} fallback={icon} />
         </span>
       ) : (
         icon
@@ -54,7 +51,7 @@ export function MediaRow({ media, actions, isSelected, onSelect }: ItemProps) {
             <Lock size={11} className="shrink-0 text-warning" />
           )}
           <span className="truncate text-sm font-medium text-default-700">
-            {media.originalName}
+            {name}
           </span>
         </div>
         <span

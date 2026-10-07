@@ -1,3 +1,4 @@
+
 /*
  * -------------------------------------------------------
  * THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
@@ -89,6 +90,7 @@ export interface IMutation {
     resendInvitation(id: number): Invitation | Promise<Invitation>;
     revokeInvitation(id: number): boolean | Promise<boolean>;
     deleteMedia(id: number): boolean | Promise<boolean>;
+    deleteMediaWithResult(id: number): MediaDeletionResult | Promise<MediaDeletionResult>;
     markNotificationRead(id: number): Notification | Promise<Notification>;
     markAllNotificationsRead(): number | Promise<number>;
     createPermission(input: CreatePermissionInput): Permission | Promise<Permission>;
@@ -131,6 +133,13 @@ export interface CreateInvitationResult {
     __typename?: 'CreateInvitationResult';
     invitation: Invitation;
     inviteUrl: string;
+}
+
+export interface MediaDeletionResult {
+    __typename?: 'MediaDeletionResult';
+    id: number;
+    status: string;
+    code?: Nullable<string>;
 }
 
 export interface Media {

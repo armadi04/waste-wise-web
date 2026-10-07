@@ -35,9 +35,9 @@ describe('Media (e2e)', () => {
     const res = await request(server)
       .post('/api/media/upload')
       .set('Authorization', `Bearer ${token}`)
-      .attach('file', Buffer.from('hello-world'), {
-        filename: 'hello.txt',
-        contentType: 'text/plain',
+      .attach('file', Buffer.from('%PDF-1.7\n1 0 obj\n<<>>\nendobj\n%%EOF'), {
+        filename: 'hello.pdf',
+        contentType: 'application/pdf',
       })
       .expect(201);
     return res.body.id as number;
@@ -48,9 +48,9 @@ describe('Media (e2e)', () => {
       const res = await request(server)
         .post('/api/media/upload')
         .set('Authorization', `Bearer ${admin}`)
-        .attach('file', Buffer.from('hello-world'), {
-          filename: 'hello.txt',
-          contentType: 'text/plain',
+        .attach('file', Buffer.from('%PDF-1.7\n1 0 obj\n<<>>\nendobj\n%%EOF'), {
+          filename: 'hello.pdf',
+          contentType: 'application/pdf',
         })
         .expect(201);
 

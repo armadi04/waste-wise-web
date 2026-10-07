@@ -3,6 +3,7 @@ import { useQuery } from '@tanstack/react-query'
 import { getRouteApi } from '@tanstack/react-router'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useShallow } from 'zustand/react/shallow'
+import { useMediaDeletion } from './use-media-deletion'
 import type { Media } from '@/types/media'
 import type { SelectModifiers } from '@/lib/stores/media-selection.store'
 import type { MediaSortKey } from '@/lib/schemas/media'
@@ -14,12 +15,7 @@ import { useConfirmation } from '@/hooks/global/use-confirmation'
 import { mediaExportColumns } from '@/components/features/media/components/table-columns'
 import { useUserPermission } from '@/hooks/permissions/use-permissions'
 import { mediaQueryOptions } from '@/lib/query/options'
-import {
-  bulkDeleteMedia,
-  deleteMedia,
-  getMediaList,
-  uploadMedia,
-} from '@/lib/services/media.service'
+import { getMediaList, uploadMedia } from '@/lib/services/media.service'
 import { useAuthStore } from '@/lib/stores/auth.store'
 import { useMediaSelectionStore } from '@/lib/stores/media-selection.store'
 import { useMediaUiStore } from '@/lib/stores/media-ui.store'
@@ -129,16 +125,15 @@ export const useMediaPage = () => {
 
   const upload = useUploadMedia()
 
-  const deleteMutation = useAppMutation({
-    mutationFn: deleteMedia,
-    invalidateKeys: ['media'],
-    successMessage: 'Media deleted successfully',
-  })
-
-  const bulkDeleteMutation = useAppMutation({
-    mutationFn: bulkDeleteMedia,
-    invalidateKeys: ['media'],
-    successMessage: 'Media deleted successfully',
+  const { deleteMutation, bulkDeleteMutation } = useMediaDeletion((result) => {
+    selection.setSelection(
+      result.results
+        .filter(
+          (item) =>
+            item.status === 'failed' && orderedIdsRef.current.includes(item.id),
+        )
+        .map((item) => item.id),
+    )
   })
 
   const selectedList = useMemo(
@@ -154,6 +149,13 @@ export const useMediaPage = () => {
   // re-sorting swaps the whole set out from under it, and a stale id would then
   // be deleted by a bulk action the user can no longer see.
   const { page, limit, search, sortDescriptor } = tableState
+  useEffect(() => {
+    const visible = new Set(orderedIds)
+    const selected = useMediaSelectionStore.getState().selectedIds
+    if ([...selected].some((id) => !visible.has(id))) {
+      selection.setSelection([...selected].filter((id) => visible.has(id)))
+    }
+  }, [orderedIds, selection.setSelection])
   useEffect(() => {
     selection.clear()
   }, [
@@ -209,7 +211,7 @@ export const useMediaPage = () => {
 
   const handleDownload = async (media: Media) => {
     if (!media.url) return
-    await downloadFile(media.url, media.originalName)
+    await downloadFile(media.url, media.originalName ?? media.filename)
   }
 
   const handleCopyLink = async (media: Media) => {
@@ -231,7 +233,8 @@ export const useMediaPage = () => {
     setIsDownloading(true)
     try {
       for (const item of selectedItems) {
-        if (item.url) await downloadFile(item.url, item.originalName)
+        if (item.url)
+          await downloadFile(item.url, item.originalName ?? item.filename)
       }
     } finally {
       setIsDownloading(false)
@@ -254,7 +257,7 @@ export const useMediaPage = () => {
       color: 'danger',
     })
     if (isConfirmed) {
-      bulkDeleteMutation.mutate(selectedList, { onSuccess: selection.clear })
+      bulkDeleteMutation.mutate(selectedList)
     }
   }
 

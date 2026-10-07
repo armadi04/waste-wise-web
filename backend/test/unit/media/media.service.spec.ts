@@ -1,163 +1,203 @@
-import { Test, TestingModule } from '@nestjs/testing';
-import { getRepositoryToken } from '@nestjs/typeorm';
+import { describe, beforeEach, it, expect, mock } from 'bun:test';
 import { ConfigService } from '@nestjs/config';
-import { EventEmitter2 } from '@nestjs/event-emitter';
 import { Repository } from 'typeorm';
 import { NotFoundException } from '@nestjs/common';
-import { describe, beforeEach, it, expect, jest } from 'bun:test';
-import { MediaService } from '../../../src/media/media.service';
-import { Media } from '../../../src/media/entities/media.entity';
+import { MediaService } from '@/media/media.service';
+import { Media } from '@/media/entities/media.entity';
+import { MediaStorageService } from '@/media/storage/media-storage.service';
+import { MediaCleanupService } from '@/media/media-cleanup.service';
+import { MediaUploadPipe } from '@/media/media-upload.pipe';
 
-// The `DepotClient` is constructed inside the MediaService constructor. We let
-// the (network-free) constructor run, then swap the private `depot` field for a
-// fake before exercising any method.
-const mockDepot = {
-  upload: jest.fn(),
-  getUrl: jest.fn(),
-  delete: jest.fn(),
-};
-
-describe('MediaService', () => {
+describe('MediaService lifecycle', () => {
+  let row: Media | undefined;
   let service: MediaService;
-  let repository: Repository<Media>;
+  let repository: {
+    create: ReturnType<typeof mock>;
+    save: ReturnType<typeof mock>;
+    update: ReturnType<typeof mock>;
+    findOne: ReturnType<typeof mock>;
+    find: ReturnType<typeof mock>;
+    findAndCount: ReturnType<typeof mock>;
+  };
+  let adapter: {
+    upload: ReturnType<typeof mock>;
+    getSignedUrl: ReturnType<typeof mock>;
+  };
+  let deletion: ReturnType<typeof mock>;
+  const file = {
+    originalname: 'file.pdf',
+    mimetype: 'application/pdf',
+    size: 5,
+    buffer: Buffer.from('bytes'),
+  } as Express.Multer.File;
 
-  beforeEach(async () => {
-    mockDepot.upload.mockReset();
-    mockDepot.getUrl.mockReset();
-    mockDepot.delete.mockReset();
-
-    const module: TestingModule = await Test.createTestingModule({
-      providers: [
-        MediaService,
-        {
-          provide: getRepositoryToken(Media),
-          useValue: {
-            findAndCount: jest.fn().mockResolvedValue([[], 0]),
-            create: jest.fn((dto: Partial<Media>) => ({ ...dto })),
-            save: jest.fn((entity: Partial<Media>) =>
-              Promise.resolve({ id: 1, ...entity }),
-            ),
-            findOne: jest.fn(),
-            find: jest.fn().mockResolvedValue([]),
-            findOneBy: jest.fn(),
-          },
-        },
-        {
-          provide: ConfigService,
-          useValue: {
-            get: jest.fn((key: string) => {
-              if (key === 'DEPOT_BASE_URL') return 'https://depot.test';
-              if (key === 'DEPOT_API_KEY') return 'mk_test_key';
-              if (key === 'APP_URL') return 'http://localhost:3000';
-              return null;
-            }),
-          },
-        },
-        { provide: EventEmitter2, useValue: { emit: jest.fn() } },
-      ],
-    }).compile();
-
-    service = module.get<MediaService>(MediaService);
-    repository = module.get<Repository<Media>>(getRepositoryToken(Media));
-    (service as unknown as { depot: typeof mockDepot }).depot = mockDepot;
-  });
-
-  it('should be defined', () => {
-    expect(service).toBeDefined();
-  });
-
-  describe('uploadFile', () => {
-    it('should upload via Depot, persist the row with depotFileId and set a local view URL', async () => {
-      const file = {
-        originalname: 'pic.png',
-        mimetype: 'image/png',
-        size: 123,
-        buffer: Buffer.from('bytes'),
-      } as Express.Multer.File;
-
-      mockDepot.upload.mockResolvedValue({
-        id: 42,
-        s3Key: 'uploads/pic.png',
-      });
-
-      const result = await service.uploadFile(file, 7);
-
-      expect(mockDepot.upload).toHaveBeenCalledWith({
-        body: file.buffer,
-        name: 'pic.png',
-        mime: 'image/png',
-        size: 123,
-        ownerUserId: 7,
-      });
-      expect(repository.create).toHaveBeenCalledWith(
-        expect.objectContaining({ depotFileId: 42, path: 'uploads/pic.png' }),
-      );
-      expect(repository.save).toHaveBeenCalledTimes(2);
-      expect(result.url).toBe('http://localhost:3000/api/media/1/view');
-    });
-  });
-
-  describe('findOne', () => {
-    it('should throw NotFoundException when the media is missing', async () => {
-      (repository.findOne as jest.Mock).mockResolvedValue(null);
-      await expect(service.findOne(999)).rejects.toThrow(NotFoundException);
-    });
-  });
-
-  describe('getSignedUrl', () => {
-    it('should resolve a Depot signed URL for an existing media row', async () => {
-      (repository.findOne as jest.Mock).mockResolvedValue({
+  beforeEach(() => {
+    row = undefined;
+    repository = {
+      create: mock((data: Partial<Media>) => ({
         id: 1,
-        depotFileId: 42,
-      });
-      mockDepot.getUrl.mockResolvedValue({
-        url: 'https://depot.test/signed/42',
-      });
-
-      const url = await service.getSignedUrl(1);
-
-      expect(mockDepot.getUrl).toHaveBeenCalledWith(42);
-      expect(url).toBe('https://depot.test/signed/42');
-    });
+        cleanupAttempts: 0,
+        ...data,
+      })),
+      save: mock(async (data: Media) => {
+        row = { ...data };
+        return { ...row };
+      }),
+      update: mock(async (where: Partial<Media>, data: Partial<Media>) => {
+        if (
+          !row ||
+          Object.entries(where).some(
+            ([key, value]) => Reflect.get(row!, key) !== value,
+          )
+        )
+          return { affected: 0 };
+        Object.assign(row, data);
+        return { affected: 1 };
+      }),
+      findOne: mock(async ({ where }: { where: Partial<Media> }) =>
+        row &&
+        Object.entries(where).every(
+          ([key, value]) => Reflect.get(row!, key) === value,
+        )
+          ? { ...row }
+          : null,
+      ),
+      find: mock(async () => []),
+      findAndCount: mock(async () => [[], 0]),
+    };
+    adapter = {
+      upload: mock(async (_file, object, reserved) => {
+        expect(row?.state).toBe('pending');
+        expect(row?.remoteName).toBe(object.remoteName);
+        const stored = { ...object, path: 'remote/key', depotFileId: 42 };
+        await reserved(stored);
+        return stored;
+      }),
+      getSignedUrl: mock(async () => 'https://storage.example.test/file'),
+    };
+    deletion = mock(async (id: number) => ({ id, status: 'deleted' }));
+    service = new MediaService(
+      repository as unknown as Repository<Media>,
+      { get: () => 'http://localhost:3001' } as unknown as ConfigService,
+      {
+        selected: {
+          provider: 'depot',
+          profile: 'depot-default',
+          fingerprint: '0'.repeat(64),
+          adapter,
+        },
+        forMedia: () => adapter,
+      } as unknown as MediaStorageService,
+      { requestDeletion: deletion } as unknown as MediaCleanupService,
+      {
+        transform: async (value: Express.Multer.File) => value,
+      } as MediaUploadPipe,
+    );
   });
 
-  describe('findAllMedia', () => {
-    it('should filter by userId when provided', async () => {
-      await service.findAllMedia(7);
-      expect(repository.find).toHaveBeenCalledWith({
-        where: { userId: 7 },
-        relations: { user: true },
-      });
-    });
-
-    it('should list all media when no userId is provided', async () => {
-      await service.findAllMedia();
-      expect(repository.find).toHaveBeenCalledWith({
-        relations: { user: true },
-      });
-    });
+  it('persists staging identity before external I/O and publishes only after reservation is stored', async () => {
+    const result = await service.uploadFile(file, 7);
+    expect(result.state).toBe('ready');
+    expect(result.depotFileId).toBe(42);
+    expect(result.url).toBe('http://localhost:3001/api/media/1/view');
+    expect(result.cleanupAt).toBeNull();
+    expect(result.cleanupLeaseToken).toBeNull();
   });
-
-  describe('findAllMediaPaginated', () => {
-    it('should use default sorting (createdAt DESC)', async () => {
-      await service.findAllMediaPaginated(1, 10);
-      expect(repository.findAndCount).toHaveBeenCalledWith(
-        expect.objectContaining({ order: { createdAt: 'DESC' } }),
-      );
+  it('does not create remote objects when staging persistence fails', async () => {
+    repository.save.mockRejectedValue(new Error('Database unavailable'));
+    await expect(service.uploadFile(file, 7)).rejects.toThrow(
+      'Database unavailable',
+    );
+    expect(adapter.upload).not.toHaveBeenCalled();
+  });
+  it('rejects non-image avatars before staging or remote upload', async () => {
+    await expect(service.uploadFile(file, 7, true)).rejects.toThrow(
+      'image is required',
+    );
+    expect(repository.save).not.toHaveBeenCalled();
+    expect(adapter.upload).not.toHaveBeenCalled();
+  });
+  it('never treats an OAuth client sentinel as unrestricted ownership', async () => {
+    await service.findAllMedia(0);
+    expect(repository.find).toHaveBeenCalledWith(
+      expect.objectContaining({ where: { state: 'ready', userId: 0 } }),
+    );
+    await service.findAllMediaPaginated(
+      1,
+      10,
+      undefined,
+      'createdAt',
+      'DESC',
+      0,
+    );
+    expect(repository.findAndCount).toHaveBeenCalledWith(
+      expect.objectContaining({
+        where: expect.objectContaining({ userId: 0 }),
+      }),
+    );
+    await expect(service.uploadFile(file, 0)).rejects.toThrow('user account');
+    expect(repository.save).not.toHaveBeenCalled();
+  });
+  it('retains recovery identity when remote reservation succeeded but its ID was not persisted', async () => {
+    adapter.upload.mockRejectedValue(
+      new Error('Process interrupted after reservation'),
+    );
+    await expect(service.uploadFile(file, 7)).rejects.toThrow(
+      'scheduled for cleanup',
+    );
+    expect(row?.state).toBe('pending');
+    expect(row?.remoteName).toMatch(/^media\/7\/[a-f0-9-]+$/);
+    expect(row?.cleanupAt!.getTime()).toBeGreaterThan(Date.now());
+    expect(row?.storageFingerprint).toHaveLength(64);
+  });
+  it('does not publish after another worker took the lease', async () => {
+    adapter.upload.mockImplementation(async (_file, object) => {
+      row!.cleanupLeaseToken = 'new-worker-token';
+      return object;
     });
-
-    it('should scope the query to a user when a userId filter is given', async () => {
-      await service.findAllMediaPaginated(
-        1,
-        10,
-        undefined,
-        'filename',
-        'ASC',
-        7,
-      );
-      expect(repository.findAndCount).toHaveBeenCalledWith(
-        expect.objectContaining({ where: { userId: 7 } }),
-      );
+    await expect(service.uploadFile(file, 7)).rejects.toThrow(
+      'scheduled for cleanup',
+    );
+    expect(row?.state).toBe('pending');
+    expect(row?.cleanupLeaseToken).toBe('new-worker-token');
+  });
+  it('returns per-item outcomes and continues after failures; duplicate IDs execute once', async () => {
+    deletion.mockImplementation(async (id: number) => {
+      if (id === 2) throw new Error('Database unavailable');
+      if (id === 4) throw new NotFoundException();
+      return { id, status: id === 3 ? 'queued' : 'deleted' };
     });
+    const result = await service.deleteMany([1, 2, 3, 4, 1]);
+    expect(result).toMatchObject({ deleted: 1, queued: 1, failed: 2 });
+    expect(result.results.map((item) => item.status)).toEqual([
+      'deleted',
+      'failed',
+      'queued',
+      'failed',
+    ]);
+    expect(result.results[3].code).toBe('NOT_FOUND');
+    expect(deletion).toHaveBeenCalledTimes(4);
+  });
+  it('hides staged/deleting rows from public reads', async () => {
+    await service.uploadFile(file, 7);
+    row!.state = 'pending';
+    await expect(service.findOne(1)).rejects.toThrow(NotFoundException);
+    await service.findAllMediaPaginated(1, 10, 'file', 'createdAt', 'DESC', 7);
+    expect(repository.findAndCount).toHaveBeenCalledWith(
+      expect.objectContaining({
+        where: expect.arrayContaining([
+          expect.objectContaining({ state: 'ready', userId: 7 }),
+        ]),
+      }),
+    );
+  });
+  it('maps provider read failures to a safe operational response', async () => {
+    await service.uploadFile(file, 7);
+    adapter.getSignedUrl.mockRejectedValue(
+      new Error('Provider failure containing a signed credential'),
+    );
+    await expect(service.getSignedUrl(1)).rejects.toThrow(
+      'Media storage is unavailable',
+    );
   });
 });

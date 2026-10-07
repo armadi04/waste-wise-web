@@ -3,12 +3,11 @@ import { afterEach, describe, expect, it, jest, setSystemTime } from 'bun:test';
 import { DataSource, Repository } from 'typeorm';
 import { MailOutboxService } from '@/mail/mail-outbox.service';
 import { OutboundEmail } from '@/mail/entities/outbound-email.entity';
-import { AvatarCleanupService } from '@/media/avatar-cleanup.service';
 
 afterEach(() => setSystemTime());
 describe('Technical worker timezones', () => {
-  it('pins mail and avatar cron to UTC independently of business zones', () => {
-    for (const worker of [MailOutboxService, AvatarCleanupService]) {
+  it('pins mail cron to UTC independently of display zones', () => {
+    for (const worker of [MailOutboxService]) {
       expect(
         Reflect.getMetadata(
           'SCHEDULE_CRON_OPTIONS',
