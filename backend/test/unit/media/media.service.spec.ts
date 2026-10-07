@@ -99,7 +99,7 @@ describe('MediaService lifecycle', () => {
     const result = await service.uploadFile(file, 7);
     expect(result.state).toBe('ready');
     expect(result.depotFileId).toBe(42);
-    expect(result.url).toBe('http://localhost:3001/api/media/1/view');
+    expect(result.url).toBe('http://localhost:3001/api/v1/media/1/view');
     expect(result.cleanupAt).toBeNull();
     expect(result.cleanupLeaseToken).toBeNull();
   });

@@ -1,3 +1,4 @@
+import { API_BASE_PATH } from '@/config/api-routing';
 import {
   Injectable,
   NotFoundException,
@@ -92,7 +93,7 @@ export class MediaService extends BaseService<Media> {
         {
           path: stored.path,
           depotFileId: stored.depotFileId ?? null,
-          url: `${baseUrl}/api/media/${media.id}/view`,
+          url: `${baseUrl.replace(/\/+$/, '')}${API_BASE_PATH}/media/${media.id}/view`,
           state: 'ready',
           cleanupAt: null,
           cleanupLeaseUntil: null,
