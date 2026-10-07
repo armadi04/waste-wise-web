@@ -1,7 +1,6 @@
 import {
   Card,
   CardBody,
-  Pagination,
   Skeleton,
   Table,
   TableBody,
@@ -11,6 +10,7 @@ import {
   TableRow,
 } from '@heroui/react'
 import type { DataTableProps } from '@/components/shared/datatable/types'
+import { Pagination } from '@/components/shared/controls'
 import { DataTableToolbar } from '@/components/shared/datatable/child/data-table-toolbar'
 import { useDataTableState } from '@/hooks/global'
 
@@ -111,19 +111,26 @@ export function DataTable<T extends { id: string | number }>({
           <Table
             aria-label="Loading data"
             shadow="none"
+            checkboxesProps={{
+              classNames: { base: 'app-choice', wrapper: 'app-choice-control' },
+            }}
             classNames={{
               base: 'px-0 pb-0',
               wrapper: 'bg-transparent shadow-none p-0 rounded-large',
-              table: '',
+              table: 'app-table text-sm tabular-nums',
               thead: 'bg-default-50',
-              th: 'bg-default-50 text-default-500 font-semibold text-xs uppercase tracking-wider border-b border-default-200 h-11 rounded-none first:pl-4 last:pr-4',
+              th: 'bg-[var(--app-muted)] text-default-500 font-semibold text-sm border-b border-default-200 h-11 rounded-none first:pl-4 last:pr-4',
               td: 'py-3 border-b border-default-200 group-last:border-none first:pl-4 last:pr-4',
               tr: 'group hover:bg-default-50 transition-colors',
             }}
           >
             <TableHeader columns={headerColumns}>
               {(column) => (
-                <TableColumn key={column.uid} allowsSorting={column.sortable}>
+                <TableColumn
+                  key={column.uid}
+                  allowsSorting={column.sortable}
+                  align={column.align}
+                >
                   {column.name}
                 </TableColumn>
               )}
@@ -132,7 +139,12 @@ export function DataTable<T extends { id: string | number }>({
               {Array.from({ length: 5 }).map((_, index) => (
                 <TableRow key={index}>
                   {headerColumns.map((column) => (
-                    <TableCell key={column.uid}>
+                    <TableCell
+                      key={column.uid}
+                      className={
+                        column.align === 'end' ? 'text-right' : undefined
+                      }
+                    >
                       <Skeleton className="rounded-large">
                         <div className="h-3 w-4/5 rounded-large bg-default-200"></div>
                       </Skeleton>
@@ -146,14 +158,17 @@ export function DataTable<T extends { id: string | number }>({
           <Table
             aria-label="Data table"
             shadow="none"
+            checkboxesProps={{
+              classNames: { base: 'app-choice', wrapper: 'app-choice-control' },
+            }}
             classNames={{
               base: 'px-0 pb-0',
               wrapper: 'bg-transparent shadow-none p-0 rounded-large',
-              table: '',
+              table: 'app-table text-sm tabular-nums',
               thead: 'bg-default-50',
-              th: 'bg-default-50 text-default-500 font-semibold text-xs uppercase tracking-wider border-b border-default-200 h-11 rounded-none first:pl-4 last:pr-4',
+              th: 'bg-[var(--app-muted)] text-default-500 font-semibold text-sm border-b border-default-200 h-11 rounded-none first:pl-4 last:pr-4',
               td: 'py-3 border-b border-default-200 group-last:border-none first:pl-4 last:pr-4',
-              tr: 'group hover:bg-default-50 transition-colors data-[selected=true]:bg-primary-50',
+              tr: 'group hover:bg-default-50 transition-colors data-[selected=true]:bg-[var(--app-selected-background)]',
             }}
             selectionMode={enableSelection ? 'multiple' : 'none'}
             selectedKeys={selectedKeys}
@@ -178,7 +193,11 @@ export function DataTable<T extends { id: string | number }>({
           >
             <TableHeader columns={headerColumns}>
               {(column) => (
-                <TableColumn key={column.uid} allowsSorting={column.sortable}>
+                <TableColumn
+                  key={column.uid}
+                  allowsSorting={column.sortable}
+                  align={column.align}
+                >
                   {column.name}
                 </TableColumn>
               )}
@@ -192,7 +211,7 @@ export function DataTable<T extends { id: string | number }>({
                     key={item.id}
                     className={
                       isPending
-                        ? 'bg-danger-50/40 pointer-events-none transition-colors'
+                        ? 'app-status-danger bg-[var(--app-danger-background)] pointer-events-none transition-colors'
                         : 'transition-colors'
                     }
                   >
@@ -214,7 +233,11 @@ export function DataTable<T extends { id: string | number }>({
                         ? column.render(item)
                         : (item as any)[columnKey]
                       return (
-                        <TableCell>
+                        <TableCell
+                          className={
+                            column?.align === 'end' ? 'text-right' : undefined
+                          }
+                        >
                           {column?.truncate ? (
                             <TruncatedCell maxWidth={column.maxWidth}>
                               {raw}
