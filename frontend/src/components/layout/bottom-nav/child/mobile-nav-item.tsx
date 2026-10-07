@@ -1,8 +1,8 @@
-import { Button } from '@heroui/react'
 import { AnimatePresence, motion, useReducedMotion } from 'framer-motion'
 import { ChevronRight } from 'lucide-react'
 import { useState } from 'react'
 import type { NavItem } from '@/lib/constants/sidebar'
+import { Button } from '@/components/shared/controls'
 
 export const MobileNavItem = ({
   item,
@@ -42,18 +42,18 @@ export const MobileNavItem = ({
         aria-controls={hasChildren ? submenuId : undefined}
         className={`w-full justify-start gap-4 rounded-large px-4 py-3 text-left transition-all focus-visible:ring-2 focus-visible:ring-focus ${
           isActive
-            ? 'bg-primary/10 font-bold text-primary'
+            ? 'app-selected font-medium'
             : 'text-default-600 hover:bg-default-100'
         }`}
       >
         <span
-          className={`shrink-0 ${isActive ? 'text-primary' : 'text-default-500'}`}
+          className={`shrink-0 ${isActive ? 'text-[var(--app-selected-foreground)]' : 'text-default-500'}`}
         >
           {item.icon}
         </span>
         <span className="min-w-0 flex-1 truncate text-base">{item.label}</span>
         {badgeCount > 0 && (
-          <span className="shrink-0 rounded-full bg-danger px-2 py-0.5 text-[11px] font-bold leading-none text-danger-foreground">
+          <span className="shrink-0 rounded-full bg-danger px-2 py-0.5 text-[11px] font-semibold leading-none text-danger-foreground">
             {badgeCount > 99 ? '99+' : badgeCount}
           </span>
         )}
@@ -87,7 +87,7 @@ export const MobileNavItem = ({
                 aria-current={activeKey === child.key ? 'page' : undefined}
                 className={`w-full justify-start rounded-large px-4 py-2.5 text-left text-sm transition-all focus-visible:ring-2 focus-visible:ring-focus ${
                   activeKey === child.key
-                    ? 'bg-primary/5 font-bold text-primary'
+                    ? 'app-selected font-medium'
                     : 'text-default-500 hover:bg-default-100 hover:text-default-900'
                 }`}
               >

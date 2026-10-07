@@ -1,8 +1,5 @@
 import {
   Avatar,
-  Button,
-  Dropdown,
-  DropdownItem,
   DropdownMenu,
   DropdownSection,
   DropdownTrigger,
@@ -21,6 +18,7 @@ import {
   UserCog,
 } from 'lucide-react'
 import { useState } from 'react'
+import { Button, Dropdown, DropdownItem } from '@/components/shared/controls'
 import { ProfileDrawer } from '@/components/features/profile/drawer/profile-drawer'
 import { NotificationDropdown } from '@/components/features/notifications/components/notification-dropdown'
 import { useAuth, useProfile } from '@/hooks/auth'
@@ -74,7 +72,7 @@ export const Header = () => {
           >
             <Link
               to="/"
-              className="shrink-0 font-medium text-primary transition-colors hover:text-primary-600"
+              className="shrink-0 font-medium text-[var(--app-link)] transition-colors hover:text-[var(--app-link-hover)]"
             >
               Home
             </Link>
@@ -84,7 +82,7 @@ export const Header = () => {
                 {bc.href && !bc.isCurrent ? (
                   <Link
                     to={bc.href}
-                    className="truncate font-medium text-primary transition-colors hover:text-primary-600"
+                    className="truncate font-medium text-[var(--app-link)] transition-colors hover:text-[var(--app-link-hover)]"
                   >
                     {bc.label}
                   </Link>
@@ -153,7 +151,9 @@ export const Header = () => {
                 <DropdownTrigger>
                   <div
                     className={`flex items-center gap-3 cursor-pointer transition-opacity ${
-                      isUserMenuOpen ? 'opacity-disabled' : 'hover:opacity-80'
+                      isUserMenuOpen
+                        ? 'bg-[var(--app-selected-background)]'
+                        : 'hover:bg-[var(--app-surface-hover)]'
                     }`}
                   >
                     <div className="hidden sm:flex flex-col items-end gap-1">
@@ -215,10 +215,17 @@ export const Header = () => {
                               <DropdownItem
                                 key={`role-${role.name}`}
                                 textValue={role.name}
-                                className={isActive ? 'bg-primary/10' : ''}
+                                className={
+                                  isActive
+                                    ? 'bg-[var(--app-selected-background)]'
+                                    : ''
+                                }
                                 endContent={
                                   isActive ? (
-                                    <Check size={16} className="text-primary" />
+                                    <Check
+                                      size={16}
+                                      className="text-[var(--app-link)]"
+                                    />
                                   ) : null
                                 }
                                 onPress={() => void onSwitchRole(role.name)}
@@ -226,7 +233,7 @@ export const Header = () => {
                                 <span
                                   className={`capitalize ${
                                     isActive
-                                      ? 'font-semibold text-primary'
+                                      ? 'font-semibold text-[var(--app-link)]'
                                       : 'text-default-700'
                                   }`}
                                 >

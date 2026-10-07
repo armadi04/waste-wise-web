@@ -1,11 +1,6 @@
-import {
-  Kbd,
-  Modal,
-  ModalBody,
-  ModalContent,
-  ScrollShadow,
-} from '@heroui/react'
+import { Kbd, ModalBody, ModalContent, ScrollShadow } from '@heroui/react'
 import { Search } from 'lucide-react'
+import { Modal } from '@/components/shared/controls'
 import { CommandRow } from '@/components/layout/command-palette/child/command-row'
 import { useCommandPalette, useCommandPaletteShortcut } from '@/hooks/global'
 

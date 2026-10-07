@@ -1,8 +1,6 @@
 import {
   Avatar,
   Divider,
-  Dropdown,
-  DropdownItem,
   DropdownMenu,
   DropdownSection,
   DropdownTrigger,
@@ -20,6 +18,7 @@ import {
   User,
 } from 'lucide-react'
 import { useState } from 'react'
+import { Dropdown, DropdownItem } from '@/components/shared/controls'
 import { useAuthStore } from '@/lib/stores/auth.store'
 import { useFullscreen, useSidebarLogic, useTheme } from '@/hooks/global'
 import { SidebarItem } from '@/components/layout/sidebar/child/sidebar-item'
@@ -70,9 +69,9 @@ export const Sidebar = () => {
               animate={{ opacity: 1, scale: 1 }}
               exit={{ opacity: 0, scale: 0.8 }}
               transition={{ duration: 0.2 }}
-              className="whitespace-nowrap text-[24px] font-bold tracking-tight italic"
+              className="whitespace-nowrap text-[24px] font-semibold tracking-tight italic"
             >
-              <span className="text-primary">K</span>
+              <span className="text-[var(--app-link)]">K</span>
               <span className="text-foreground">M</span>
             </motion.div>
           ) : (
@@ -84,8 +83,8 @@ export const Sidebar = () => {
               transition={{ duration: 0.2 }}
               className="flex items-center gap-0"
             >
-              <div className="font-bold text-2xl tracking-tight italic">
-                <span className="text-primary">Nest</span>
+              <div className="font-semibold text-2xl tracking-tight italic">
+                <span className="text-[var(--app-link)]">Nest</span>
                 <span className="text-foreground">plate</span>
               </div>
             </motion.div>
@@ -135,7 +134,7 @@ export const Sidebar = () => {
             href="https://armadii.my.id"
             target="_blank"
             rel="noopener noreferrer"
-            className="text-[10px] font-medium tracking-widest text-default-300 hover:text-default-500 transition-colors uppercase"
+            className="text-[10px] font-medium tracking-widest text-default-500 hover:text-default-500 transition-colors uppercase"
           >
             developer
           </a>
@@ -157,7 +156,7 @@ export const Sidebar = () => {
             <div
               className={`flex items-center gap-3 p-2 rounded-large transition-colors cursor-pointer ${
                 isMenuOpen
-                  ? 'bg-default-100 opacity-disabled'
+                  ? 'bg-[var(--app-selected-background)]'
                   : 'hover:bg-default-100'
               } ${isCollapsed ? 'justify-center' : ''}`}
             >
@@ -221,7 +220,7 @@ export const Sidebar = () => {
             <DropdownItem
               key="logout"
               color="danger"
-              className="text-danger"
+              className="text-[var(--app-danger)]"
               startContent={<LogOut size={18} />}
               onPress={() => logout()}
             >

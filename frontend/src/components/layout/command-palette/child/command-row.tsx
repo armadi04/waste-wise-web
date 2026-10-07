@@ -17,10 +17,10 @@ export const CommandRow = ({
     onClick={onRun}
     className={`flex w-full items-center gap-3 rounded-large px-3 py-2 text-left text-sm transition-colors ${
       isActive ? 'bg-default-100' : ''
-    } ${command.isDanger ? 'text-danger' : 'text-default-700'}`}
+    } ${command.isDanger ? 'text-[var(--app-danger)]' : 'text-default-700'}`}
   >
     <span
-      className={`shrink-0 ${command.isDanger ? 'text-danger' : 'text-default-500'}`}
+      className={`shrink-0 ${command.isDanger ? 'text-[var(--app-danger)]' : 'text-default-500'}`}
     >
       {command.icon}
     </span>

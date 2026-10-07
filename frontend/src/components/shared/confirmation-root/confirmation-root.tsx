@@ -1,11 +1,10 @@
 import {
-  Button,
-  Modal,
   ModalBody,
   ModalContent,
   ModalFooter,
   ModalHeader,
 } from '@heroui/react'
+import { Button, Modal } from '@/components/shared/controls'
 import { useConfirmationStore } from '@/lib/stores/confirmation.store'
 
 /**
@@ -23,7 +22,6 @@ export function ConfirmationRoot() {
     <Modal
       isOpen={isOpen}
       onClose={handleCancel}
-      backdrop="blur"
       placement="center"
       hideCloseButton
     >

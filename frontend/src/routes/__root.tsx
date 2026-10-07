@@ -1,4 +1,4 @@
-import { Button, ToastProvider } from '@heroui/react'
+import { ToastProvider } from '@heroui/react'
 import {
   Link,
   Outlet,
@@ -12,6 +12,7 @@ import { Suspense, lazy, useEffect } from 'react'
 
 import type { QueryClient } from '@tanstack/react-query'
 import type { ErrorComponentProps } from '@tanstack/react-router'
+import { Button } from '@/components/shared/controls'
 import { LottieAnimation } from '@/components/atoms/lottie-animation'
 import { EmailVerificationGate } from '@/components/features/auth/components/email-verification-gate'
 import { ImpersonationBanner } from '@/components/features/users/components/impersonation-banner'
@@ -44,7 +45,7 @@ function RootError({ error }: ErrorComponentProps) {
 
   return (
     <main className="flex min-h-[80vh] w-full flex-col items-center justify-center gap-4 p-6 text-center">
-      <h1 className="text-2xl font-bold text-default-800">
+      <h1 className="text-2xl font-semibold text-default-800">
         {accessDenied ? 'Access Denied' : 'Unable to load this page'}
       </h1>
       <p role="alert" className="max-w-md text-default-500">
@@ -70,7 +71,7 @@ function NotFound() {
       <div className="w-full max-w-md">
         <LottieAnimation name="notFound" />
       </div>
-      <h1 className="text-2xl font-bold text-default-800 mt-2">
+      <h1 className="text-2xl font-semibold text-default-800 mt-2">
         Oops! Page Not Found
       </h1>
       <p className="text-default-500 mb-6 text-center">
@@ -81,7 +82,7 @@ function NotFound() {
         to="/"
         color="primary"
         variant="flat"
-        className="font-medium bg-primary/10 text-primary"
+        className="font-medium bg-[var(--app-selected-background)] text-primary"
       >
         Return to Dashboard
       </Button>

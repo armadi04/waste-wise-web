@@ -38,9 +38,9 @@ export function SectionNavLayout<TKey extends string>({
               type="button"
               aria-current={isActive ? 'page' : undefined}
               onClick={() => onChange(section.key)}
-              className={`shrink-0 rounded-medium px-4 py-2.5 text-left text-xs font-bold tracking-widest uppercase transition-colors ${
+              className={`shrink-0 rounded-medium px-4 py-2.5 text-left text-xs font-semibold tracking-widest uppercase transition-colors ${
                 isActive
-                  ? 'bg-primary text-primary-foreground'
+                  ? 'app-selected'
                   : 'text-default-500 hover:bg-default-100'
               }`}
             >
