@@ -1,9 +1,9 @@
-import { addToast } from '@heroui/react'
 import { useQueryClient } from '@tanstack/react-query'
 import { useNavigate } from '@tanstack/react-router'
 import { useEffect } from 'react'
 import { io } from 'socket.io-client'
 import type { Notification as NotificationEntity } from '@/types/api'
+import { addToast } from '@/components/shared/controls/toast'
 import {
   clearCachesAndReload,
   getAppliedRefreshAt,

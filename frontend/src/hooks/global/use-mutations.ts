@@ -1,7 +1,7 @@
-import { addToast } from '@heroui/react'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import axios from 'axios'
 import type { UseMutationOptions } from '@tanstack/react-query'
+import { addToast } from '@/components/shared/controls/toast'
 
 interface MutationHelperOptions<
   TData,

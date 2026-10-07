@@ -93,3 +93,24 @@ The Register Method column uses labeled badges for Email & OTP, Google, Undangan
 Seeder, and Tidak diketahui. It describes account creation, not the latest sign-in.
 Users export fetches all matching rows with the active search, filters, and sorting, and
 exports the registration-method label. No additional permission or menu is required.
+
+## UI theme and shared controls
+
+[DESIGN.md](../../DESIGN.md) owns the exact light/dark palette and interaction pairs.
+Application tokens live in `src/styles/tokens.css`; `src/hero.ts` maps HeroUI roles and
+complete shade ramps. Use `components/shared/controls` for buttons, inputs, selection
+controls, chips, menus and overlays. These HeroUI variants retain native props and focus
+management while `styles/controls.css` maps operational slots and states to explicit tokens.
+Use `components/shared/controls/toast` for status toasts. Soft statuses use their background,
+foreground and border together; solid status buttons use the separate solid token family.
+Do not add opacity reductions or page-specific colors to these controls.
+Modal and Drawer default to the same blurred backdrop (12 px blur with a 30% surface
+tint and 150% saturation), matching Users and Invitations. Keep this shared default across forms and pages;
+feature overlays may adjust stacking order without changing backdrop appearance.
+
+The document receives exactly one `light` or `dark` class before first paint. Persisted
+`theme-store` preferences take precedence over the legacy `theme` key and system preference.
+The theme store maintains root classes, color scheme and browser chrome on changes. Plus
+Jakarta Sans (400/500/600) is the application font; reduced motion disables appearance reveals.
+DataTable accepts optional column `align` values (`start`, `center`, `end`); use `end` for
+monetary amounts. Table numbers and dates use tabular numerals.

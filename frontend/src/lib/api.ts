@@ -1,5 +1,4 @@
 import axios from 'axios'
-import { addToast } from '@heroui/react'
 import { clearAuthFlag } from './utils/cookies'
 import type {
   AxiosError,
@@ -7,6 +6,7 @@ import type {
   AxiosResponse,
   InternalAxiosRequestConfig,
 } from 'axios'
+import { addToast } from '@/components/shared/controls/toast'
 import { getCsrfToken } from '@/lib/utils/csrf'
 
 let isRefreshing = false

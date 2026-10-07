@@ -1,0 +1,494 @@
+/* Declare before Tailwind so explicit important states beat native important utilities. */
+@layer app-controls {
+  /* Explicit operational states take precedence over HeroUI shade/opacity variants. */
+  .app-tone-default {
+    --tone-bg: var(--app-muted);
+    --tone-fg: var(--app-foreground);
+    --tone-border: var(--app-border-control);
+    --tone-solid: var(--app-muted);
+    --tone-solid-fg: var(--app-foreground);
+    --tone-hover: var(--app-surface-hover);
+    --tone-pressed: var(--app-surface-pressed);
+    --tone-text: var(--app-foreground);
+  }
+  .app-tone-primary {
+    --tone-bg: var(--app-selected-background);
+    --tone-fg: var(--app-selected-foreground);
+    --tone-border: var(--app-selected-border);
+    --tone-solid: var(--app-primary);
+    --tone-solid-fg: var(--app-primary-foreground);
+    --tone-hover: var(--app-primary-hover);
+    --tone-pressed: var(--app-primary-pressed);
+    --tone-text: var(--app-link);
+  }
+  .app-tone-secondary {
+    --tone-bg: var(--app-selected-background);
+    --tone-fg: var(--app-selected-foreground);
+    --tone-border: var(--app-selected-border);
+    --tone-solid: var(--app-primary);
+    --tone-solid-fg: var(--app-primary-foreground);
+    --tone-hover: var(--app-primary-hover);
+    --tone-pressed: var(--app-primary-pressed);
+    --tone-text: var(--app-link);
+  }
+  .app-tone-success {
+    --tone-bg: var(--app-success-background);
+    --tone-fg: var(--app-success-foreground);
+    --tone-border: var(--app-success-border);
+    --tone-solid: var(--app-success-solid);
+    --tone-solid-fg: var(--app-success-solid-foreground);
+    --tone-hover: var(--app-success-solid-hover);
+    --tone-pressed: var(--app-success-solid-pressed);
+    --tone-text: var(--app-success);
+  }
+  .app-tone-warning {
+    --tone-bg: var(--app-warning-background);
+    --tone-fg: var(--app-warning-foreground);
+    --tone-border: var(--app-warning-border);
+    --tone-solid: var(--app-warning-solid);
+    --tone-solid-fg: var(--app-warning-solid-foreground);
+    --tone-hover: var(--app-warning-solid-hover);
+    --tone-pressed: var(--app-warning-solid-pressed);
+    --tone-text: var(--app-warning);
+  }
+  .app-tone-danger {
+    --tone-bg: var(--app-danger-background);
+    --tone-fg: var(--app-danger-foreground);
+    --tone-border: var(--app-danger-border);
+    --tone-solid: var(--app-danger-solid);
+    --tone-solid-fg: var(--app-danger-solid-foreground);
+    --tone-hover: var(--app-danger-solid-hover);
+    --tone-pressed: var(--app-danger-solid-pressed);
+    --tone-text: var(--app-danger);
+  }
+  .app-tone-info {
+    --tone-bg: var(--app-info-background);
+    --tone-fg: var(--app-info-foreground);
+    --tone-border: var(--app-info-border);
+    --tone-solid: var(--app-info-solid);
+    --tone-solid-fg: var(--app-info-solid-foreground);
+    --tone-hover: var(--app-info-solid-hover);
+    --tone-pressed: var(--app-info-solid-pressed);
+    --tone-text: var(--app-info);
+  }
+
+  :is(.app-button, .app-chip, .app-snippet).app-solid,
+  .app-button.app-shadow {
+    background: var(--tone-solid) !important;
+    color: var(--tone-solid-fg) !important;
+  }
+  .app-button:is(.app-solid, .app-shadow):is(:hover, [data-hover='true']) {
+    background: var(--tone-hover) !important;
+  }
+  .app-button:is(.app-solid, .app-shadow):is(:active, [data-pressed='true']) {
+    background: var(--tone-pressed) !important;
+  }
+  :is(.app-button, .app-chip, .app-snippet):is(.app-flat, .app-faded) {
+    background: var(--tone-bg) !important;
+    color: var(--tone-fg) !important;
+    border: 1px solid var(--tone-border) !important;
+  }
+  :is(.app-button, .app-chip).app-bordered {
+    background: var(--app-surface) !important;
+    color: var(--tone-text) !important;
+    border: 1px solid var(--tone-border) !important;
+  }
+  .app-button:is(.app-light, .app-ghost) {
+    background: transparent !important;
+    color: var(--tone-text) !important;
+  }
+  .app-button.app-ghost {
+    border: 1px solid var(--tone-border) !important;
+  }
+  .app-button:is(
+      .app-flat,
+      .app-faded,
+      .app-bordered,
+      .app-light,
+      .app-ghost
+    ):is(:hover, [data-hover='true']) {
+    background: var(--app-surface-hover) !important;
+  }
+  .app-button:is(
+      .app-flat,
+      .app-faded,
+      .app-bordered,
+      .app-light,
+      .app-ghost
+    ):is(:active, [data-pressed='true']) {
+    background: var(--app-surface-pressed) !important;
+  }
+  .app-chip {
+    font-size: 12px;
+    font-weight: 500;
+  }
+  .app-chip [data-slot='content'],
+  .app-button > span {
+    color: inherit;
+  }
+  .app-button {
+    font-size: 14px;
+    font-weight: 500;
+  }
+  .app-button:is([data-hover='true'], [data-pressed='true']) {
+    opacity: 1 !important;
+    filter: none !important;
+  }
+  .app-button:is(:disabled, [data-disabled='true']),
+  .app-field[data-disabled='true'] .app-field-control {
+    background: var(--app-disabled-background) !important;
+    color: var(--app-disabled-foreground) !important;
+    border: 1px solid var(--app-disabled-border) !important;
+    opacity: 1 !important;
+  }
+  .app-field[data-disabled='true'],
+  .app-choice[data-disabled='true'] {
+    opacity: 1 !important;
+  }
+  .app-field-control,
+  .app-field [data-slot='input-wrapper'],
+  .app-field [data-slot='trigger'] {
+    background: var(--app-input-background) !important;
+    color: var(--app-input-foreground) !important;
+    border: 1px solid var(--app-input-border) !important;
+    box-shadow: none;
+  }
+  .app-field-control:is(:hover, [data-hover='true']),
+  .app-field [data-slot='input-wrapper'][data-hover='true'] {
+    border-color: var(--app-input-border-hover) !important;
+  }
+  .app-field-control:focus-within,
+  .app-field[data-focus='true'] .app-field-control,
+  .app-field [data-slot='input-wrapper']:focus-within {
+    border-color: var(--app-input-border-focus) !important;
+  }
+  .app-field[data-invalid='true'] .app-field-control,
+  .app-field [data-slot='input-wrapper'][data-invalid='true'],
+  .app-field-control:has([aria-invalid='true']) {
+    border-color: var(--app-input-border-error) !important;
+  }
+  .app-field-text,
+  .app-field [data-slot='input'],
+  .app-field [data-slot='value'] {
+    color: var(--app-input-foreground) !important;
+    font-size: 14px;
+  }
+  .app-field input::placeholder,
+  .app-field textarea::placeholder,
+  .app-field [data-slot='value'][data-placeholder='true'] {
+    color: var(--app-input-placeholder) !important;
+    opacity: 1;
+  }
+  .app-field-label,
+  .app-field [data-slot='label'] {
+    color: var(--app-foreground) !important;
+    font-size: 14px;
+    font-weight: 500;
+  }
+  .app-field-error {
+    color: var(--app-danger) !important;
+  }
+  .app-field input[readonly],
+  .app-field textarea[readonly] {
+    user-select: text;
+  }
+  .app-field[data-disabled='true']
+    :is(input, textarea, [data-slot='value'], label) {
+    color: var(--app-disabled-foreground) !important;
+  }
+  .app-overlay {
+    background: var(--app-surface) !important;
+    color: var(--app-foreground) !important;
+    --app-focus-offset: var(--app-surface);
+  }
+  .app-dropdownitem,
+  .app-neutral-control {
+    color: var(--app-foreground) !important;
+  }
+  .app-dropdownitem:is([data-hover='true'], [data-focus='true']),
+  .app-neutral-control:is(:hover, [data-hover='true']) {
+    background: var(--app-surface-hover) !important;
+    color: var(--app-foreground) !important;
+    opacity: 1 !important;
+  }
+  .app-dropdownitem[data-selected='true'],
+  .app-selected,
+  .app-pagination [aria-current='page'] {
+    background: var(--app-selected-background) !important;
+    color: var(--app-selected-foreground) !important;
+    box-shadow: inset 3px 0 var(--app-selected-border);
+  }
+  .app-dropdownitem[data-selected='true']:is(
+      [data-hover='true'],
+      [data-focus='true']
+    ),
+  .app-selected:hover {
+    background: var(--app-selected-hover) !important;
+  }
+  .app-dropdownitem.app-tone-danger {
+    color: var(--app-danger) !important;
+  }
+  .app-dropdownitem.app-tone-danger:is(
+      [data-hover='true'],
+      [data-focus='true']
+    ) {
+    background: var(--app-danger-background) !important;
+    color: var(--app-danger-foreground) !important;
+  }
+  .app-choice-control {
+    border-color: var(--app-border-control) !important;
+  }
+  .app-choice[data-selected='true'] .app-choice-control::before {
+    border-color: var(--app-selected-border) !important;
+  }
+  .app-choice[data-selected='true'] .app-choice-control::after,
+  .app-choice[data-selected='true'] .app-switch {
+    background: var(--app-primary) !important;
+  }
+  .app-choice-control svg {
+    color: var(--app-primary-foreground);
+  }
+  .app-switch {
+    background: var(--app-muted);
+    border: 1px solid var(--app-border-control) !important;
+  }
+  .app-switch-thumb {
+    background: var(--app-primary-foreground);
+  }
+  .app-choice[data-disabled='true'] :is(.app-choice-control, .app-switch) {
+    background: var(--app-disabled-background) !important;
+    border-color: var(--app-disabled-border) !important;
+    opacity: 1 !important;
+  }
+  .app-choice[data-disabled='true'] .app-field-label {
+    color: var(--app-disabled-foreground) !important;
+  }
+  .app-pagination-cursor {
+    background: var(--app-primary) !important;
+    color: var(--app-primary-foreground) !important;
+  }
+  :where(
+    a,
+    button,
+    [role='button'],
+    input,
+    textarea,
+    select,
+    [tabindex]
+  ):focus-visible,
+  :is(
+    .app-button,
+    .app-neutral-control,
+    .app-dropdownitem,
+    .app-choice-control
+  )[data-focus-visible='true'],
+  .app-field-control:has(:focus-visible),
+  .app-field [data-slot='input-wrapper']:has(:focus-visible) {
+    outline: 2px solid var(--app-focus) !important;
+    outline-offset: 2px !important;
+    box-shadow: 0 0 0 2px var(--app-focus-offset) !important;
+  }
+  .app-field input:focus-visible,
+  .app-field textarea:focus-visible {
+    outline: none !important;
+    box-shadow: none !important;
+  }
+  a:not(.app-button) {
+    color: var(--app-link);
+  }
+  a:not(.app-button):hover {
+    color: var(--app-link-hover);
+  }
+  h1,
+  h2,
+  h3,
+  h4 {
+    line-height: 1.3;
+  }
+  .app-table {
+    font-size: 14px;
+    font-variant-numeric: tabular-nums;
+  }
+  .app-table [data-slot='tr']:hover {
+    background: var(--app-surface-hover) !important;
+  }
+  .app-table [data-slot='tr'][data-selected='true'] {
+    background: var(--app-selected-background) !important;
+    color: var(--app-selected-foreground);
+    box-shadow: inset 3px 0 var(--app-selected-border);
+  }
+  .app-table [data-slot='tr'][data-selected='true']:hover {
+    background: var(--app-selected-hover) !important;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      transition-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
+    }
+    ::view-transition-group(*),
+    ::view-transition-old(*),
+    ::view-transition-new(*) {
+      animation: none !important;
+    }
+  }
+
+  .app-toast {
+    background: var(--tone-bg) !important;
+    color: var(--tone-fg) !important;
+    border: 1px solid var(--tone-border) !important;
+  }
+  .app-toast-text {
+    color: var(--tone-fg) !important;
+    opacity: 1 !important;
+  }
+  .app-toast [role='progressbar'] {
+    background: var(--tone-border) !important;
+  }
+
+  /* Keep selected controls stronger than the underlying button variant. */
+  .app-button.app-selected {
+    background: var(--app-selected-background) !important;
+    color: var(--app-selected-foreground) !important;
+  }
+  .app-button.app-selected:is(:hover, [data-hover='true']) {
+    background: var(--app-selected-hover) !important;
+  }
+  .app-button.app-tone-default.app-solid {
+    border: 1px solid var(--app-border-control) !important;
+  }
+  .app-field.app-field[data-invalid='true'] [data-slot='input-wrapper'],
+  .app-field.app-field [data-slot='input-wrapper'][data-invalid='true'],
+  .app-field.app-field [data-slot='input-wrapper']:has([aria-invalid='true']) {
+    background: var(--app-input-background) !important;
+    color: var(--app-input-foreground) !important;
+    border-color: var(--app-input-border-error) !important;
+  }
+  .app-field.app-field[data-disabled='true'] [data-slot='input-wrapper'] {
+    background: var(--app-disabled-background) !important;
+    border-color: var(--app-disabled-border) !important;
+  }
+  .app-table [data-slot='tr'][data-selected='true'] td {
+    color: var(--app-selected-foreground) !important;
+  }
+  .app-option {
+    color: var(--app-foreground) !important;
+  }
+  .app-option:is([data-hover='true'], [data-focus='true']) {
+    background: var(--app-surface-hover) !important;
+    color: var(--app-foreground) !important;
+  }
+  .app-option[data-selected='true'] {
+    background: var(--app-selected-background) !important;
+    color: var(--app-selected-foreground) !important;
+    box-shadow: inset 3px 0 var(--app-selected-border);
+  }
+  .app-option[data-selected='true']:is(
+      [data-hover='true'],
+      [data-focus='true']
+    ) {
+    background: var(--app-selected-hover) !important;
+  }
+  .app-choice[data-disabled='true'] .app-choice-control::after {
+    background: var(--app-disabled-background) !important;
+  }
+  .app-tabs [data-slot='cursor'] {
+    background: var(--app-selected-background) !important;
+    border: 1px solid var(--app-selected-border);
+  }
+  .app-tabs [data-selected='true'] [data-slot='tabContent'] {
+    color: var(--app-selected-foreground) !important;
+  }
+  .app-tabs [data-slot='tab']:hover {
+    background: var(--app-surface-hover);
+    opacity: 1 !important;
+  }
+
+  .app-choice-control::before {
+    border-color: var(--app-border-control) !important;
+  }
+  .app-table [data-selected='true'] .app-choice-control::after,
+  .app-choice-control[data-selected='true']::after {
+    background: var(--app-primary) !important;
+  }
+  .app-table .app-choice-control svg {
+    color: var(--app-primary-foreground);
+  }
+  .app-pagination [data-slot='wrapper'] {
+    background: var(--app-surface) !important;
+  }
+
+  .app-field.app-field [data-slot='label'] {
+    color: var(--app-foreground) !important;
+  }
+  .app-field.app-field [data-slot='input'] {
+    color: var(--app-input-foreground) !important;
+  }
+  .app-field.app-field[data-disabled='true']
+    :is([data-slot='label'], [data-slot='input']) {
+    color: var(--app-disabled-foreground) !important;
+  }
+
+  .app-button.app-button:is(:disabled, [data-disabled='true']) {
+    background: var(--app-disabled-background) !important;
+    color: var(--app-disabled-foreground) !important;
+    border: 1px solid var(--app-disabled-border) !important;
+    opacity: 1 !important;
+  }
+  .app-field-control:disabled {
+    background: var(--app-disabled-background) !important;
+    color: var(--app-disabled-foreground) !important;
+    border-color: var(--app-disabled-border) !important;
+    opacity: 1 !important;
+  }
+
+  .app-field [data-slot='error-message'],
+  .app-field [data-slot='label']::after {
+    color: var(--app-danger) !important;
+  }
+
+  /* One backdrop contract for every modal and drawer, matching Users/Invitations. */
+  .app-backdrop {
+    background: color-mix(
+      in srgb,
+      var(--app-surface) 30%,
+      transparent
+    ) !important;
+    backdrop-filter: blur(12px) saturate(1.5) !important;
+    -webkit-backdrop-filter: blur(12px) saturate(1.5) !important;
+  }
+  .app-status-success {
+    background: var(--app-success-background) !important;
+    color: var(--app-success-foreground) !important;
+    border: 1px solid var(--app-success-border) !important;
+  }
+  .app-status-success :is(p, span, svg) {
+    color: var(--app-success-foreground) !important;
+  }
+  .app-status-warning {
+    background: var(--app-warning-background) !important;
+    color: var(--app-warning-foreground) !important;
+    border: 1px solid var(--app-warning-border) !important;
+  }
+  .app-status-warning :is(p, span, svg) {
+    color: var(--app-warning-foreground) !important;
+  }
+  .app-status-danger {
+    background: var(--app-danger-background) !important;
+    color: var(--app-danger-foreground) !important;
+    border: 1px solid var(--app-danger-border) !important;
+  }
+  .app-status-danger :is(p, span, svg) {
+    color: var(--app-danger-foreground) !important;
+  }
+  .app-status-info {
+    background: var(--app-info-background) !important;
+    color: var(--app-info-foreground) !important;
+    border: 1px solid var(--app-info-border) !important;
+  }
+  .app-status-info :is(p, span, svg) {
+    color: var(--app-info-foreground) !important;
+  }
+}
