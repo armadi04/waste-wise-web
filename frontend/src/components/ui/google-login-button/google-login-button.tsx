@@ -1,6 +1,7 @@
-import { Button, addToast } from '@heroui/react'
 import { useGoogleLogin } from '@react-oauth/google'
 import { useNavigate } from '@tanstack/react-router'
+import { addToast } from '@/components/shared/controls/toast'
+import { Button } from '@/components/shared/controls'
 import { useAuth } from '@/hooks/auth'
 
 // Google login is optional: only enabled when VITE_GOOGLE_CLIENT_ID is set.
@@ -75,7 +76,7 @@ export function GoogleLoginButton({
       }
       onPress={() => handleGoogleLogin()}
     >
-      <span className="text-primary font-medium">Google</span>
+      <span className="text-[var(--app-link)] font-medium">Google</span>
     </Button>
   )
 }

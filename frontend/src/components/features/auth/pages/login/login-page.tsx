@@ -1,6 +1,7 @@
-import { Button, Divider, Input } from '@heroui/react'
+import { Divider } from '@heroui/react'
 import { Link } from '@tanstack/react-router'
 import { Building2, Eye, EyeOff, Lock, LogIn, User } from 'lucide-react'
+import { Button, Input } from '@/components/shared/controls'
 import { LoginTwoFactorForm } from '@/components/features/auth/pages/login/child/login-two-factor-form'
 import {
   SSO_ERRORS,
@@ -63,10 +64,11 @@ export function LoginPage() {
     <AuthPageShell>
       {/* Header */}
       <div className="space-y-3 text-center">
-        <h1 className="text-3xl font-bold tracking-tight text-foreground sm:text-4xl">
-          Welcome back to <span className="text-primary italic">Nest</span>
+        <h1 className="text-2xl font-semibold tracking-tight text-foreground sm:text-[28px]">
+          Welcome back to{' '}
+          <span className="text-[var(--app-link)] italic">Nest</span>
           <span className="text-foreground italic">plate </span>
-          <span className="text-primary italic">Admin</span>
+          <span className="text-[var(--app-link)] italic">Admin</span>
         </h1>
         <p className="text-sm text-default-500">
           Sign in to continue to your dashboard.
@@ -75,10 +77,10 @@ export function LoginPage() {
 
       <div className="space-y-6">
         {ssoFailure && (
-          <div className="flex gap-3 rounded-large border border-danger-200 bg-danger/10 p-4">
-            <ssoFailure.icon className="mt-0.5 h-5 w-5 shrink-0 text-danger" />
+          <div className="flex gap-3 rounded-large border border-[var(--app-danger-border)] app-status-danger bg-[var(--app-danger-background)] text-[var(--app-danger-foreground)] p-4">
+            <ssoFailure.icon className="mt-0.5 h-5 w-5 shrink-0 text-[var(--app-danger)]" />
             <div className="space-y-1">
-              <p className="text-sm font-semibold text-danger">
+              <p className="text-sm font-semibold text-[var(--app-danger)]">
                 {ssoFailure.title}
               </p>
               <p className="text-xs text-default-600">
@@ -112,8 +114,11 @@ export function LoginPage() {
             endContent={
               <button
                 type="button"
+                aria-label={
+                  isPasswordVisible ? 'Hide password' : 'Show password'
+                }
                 onClick={togglePasswordVisibility}
-                className="focus:outline-none"
+                className="focus-visible:outline-2 focus-visible:outline-focus focus-visible:outline-offset-2"
               >
                 {isPasswordVisible ? (
                   <EyeOff className="w-4 h-4 text-default-400" />
@@ -137,7 +142,7 @@ export function LoginPage() {
           <div className="flex justify-end -mt-1">
             <Link
               to="/forgot-password"
-              className="text-xs text-primary hover:text-primary-700 hover:underline transition-colors"
+              className="text-xs text-[var(--app-link)] hover:text-[var(--app-link-hover)] hover:underline transition-colors"
             >
               Forgot password?
             </Link>
@@ -157,7 +162,7 @@ export function LoginPage() {
 
           {turnstileError && (
             <div>
-              <p role="alert" className="text-sm text-danger">
+              <p role="alert" className="text-sm text-[var(--app-danger)]">
                 {turnstileErrorMessages[turnstileError]}
               </p>
               <Button type="button" variant="light" onPress={resetTurnstile}>
@@ -170,8 +175,9 @@ export function LoginPage() {
 
           {/* Submit Button */}
           <Button
+            color="primary"
             type="submit"
-            className="w-full h-12 bg-primary hover:bg-primary-700 text-primary-foreground font-medium disabled:opacity-60"
+            className="w-full h-12 bg-primary hover:bg-primary-700 text-primary-foreground font-medium "
             isLoading={isLoading}
             isDisabled={isLoading || !isTurnstileReady}
             startContent={!isLoading && <LogIn className="w-4 h-4" />}
@@ -201,9 +207,11 @@ export function LoginPage() {
             variant="flat"
             color="primary"
             className="flex-1"
-            startContent={<Building2 className="w-5 h-5 text-primary" />}
+            startContent={
+              <Building2 className="w-5 h-5 text-[var(--app-link)]" />
+            }
           >
-            <span className="text-primary font-medium">Passport</span>
+            <span className="text-[var(--app-link)] font-medium">Passport</span>
           </Button>
         </div>
       </div>

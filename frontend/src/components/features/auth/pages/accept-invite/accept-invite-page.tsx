@@ -1,5 +1,6 @@
-import { Button, Input, Spinner } from '@heroui/react'
+import { Spinner } from '@heroui/react'
 import { AlertTriangle, Mail, Phone, User } from 'lucide-react'
+import { Button, Input } from '@/components/shared/controls'
 import { routeApi } from '@/components/features/auth/pages/accept-invite/lib/accept-invite-page-helpers'
 import { AuthPageShell } from '@/components/layout/auth-page-shell'
 import { useAcceptInvite, useAuthGuard } from '@/hooks/auth'
@@ -47,11 +48,11 @@ export function AcceptInvitePage() {
           <>
             <div className="text-center space-y-2">
               <div className="flex justify-center mb-4">
-                <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center">
-                  <User className="w-6 h-6 text-primary" />
+                <div className="w-12 h-12 rounded-full bg-[var(--app-selected-background)] flex items-center justify-center">
+                  <User className="w-6 h-6 text-[var(--app-link)]" />
                 </div>
               </div>
-              <h1 className="text-2xl font-bold tracking-tight text-foreground">
+              <h1 className="text-2xl font-semibold tracking-tight text-foreground">
                 Set Up Your Account
               </h1>
               <p className="text-sm text-default-500">
@@ -60,9 +61,9 @@ export function AcceptInvitePage() {
             </div>
 
             {apiError && (
-              <div className="flex items-start gap-2 rounded-large bg-danger/10 border border-danger-200 px-4 py-3">
-                <AlertTriangle className="w-4 h-4 text-danger mt-0.5 shrink-0" />
-                <p className="text-sm text-danger">{apiError}</p>
+              <div className="flex items-start gap-2 rounded-large app-status-danger bg-[var(--app-danger-background)] text-[var(--app-danger-foreground)] border border-[var(--app-danger-border)] px-4 py-3">
+                <AlertTriangle className="w-4 h-4 text-[var(--app-danger)] mt-0.5 shrink-0" />
+                <p className="text-sm text-[var(--app-danger)]">{apiError}</p>
               </div>
             )}
 
@@ -122,8 +123,9 @@ export function AcceptInvitePage() {
               />
 
               <Button
+                color="primary"
                 type="submit"
-                className="w-full h-12 bg-primary hover:bg-primary-700 text-primary-foreground font-medium mt-2 disabled:opacity-60"
+                className="w-full h-12 bg-primary hover:bg-primary-700 text-primary-foreground font-medium mt-2 "
                 isLoading={isPending}
                 isDisabled={isPending}
               >

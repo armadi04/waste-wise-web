@@ -6,12 +6,12 @@ export function SuccessState() {
     <>
       <div className="text-center space-y-4">
         <div className="flex justify-center">
-          <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center">
-            <Mail className="w-8 h-8 text-primary" />
+          <div className="w-16 h-16 rounded-full bg-[var(--app-selected-background)] flex items-center justify-center">
+            <Mail className="w-8 h-8 text-[var(--app-link)]" />
           </div>
         </div>
         <div className="space-y-2">
-          <h1 className="text-2xl font-bold tracking-tight text-foreground">
+          <h1 className="text-2xl font-semibold tracking-tight text-foreground">
             Check your email
           </h1>
           <p className="text-sm text-default-500 leading-relaxed">

@@ -1,5 +1,5 @@
 import { Card, CardBody } from '@heroui/react'
-import { motion } from 'framer-motion'
+import { motion, useReducedMotion } from 'framer-motion'
 import loginDayBg from '@/assets/images/login-day.webp'
 import loginNightBg from '@/assets/images/login-night.webp'
 import { useTheme } from '@/hooks/global'
@@ -27,6 +27,7 @@ interface AuthPageShellProps {
 export function AuthPageShell({ children, morph = true }: AuthPageShellProps) {
   useTimeZone((s) => s.timeZone)
   const { isDark } = useTheme()
+  const reducedMotion = useReducedMotion()
   const background = isDark ? loginNightBg : loginDayBg
 
   return (
@@ -44,25 +45,25 @@ export function AuthPageShell({ children, morph = true }: AuthPageShellProps) {
 
       <main className="relative z-10 flex flex-1 items-center justify-center px-4 py-12">
         <motion.div
-          layoutId={morph ? 'auth-card' : undefined}
-          initial={{ opacity: 0, scale: 0.95, y: 10 }}
+          layoutId={morph && !reducedMotion ? 'auth-card' : undefined}
+          initial={reducedMotion ? false : { opacity: 0, scale: 0.95, y: 10 }}
           animate={{ opacity: 1, scale: 1, y: 0 }}
           transition={{ type: 'spring', bounce: 0.2, duration: 0.5 }}
           className="w-full max-w-md"
         >
-          <Card className="w-full border-0 bg-white/80 text-foreground shadow-2xl backdrop-blur-md dark:bg-black/55">
+          <Card className="w-full border-0 bg-content1 text-foreground shadow-none">
             <CardBody className="gap-6 p-8">{children}</CardBody>
           </Card>
         </motion.div>
       </main>
 
-      <footer className="relative z-10 flex items-center justify-between px-6 pb-6 text-xs text-white/80 drop-shadow-sm">
+      <footer className="relative z-10 flex items-center justify-between px-6 pb-6 pt-4 text-xs text-white drop-shadow-[0_1px_2px_rgba(0,0,0,0.9)]">
         <p>© {formatBusinessDate(new Date(), 'yyyy')} Nestplate Starter.</p>
         <a
           href="https://armadii.my.id"
           target="_blank"
           rel="noopener noreferrer"
-          className="uppercase tracking-wide transition-colors hover:text-white"
+          className="uppercase tracking-wide underline-offset-4 hover:underline focus-visible:rounded-small focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-white"
         >
           developer
         </a>

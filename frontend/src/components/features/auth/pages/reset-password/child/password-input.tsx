@@ -1,6 +1,6 @@
-import { Input } from '@heroui/react'
 import { Eye, EyeOff, Lock } from 'lucide-react'
 import type { useResetPassword } from '@/hooks/auth'
+import { Input } from '@/components/shared/controls'
 
 export function PasswordInput({
   label,
@@ -25,7 +25,12 @@ export function PasswordInput({
       type={isVisible ? 'text' : 'password'}
       startContent={<Lock className="w-4 h-4 text-default-400" />}
       endContent={
-        <button type="button" onClick={onToggle} className="focus:outline-none">
+        <button
+          type="button"
+          aria-label={isVisible ? 'Hide password' : 'Show password'}
+          onClick={onToggle}
+          className="focus-visible:outline-2 focus-visible:outline-focus focus-visible:outline-offset-2"
+        >
           {isVisible ? (
             <EyeOff className="w-4 h-4 text-default-400" />
           ) : (
