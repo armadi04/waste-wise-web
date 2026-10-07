@@ -51,7 +51,7 @@ describe('Notifications (e2e)', () => {
     await seedNotificationFor(user.id);
 
     const res = await request(server)
-      .get('/api/notifications')
+      .get('/api/v1/notifications')
       .set('Authorization', `Bearer ${tokenFor(ctx, user.id, user.email)}`)
       .expect(200);
 
@@ -64,7 +64,7 @@ describe('Notifications (e2e)', () => {
     await seedNotificationFor(user.id);
 
     const res = await request(server)
-      .get('/api/notifications/unread-count')
+      .get('/api/v1/notifications/unread-count')
       .set('Authorization', `Bearer ${tokenFor(ctx, user.id, user.email)}`)
       .expect(200);
 
@@ -76,7 +76,7 @@ describe('Notifications (e2e)', () => {
     const id = await seedNotificationFor(user.id);
 
     await request(server)
-      .patch(`/api/notifications/${id}/read`)
+      .patch(`/api/v1/notifications/${id}/read`)
       .set('Authorization', `Bearer ${tokenFor(ctx, user.id, user.email)}`)
       .expect(200);
 
@@ -90,7 +90,7 @@ describe('Notifications (e2e)', () => {
   it('PATCH /notifications/:id/read returns 404 for a missing notification', async () => {
     const user = await createUser(ctx, { email: 'notif-missing@b.com' });
     await request(server)
-      .patch('/api/notifications/999999/read')
+      .patch('/api/v1/notifications/999999/read')
       .set('Authorization', `Bearer ${tokenFor(ctx, user.id, user.email)}`)
       .expect(404);
   });
@@ -101,19 +101,19 @@ describe('Notifications (e2e)', () => {
     await seedNotificationFor(user.id);
 
     await request(server)
-      .post('/api/notifications/read-all')
+      .post('/api/v1/notifications/read-all')
       .set('Authorization', `Bearer ${tokenFor(ctx, user.id, user.email)}`)
       .expect(201);
 
     const res = await request(server)
-      .get('/api/notifications/unread-count')
+      .get('/api/v1/notifications/unread-count')
       .set('Authorization', `Bearer ${tokenFor(ctx, user.id, user.email)}`)
       .expect(200);
     expect(Number(res.text)).toBe(0);
   });
 
   it('rejects an unauthenticated request with 401', async () => {
-    await request(server).get('/api/notifications').expect(401);
+    await request(server).get('/api/v1/notifications').expect(401);
   });
 
   it('forbids an unverified user with 403 (JwtAuthGuard)', async () => {
@@ -122,7 +122,7 @@ describe('Notifications (e2e)', () => {
       verified: false,
     });
     await request(server)
-      .get('/api/notifications')
+      .get('/api/v1/notifications')
       .set('Authorization', `Bearer ${tokenFor(ctx, user.id, user.email)}`)
       .expect(403);
   });

@@ -34,7 +34,7 @@ describe('App refresh (e2e)', () => {
   describe('POST /app/force-refresh', () => {
     it('issues a signal for a holder of app.force_refresh', async () => {
       const res = await request(server)
-        .post('/api/app/force-refresh')
+        .post('/api/v1/app/force-refresh')
         .set('Authorization', `Bearer ${admin}`)
         .expect(201);
 
@@ -43,14 +43,14 @@ describe('App refresh (e2e)', () => {
 
     it('issues a fresh timestamp each time, so a client reloads only once per signal', async () => {
       const first = await request(server)
-        .post('/api/app/force-refresh')
+        .post('/api/v1/app/force-refresh')
         .set('Authorization', `Bearer ${admin}`)
         .expect(201);
 
       await new Promise((resolve) => setTimeout(resolve, 5));
 
       const second = await request(server)
-        .post('/api/app/force-refresh')
+        .post('/api/v1/app/force-refresh')
         .set('Authorization', `Bearer ${admin}`)
         .expect(201);
 
@@ -61,13 +61,13 @@ describe('App refresh (e2e)', () => {
       const user = await createUser(ctx, { email: 'nobroadcast@b.com' });
 
       await request(server)
-        .post('/api/app/force-refresh')
+        .post('/api/v1/app/force-refresh')
         .set('Authorization', `Bearer ${tokenFor(ctx, user.id, user.email)}`)
         .expect(403);
     });
 
     it('rejects an unauthenticated request with 401', async () => {
-      await request(server).post('/api/app/force-refresh').expect(401);
+      await request(server).post('/api/v1/app/force-refresh').expect(401);
     });
   });
 });

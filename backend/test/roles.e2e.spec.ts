@@ -37,7 +37,7 @@ describe('Roles (e2e)', () => {
 
   async function createRole(name: string): Promise<number> {
     const res = await request(server)
-      .post('/api/roles')
+      .post('/api/v1/roles')
       .set('Authorization', `Bearer ${admin}`)
       .send({ name, description: 'temp' })
       .expect(201);
@@ -47,7 +47,7 @@ describe('Roles (e2e)', () => {
   describe('POST /roles', () => {
     it('creates a role for an admin', async () => {
       const res = await request(server)
-        .post('/api/roles')
+        .post('/api/v1/roles')
         .set('Authorization', `Bearer ${admin}`)
         .send({ name: 'e2e-editor', description: 'Editor' })
         .expect(201);
@@ -58,7 +58,7 @@ describe('Roles (e2e)', () => {
     it('rejects a duplicate role name with 400 (IsUnique)', async () => {
       await createRole('dup-role');
       await request(server)
-        .post('/api/roles')
+        .post('/api/v1/roles')
         .set('Authorization', `Bearer ${admin}`)
         .send({ name: 'dup-role' })
         .expect(400);
@@ -66,7 +66,7 @@ describe('Roles (e2e)', () => {
 
     it('rejects an invalid permissions payload with 400', async () => {
       await request(server)
-        .post('/api/roles')
+        .post('/api/v1/roles')
         .set('Authorization', `Bearer ${admin}`)
         .send({ name: 'bad-perms-role', permissions: ['not-a-number'] })
         .expect(400);
@@ -75,7 +75,7 @@ describe('Roles (e2e)', () => {
     it('forbids creation without roles.create with 403', async () => {
       const user = await createUser(ctx, { email: 'noroles@b.com' });
       await request(server)
-        .post('/api/roles')
+        .post('/api/v1/roles')
         .set('Authorization', `Bearer ${tokenFor(ctx, user.id, user.email)}`)
         .send({ name: 'nope' })
         .expect(403);
@@ -85,7 +85,7 @@ describe('Roles (e2e)', () => {
   describe('GET /roles', () => {
     it('lists roles for an admin', async () => {
       await request(server)
-        .get('/api/roles')
+        .get('/api/v1/roles')
         .set('Authorization', `Bearer ${admin}`)
         .expect(200);
     });
@@ -93,11 +93,11 @@ describe('Roles (e2e)', () => {
     it('returns a single role and 404 for a missing one', async () => {
       const id = await createRole('single-role');
       await request(server)
-        .get(`/api/roles/${id}`)
+        .get(`/api/v1/roles/${id}`)
         .set('Authorization', `Bearer ${admin}`)
         .expect(200);
       await request(server)
-        .get('/api/roles/999999')
+        .get('/api/v1/roles/999999')
         .set('Authorization', `Bearer ${admin}`)
         .expect(404);
     });
@@ -105,7 +105,7 @@ describe('Roles (e2e)', () => {
     it('forbids listing without roles.read with 403', async () => {
       const user = await createUser(ctx, { email: 'noread@b.com' });
       await request(server)
-        .get('/api/roles')
+        .get('/api/v1/roles')
         .set('Authorization', `Bearer ${tokenFor(ctx, user.id, user.email)}`)
         .expect(403);
     });
@@ -115,7 +115,7 @@ describe('Roles (e2e)', () => {
     it('updates a role', async () => {
       const id = await createRole('patch-role');
       const res = await request(server)
-        .patch(`/api/roles/${id}`)
+        .patch(`/api/v1/roles/${id}`)
         .set('Authorization', `Bearer ${admin}`)
         .send({ description: 'updated' })
         .expect(200);
@@ -124,7 +124,7 @@ describe('Roles (e2e)', () => {
 
     it('returns 404 for a missing role', async () => {
       await request(server)
-        .patch('/api/roles/999999')
+        .patch('/api/v1/roles/999999')
         .set('Authorization', `Bearer ${admin}`)
         .send({ description: 'x' })
         .expect(404);
@@ -135,14 +135,14 @@ describe('Roles (e2e)', () => {
     it('deletes a role', async () => {
       const id = await createRole('delete-role');
       await request(server)
-        .delete(`/api/roles/${id}`)
+        .delete(`/api/v1/roles/${id}`)
         .set('Authorization', `Bearer ${admin}`)
         .expect(200);
     });
 
     it('returns 404 for a missing role', async () => {
       await request(server)
-        .delete('/api/roles/999999')
+        .delete('/api/v1/roles/999999')
         .set('Authorization', `Bearer ${admin}`)
         .expect(404);
     });
@@ -157,7 +157,7 @@ describe('Roles (e2e)', () => {
       const perm = await permRepo.findOneByOrFail({ name: 'media.read' });
 
       await request(server)
-        .post(`/api/roles/${id}/permissions/sync`)
+        .post(`/api/v1/roles/${id}/permissions/sync`)
         .set('Authorization', `Bearer ${admin}`)
         .send({ permissions: [perm.id] })
         .expect(201);
@@ -174,7 +174,7 @@ describe('Roles (e2e)', () => {
       const id = await createRole('perm-role-2');
       const user = await createUser(ctx, { email: 'nomanage@b.com' });
       await request(server)
-        .post(`/api/roles/${id}/permissions/sync`)
+        .post(`/api/v1/roles/${id}/permissions/sync`)
         .set('Authorization', `Bearer ${tokenFor(ctx, user.id, user.email)}`)
         .send({ permissions: [] })
         .expect(403);

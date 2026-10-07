@@ -101,7 +101,7 @@ export async function loginViaHttp(
   password: string,
 ): Promise<LoginResult> {
   const res = await request(ctx.app.getHttpServer() as App)
-    .post('/api/auth/login')
+    .post('/api/v1/auth/login')
     .send({ email, password });
 
   const rawCookies = res.headers['set-cookie'];

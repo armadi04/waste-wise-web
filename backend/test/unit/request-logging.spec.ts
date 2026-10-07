@@ -8,8 +8,8 @@ import type { IncomingMessage } from 'node:http';
 
 describe('request logging', () => {
   it('drops query strings containing credentials', () => {
-    expect(redactRequestUrl('/api/auth/verify-email?token=secret')).toBe(
-      '/api/auth/verify-email',
+    expect(redactRequestUrl('/api/v1/auth/verify-email?token=secret')).toBe(
+      '/api/v1/auth/verify-email',
     );
     expect(redactRequestUrl(undefined)).toBe('');
   });
@@ -18,7 +18,7 @@ describe('request logging', () => {
     const logged = requestLogSerializers.req({
       id: 'req-1',
       method: 'POST',
-      url: '/api/auth/refresh?token=x',
+      url: '/api/v1/auth/refresh?token=x',
       headers: {
         cookie: 'refreshToken=secret',
         authorization: 'Bearer secret',
@@ -27,7 +27,7 @@ describe('request logging', () => {
     expect(logged).toEqual({
       id: 'req-1',
       method: 'POST',
-      url: '/api/auth/refresh',
+      url: '/api/v1/auth/refresh',
     });
     expect(JSON.stringify(logged)).not.toContain('secret');
   });

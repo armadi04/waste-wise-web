@@ -1,3 +1,4 @@
+import { configureApiRouting } from '@/config/api-routing';
 import { INestApplication, ValidationPipe } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
 import { ThrottlerGuard } from '@nestjs/throttler';
@@ -69,7 +70,7 @@ export async function setupTestApp(
   app.useGlobalFilters(new AllExceptionsFilter(app.get(Logger)));
   useContainer(app.select(AppModule), { fallbackOnErrors: true });
   app.use(cookieParser());
-  app.setGlobalPrefix('api');
+  configureApiRouting(app);
   app.useGlobalPipes(new ValidationPipe({ transform: true, whitelist: true }));
 
   await app.init();

@@ -33,7 +33,7 @@ describe('Media (e2e)', () => {
 
   async function uploadAs(token: string): Promise<number> {
     const res = await request(server)
-      .post('/api/media/upload')
+      .post('/api/v1/media/upload')
       .set('Authorization', `Bearer ${token}`)
       .attach('file', Buffer.from('%PDF-1.7\n1 0 obj\n<<>>\nendobj\n%%EOF'), {
         filename: 'hello.pdf',
@@ -46,7 +46,7 @@ describe('Media (e2e)', () => {
   describe('POST /media/upload', () => {
     it('uploads a file for a caller with media.create', async () => {
       const res = await request(server)
-        .post('/api/media/upload')
+        .post('/api/v1/media/upload')
         .set('Authorization', `Bearer ${admin}`)
         .attach('file', Buffer.from('%PDF-1.7\n1 0 obj\n<<>>\nendobj\n%%EOF'), {
           filename: 'hello.pdf',
@@ -55,7 +55,7 @@ describe('Media (e2e)', () => {
         .expect(201);
 
       expect(res.body.id).toBeDefined();
-      expect(res.body.url).toContain(`/api/media/${res.body.id}/view`);
+      expect(res.body.url).toContain(`/api/v1/media/${res.body.id}/view`);
     });
 
     it('forbids upload without media.create with 403', async () => {
@@ -64,7 +64,7 @@ describe('Media (e2e)', () => {
         permissionNames: ['media.read'],
       });
       await request(server)
-        .post('/api/media/upload')
+        .post('/api/v1/media/upload')
         .set('Authorization', `Bearer ${tokenFor(ctx, user.id, user.email)}`)
         .attach('file', Buffer.from('x'), { filename: 'x.txt' })
         .expect(403);
@@ -72,7 +72,7 @@ describe('Media (e2e)', () => {
 
     it('rejects an unauthenticated upload with 401', async () => {
       await request(server)
-        .post('/api/media/upload')
+        .post('/api/v1/media/upload')
         .attach('file', Buffer.from('x'), { filename: 'x.txt' })
         .expect(401);
     });
@@ -88,7 +88,7 @@ describe('Media (e2e)', () => {
       const id = await uploadAs(ownerToken);
 
       await request(server)
-        .get(`/api/media/${id}`)
+        .get(`/api/v1/media/${id}`)
         .set('Authorization', `Bearer ${ownerToken}`)
         .expect(200);
     });
@@ -105,7 +105,7 @@ describe('Media (e2e)', () => {
       const id = await uploadAs(tokenFor(ctx, owner.id, owner.email));
 
       await request(server)
-        .get(`/api/media/${id}`)
+        .get(`/api/v1/media/${id}`)
         .set(
           'Authorization',
           `Bearer ${tokenFor(ctx, stranger.id, stranger.email)}`,
@@ -115,7 +115,7 @@ describe('Media (e2e)', () => {
 
     it('returns 404 for a missing media (admin)', async () => {
       await request(server)
-        .get('/api/media/999999')
+        .get('/api/v1/media/999999')
         .set('Authorization', `Bearer ${admin}`)
         .expect(404);
     });
@@ -126,7 +126,7 @@ describe('Media (e2e)', () => {
       const id = await uploadAs(admin);
 
       const res = await request(server)
-        .get(`/api/media/${id}/view`)
+        .get(`/api/v1/media/${id}/view`)
         .expect(302);
 
       expect(res.headers['location']).toContain('depot.test/signed/');
@@ -146,7 +146,7 @@ describe('Media (e2e)', () => {
       const id = await uploadAs(tokenFor(ctx, owner.id, owner.email));
 
       await request(server)
-        .get(`/api/media/${id}/stream`)
+        .get(`/api/v1/media/${id}/stream`)
         .set(
           'Authorization',
           `Bearer ${tokenFor(ctx, stranger.id, stranger.email)}`,
@@ -159,7 +159,7 @@ describe('Media (e2e)', () => {
     it('lets an admin delete any media', async () => {
       const id = await uploadAs(admin);
       await request(server)
-        .delete(`/api/media/${id}`)
+        .delete(`/api/v1/media/${id}`)
         .set('Authorization', `Bearer ${admin}`)
         .expect(200);
     });
@@ -176,7 +176,7 @@ describe('Media (e2e)', () => {
       const id = await uploadAs(tokenFor(ctx, owner.id, owner.email));
 
       await request(server)
-        .delete(`/api/media/${id}`)
+        .delete(`/api/v1/media/${id}`)
         .set(
           'Authorization',
           `Bearer ${tokenFor(ctx, stranger.id, stranger.email)}`,
@@ -186,7 +186,7 @@ describe('Media (e2e)', () => {
 
     it('returns 404 for a missing media', async () => {
       await request(server)
-        .delete('/api/media/999999')
+        .delete('/api/v1/media/999999')
         .set('Authorization', `Bearer ${admin}`)
         .expect(404);
     });

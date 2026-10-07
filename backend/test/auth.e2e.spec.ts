@@ -45,7 +45,7 @@ describe('Auth (e2e)', () => {
   describe('POST /auth/login', () => {
     it('logs the admin in and sets auth cookies', async () => {
       const res = await request(server)
-        .post('/api/auth/login')
+        .post('/api/v1/auth/login')
         .send({ email: adminEmail(), password: adminPassword() })
         .expect(201);
 
@@ -57,14 +57,14 @@ describe('Auth (e2e)', () => {
 
     it('rejects a wrong password with 401', async () => {
       await request(server)
-        .post('/api/auth/login')
+        .post('/api/v1/auth/login')
         .send({ email: adminEmail(), password: 'wrong-password' })
         .expect(401);
     });
 
     it('rejects a malformed email with 400', async () => {
       await request(server)
-        .post('/api/auth/login')
+        .post('/api/v1/auth/login')
         .send({ email: 'not-an-email', password: 'whatever' })
         .expect(400);
     });
@@ -79,7 +79,7 @@ describe('Auth (e2e)', () => {
       );
 
       const res = await request(server)
-        .post('/api/auth/refresh')
+        .post('/api/v1/auth/refresh')
         .set('Cookie', cookies)
         .set('x-csrf-token', csrfToken)
         .expect(201);
@@ -95,7 +95,7 @@ describe('Auth (e2e)', () => {
       );
 
       await request(server)
-        .post('/api/auth/refresh')
+        .post('/api/v1/auth/refresh')
         .set('Cookie', cookies)
         .expect(403);
     });
@@ -110,14 +110,14 @@ describe('Auth (e2e)', () => {
       );
 
       await request(server)
-        .post('/api/auth/logout')
+        .post('/api/v1/auth/logout')
         .set('Authorization', `Bearer ${accessToken}`)
         .set('Cookie', cookies)
         .set('x-csrf-token', csrfToken)
         .expect(201);
 
       await request(server)
-        .get('/api/auth/profile')
+        .get('/api/v1/auth/profile')
         .set('Authorization', `Bearer ${accessToken}`)
         .expect(401);
     });
@@ -130,7 +130,7 @@ describe('Auth (e2e)', () => {
       );
 
       await request(server)
-        .post('/api/auth/logout')
+        .post('/api/v1/auth/logout')
         .set('Authorization', `Bearer ${accessToken}`)
         .expect(403);
     });
@@ -141,7 +141,7 @@ describe('Auth (e2e)', () => {
       const token = await adminToken(ctx);
 
       const res = await request(server)
-        .get('/api/auth/profile')
+        .get('/api/v1/auth/profile')
         .set('Authorization', `Bearer ${token}`)
         .expect(200);
 
@@ -149,7 +149,7 @@ describe('Auth (e2e)', () => {
     });
 
     it('rejects an unauthenticated request with 401', async () => {
-      await request(server).get('/api/auth/profile').expect(401);
+      await request(server).get('/api/v1/auth/profile').expect(401);
     });
 
     it('stays reachable for an unverified user (guarded by raw AuthGuard)', async () => {
@@ -162,7 +162,7 @@ describe('Auth (e2e)', () => {
       const token = tokenFor(ctx, user.id, user.email);
 
       await request(server)
-        .get('/api/auth/profile')
+        .get('/api/v1/auth/profile')
         .set('Authorization', `Bearer ${token}`)
         .expect(200);
     });
@@ -173,7 +173,7 @@ describe('Auth (e2e)', () => {
       const token = await adminToken(ctx);
 
       const res = await request(server)
-        .get('/api/auth/me')
+        .get('/api/v1/auth/me')
         .set('Authorization', `Bearer ${token}`)
         .expect(200);
 
@@ -185,7 +185,7 @@ describe('Auth (e2e)', () => {
     // inserted between its decorators and its handler, so it answered 200 with
     // an empty body and the SPA never learned who it was talking to.
     it('rejects an unauthenticated request with 401', async () => {
-      await request(server).get('/api/auth/me').expect(401);
+      await request(server).get('/api/v1/auth/me').expect(401);
     });
   });
 
@@ -197,7 +197,7 @@ describe('Auth (e2e)', () => {
 
     const identityFor = async (token: string) => {
       const res = await request(server)
-        .get('/api/auth/me')
+        .get('/api/v1/auth/me')
         .set('Authorization', `Bearer ${token}`)
         .expect(200);
       return res.body as {
@@ -227,7 +227,7 @@ describe('Auth (e2e)', () => {
       });
 
       const res = await request(server)
-        .post('/api/auth/switch-role')
+        .post('/api/v1/auth/switch-role')
         .set('Authorization', `Bearer ${tokenFor(ctx, user.id, user.email)}`)
         .set('Cookie', [`csrfToken=${csrf}`])
         .set('X-CSRF-Token', csrf)
@@ -248,7 +248,7 @@ describe('Auth (e2e)', () => {
       });
 
       await request(server)
-        .post('/api/auth/switch-role')
+        .post('/api/v1/auth/switch-role')
         .set('Authorization', `Bearer ${tokenFor(ctx, user.id, user.email)}`)
         .set('Cookie', [`csrfToken=${csrf}`])
         .set('X-CSRF-Token', csrf)
@@ -263,7 +263,7 @@ describe('Auth (e2e)', () => {
       });
 
       await request(server)
-        .post('/api/auth/switch-role')
+        .post('/api/v1/auth/switch-role')
         .set('Authorization', `Bearer ${tokenFor(ctx, user.id, user.email)}`)
         .set('Cookie', [`csrfToken=${csrf}`])
         .send({ role: 'user' })
@@ -274,7 +274,7 @@ describe('Auth (e2e)', () => {
   describe('POST /auth/forgot-password', () => {
     it('returns a generic message and mails a known address', async () => {
       const res = await request(server)
-        .post('/api/auth/forgot-password')
+        .post('/api/v1/auth/forgot-password')
         .send({ email: adminEmail() })
         .expect(201);
 
@@ -284,7 +284,7 @@ describe('Auth (e2e)', () => {
 
     it('rejects a malformed email with 400', async () => {
       await request(server)
-        .post('/api/auth/forgot-password')
+        .post('/api/v1/auth/forgot-password')
         .send({ email: 'nope' })
         .expect(400);
     });
@@ -306,26 +306,26 @@ describe('Auth (e2e)', () => {
       );
 
       await request(server)
-        .post('/api/auth/reset-password')
+        .post('/api/v1/auth/reset-password')
         .send({ token, password: 'brand-new-pass' })
         .expect(201);
 
       await request(server)
-        .post('/api/auth/login')
+        .post('/api/v1/auth/login')
         .send({ email: 'resettable@b.com', password: 'brand-new-pass' })
         .expect(201);
     });
 
     it('rejects an unknown token with 400', async () => {
       await request(server)
-        .post('/api/auth/reset-password')
+        .post('/api/v1/auth/reset-password')
         .send({ token: randomUUID(), password: 'brand-new-pass' })
         .expect(400);
     });
 
     it('rejects a non-UUID token with 400', async () => {
       await request(server)
-        .post('/api/auth/reset-password')
+        .post('/api/v1/auth/reset-password')
         .send({ token: 'not-a-uuid', password: 'brand-new-pass' })
         .expect(400);
     });
@@ -350,7 +350,7 @@ describe('Auth (e2e)', () => {
       );
 
       await request(server)
-        .get(`/api/auth/verify-email?token=${token}`)
+        .get(`/api/v1/auth/verify-email?token=${token}`)
         .expect(200);
 
       const userRepo = ctx.app.get<Repository<User>>(getRepositoryToken(User));
@@ -359,12 +359,12 @@ describe('Auth (e2e)', () => {
     });
 
     it('returns 404 when the token is missing', async () => {
-      await request(server).get('/api/auth/verify-email').expect(404);
+      await request(server).get('/api/v1/auth/verify-email').expect(404);
     });
 
     it('returns 404 for an unknown token', async () => {
       await request(server)
-        .get('/api/auth/verify-email?token=does-not-exist')
+        .get('/api/v1/auth/verify-email?token=does-not-exist')
         .expect(404);
     });
   });
@@ -372,7 +372,7 @@ describe('Auth (e2e)', () => {
   describe('POST /auth/google', () => {
     it('rejects an invalid Google token with 401', async () => {
       await request(server)
-        .post('/api/auth/google')
+        .post('/api/v1/auth/google')
         .send({ token: 'invalid-google-id-token' })
         .expect(401);
     });

@@ -1,3 +1,4 @@
+import { configureApiRouting } from './config/api-routing';
 import './config/env'; // validates process.env — throws on missing/invalid vars
 import { NestFactory } from '@nestjs/core';
 import type { NestExpressApplication } from '@nestjs/platform-express';
@@ -71,7 +72,7 @@ async function bootstrap() {
     ],
   });
 
-  app.setGlobalPrefix('api');
+  configureApiRouting(app);
   app.useGlobalPipes(
     new ValidationPipe({
       transform: true,
