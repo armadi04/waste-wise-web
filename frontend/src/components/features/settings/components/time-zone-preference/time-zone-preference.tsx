@@ -43,7 +43,7 @@ export function TimeZonePreference() {
           )}
       </select>
       <p className="mt-2 text-sm">
-        Berlaku untuk portal dan admin. Jadwal acara tetap mengikuti zona
+        Mengatur zona waktu tampilan akun. Laporan tetap mengikuti zona
         bisnis.
       </p>
       {(query.isError || mutation.isError) && (

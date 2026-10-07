@@ -39,9 +39,9 @@ export const getColumns = ({
         <Chip
           size="sm"
           variant="flat"
-          color={item.audience === 'portal' ? 'primary' : 'default'}
+          color="default"
         >
-          {item.audience === 'portal' ? 'Portal' : 'Admin'}
+          {item.audience === 'admin' ? 'Admin' : item.audience}
         </Chip>
         {item.isSso && (
           <Chip size="sm" variant="flat" color="secondary">

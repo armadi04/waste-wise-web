@@ -11,19 +11,19 @@ export const timeZonePreferenceOptions = (identity?: number) => ({
   queryKey: ['time-zone-preference', identity] as const,
   enabled: Boolean(identity),
   queryFn: () =>
-    apiGet<TimeZonePreference>('/api/portal/me/preferences').then((data) =>
+    apiGet<TimeZonePreference>('/api/time-zone/preferences').then((data) =>
       preferenceSchema.parse(data),
     ),
   staleTime: 30_000,
 })
 export const updateTimeZonePreference = (data: Partial<TimeZonePreference>) =>
-  apiPatch<TimeZonePreference>('/api/portal/me/preferences', data).then(
+  apiPatch<TimeZonePreference>('/api/time-zone/preferences', data).then(
     (value) => preferenceSchema.parse(value),
   )
 
 export const previewLocalTime = (localDateTime: string, timeZone: string) =>
   apiPost<{ instant: string; localDateTime: string; timeZone: string }>(
-    '/api/portal/time/preview',
+    '/api/time-zone/preview',
     { localDateTime, timeZone },
   )
 
@@ -31,7 +31,7 @@ export const timeZoneConfigOptions = () => ({
   queryKey: ['time-zone-config'] as const,
   queryFn: () =>
     apiGet<{ defaultTimeZone: string; businessTimeZones: Array<string> }>(
-      '/api/portal/time/config',
+      '/api/time-zone/config',
     ),
   staleTime: 300_000,
 })

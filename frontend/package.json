@@ -1,5 +1,5 @@
 {
-  "name": "kuponmalam",
+  "name": "nestplate-frontend",
   "private": true,
   "type": "module",
   "scripts": {
@@ -10,7 +10,8 @@
     "lint": "eslint",
     "format": "prettier",
     "check": "prettier --write . && eslint --fix",
-    "test:e2e": "playwright test"
+    "test:e2e": "playwright test",
+    "api:generate": "openapi-typescript ../backend/swagger.json -o src/types/api.generated.ts"
   },
   "dependencies": {
     "@faker-js/faker": "^10.6.0",
@@ -30,7 +31,6 @@
     "date-fns": "^4.4.0",
     "framer-motion": "^13.2.0",
     "js-cookie": "^3.0.8",
-    "jsqr": "1.4.0",
     "lottie-react": "^3.1.2",
     "lucide-react": "^1.42.0",
     "react": "^19.2.8",
