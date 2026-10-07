@@ -22,10 +22,13 @@ export function StatCard({
 }: StatCardProps) {
   const colorMap: Record<string, string> = {
     default: 'text-foreground bg-default-100',
-    primary: 'text-primary bg-primary/10',
-    success: 'text-success bg-success/10',
-    warning: 'text-warning bg-warning/10',
-    danger: 'text-danger bg-danger/10',
+    primary: 'text-[var(--app-link)] bg-[var(--app-selected-background)]',
+    success:
+      'border border-[var(--app-success-border)] app-status-success bg-[var(--app-success-background)] text-[var(--app-success-foreground)]',
+    warning:
+      'border border-[var(--app-warning-border)] app-status-warning bg-[var(--app-warning-background)] text-[var(--app-warning-foreground)]',
+    danger:
+      'border border-[var(--app-danger-border)] app-status-danger bg-[var(--app-danger-background)] text-[var(--app-danger-foreground)]',
   }
 
   return (
@@ -36,7 +39,7 @@ export function StatCard({
           {loading ? (
             <Skeleton className="h-8 w-16 rounded-large mt-1" />
           ) : (
-            <span className="text-2xl font-bold tracking-tight text-foreground mt-1">
+            <span className="text-2xl font-semibold tracking-tight text-foreground mt-1">
               {value ?? 0}
             </span>
           )}
@@ -51,7 +54,7 @@ export function StatCard({
       {trend && (
         <div className="mt-4 flex items-center gap-2 text-xs">
           <span
-            className={`flex items-center font-medium ${trendUp ? 'text-success' : 'text-danger'}`}
+            className={`flex items-center font-medium ${trendUp ? 'text-[var(--app-success)]' : 'text-[var(--app-danger)]'}`}
           >
             <TrendingUp
               size={14}

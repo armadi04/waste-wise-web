@@ -1,6 +1,6 @@
-import { Chip } from '@heroui/react'
 import type { Column } from '@/components/shared/datatable'
 import type { AuditLog } from '@/lib/services/audit.service'
+import { Chip } from '@/components/shared/controls'
 import { formatBusinessDate as format } from '@/lib/utils/format'
 
 /** Colour by what the action is about, so a scan of the page reads at a glance. */

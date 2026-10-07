@@ -14,6 +14,8 @@ import {
   Res,
   HttpCode,
   HttpStatus,
+  ClassSerializerInterceptor,
+  NotFoundException,
 } from '@nestjs/common';
 import type { Response } from 'express';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
@@ -27,12 +29,18 @@ import {
   ApiProperty,
 } from '@nestjs/swagger';
 import { MediaService } from './media.service';
+import { MediaUploadAdmissionInterceptor } from './media-upload-admission.interceptor';
+import { MediaIdPipe } from './dto/media-id.pipe';
 import { Permissions } from '../auth/permissions.decorator';
 import { PermissionsGuard } from '../auth/permissions.guard';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { CacheService } from '../common/cache/cache.service';
 import { PaginationParamsDto } from '../common/dto/pagination-params.dto';
-import { BulkDeleteDto } from '../common/dto/bulk-delete.dto';
+import {
+  MediaBulkDeleteDto,
+  MediaBulkDeleteResultDto,
+  MediaDeletionResultDto,
+} from './dto/media-deletion.dto';
 import { Media } from './entities/media.entity';
 import type { IAuthRequest } from '../auth/interfaces/auth-request.interface';
 import { PaginatedResponseDto } from '../common/services/base.service';
@@ -46,6 +54,7 @@ class PaginatedMediaResponse extends PaginatedResponseDto<Media> {
 @ApiTags('Media')
 @ApiBearerAuth()
 @Controller('media')
+@UseInterceptors(ClassSerializerInterceptor)
 export class MediaController {
   constructor(
     private readonly mediaService: MediaService,
@@ -70,7 +79,7 @@ export class MediaController {
     },
   })
   @ApiResponse({ status: 201, type: Media })
-  @UseInterceptors(FileInterceptor('file'))
+  @UseInterceptors(MediaUploadAdmissionInterceptor, FileInterceptor('file'))
   async uploadFile(
     @UploadedFile() file: Express.Multer.File,
     @Req() req: IAuthRequest,
@@ -115,7 +124,10 @@ export class MediaController {
   @ApiOperation({ summary: 'Get a media by ID' })
   @ApiResponse({ status: 200, type: Media })
   // Not cached: a cache hit would skip the ownership check below.
-  async findOne(@Param('id') id: string, @Req() req: IAuthRequest) {
+  async findOne(
+    @Param('id', MediaIdPipe) id: number,
+    @Req() req: IAuthRequest,
+  ) {
     const media = await this.mediaService.findOne(+id);
 
     const isAdmin = req.user.roles.includes('superadmin');
@@ -137,7 +149,7 @@ export class MediaController {
    */
   @Get(':id/view')
   @ApiOperation({ summary: 'View a public (non-private) media file' })
-  async viewFile(@Param('id') id: string, @Res() res: Response) {
+  async viewFile(@Param('id', MediaIdPipe) id: number, @Res() res: Response) {
     const media = await this.mediaService.findOne(+id);
     if (media.isPrivate) {
       throw new ForbiddenException(
@@ -153,7 +165,7 @@ export class MediaController {
   @Permissions('media.read')
   @ApiOperation({ summary: 'Stream a media file' })
   async streamFile(
-    @Param('id') id: string,
+    @Param('id', MediaIdPipe) id: number,
     @Req() req: IAuthRequest,
     @Res() res: Response,
   ) {
@@ -175,8 +187,8 @@ export class MediaController {
   @UseGuards(JwtAuthGuard, PermissionsGuard)
   @Permissions('media.delete')
   @ApiOperation({ summary: 'Delete multiple media' })
-  @ApiResponse({ status: 200 })
-  async bulkRemove(@Body() dto: BulkDeleteDto, @Req() req: IAuthRequest) {
+  @ApiResponse({ status: 200, type: MediaBulkDeleteResultDto })
+  async bulkRemove(@Body() dto: MediaBulkDeleteDto, @Req() req: IAuthRequest) {
     const isAdmin = req.user.roles.includes('superadmin');
     const canDeleteAll = req.user.permissions.includes('media.delete_all');
 
@@ -184,7 +196,13 @@ export class MediaController {
     // whole batch if any selected id isn't owned (mirrors single delete).
     if (!isAdmin && !canDeleteAll) {
       for (const id of dto.ids) {
-        const media = await this.mediaService.findOne(id);
+        const media = await this.mediaService
+          .findForDeletion(id)
+          .catch((error: unknown) => {
+            if (error instanceof NotFoundException) return null;
+            throw error;
+          });
+        if (!media) continue;
         if (media.userId !== req.user.userId) {
           throw new ForbiddenException(
             'You do not have permission to delete this media',
@@ -193,7 +211,7 @@ export class MediaController {
       }
     }
 
-    const result = await this.mediaService.removeMany(dto.ids);
+    const result = await this.mediaService.deleteMany(dto.ids);
     await this.cacheService.clearKeys('*/media*');
     return result;
   }
@@ -202,9 +220,9 @@ export class MediaController {
   @UseGuards(JwtAuthGuard, PermissionsGuard)
   @Permissions('media.delete')
   @ApiOperation({ summary: 'Delete a media' })
-  @ApiResponse({ status: 200 })
-  async remove(@Param('id') id: string, @Req() req: IAuthRequest) {
-    const media = await this.mediaService.findOne(+id);
+  @ApiResponse({ status: 200, type: MediaDeletionResultDto })
+  async remove(@Param('id', MediaIdPipe) id: number, @Req() req: IAuthRequest) {
+    const media = await this.mediaService.findForDeletion(id);
 
     const isAdmin = req.user.roles.includes('superadmin');
     const canDeleteAll = req.user.permissions.includes('media.delete_all');
@@ -215,7 +233,7 @@ export class MediaController {
       );
     }
 
-    const result = await this.mediaService.remove(+id);
+    const result = await this.mediaService.deleteMedia(id);
     await this.cacheService.clearKeys('*/media*');
     return result;
   }

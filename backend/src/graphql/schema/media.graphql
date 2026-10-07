@@ -31,6 +31,8 @@ extend type Query {
 }
 
 extend type Mutation {
-  """Soft-delete a media item. Owner, `media.delete_all`, or `superadmin`."""
-  deleteMedia(id: Int!): Boolean!
+  """Accept durable deletion. True does not imply remote cleanup has completed."""
+  deleteMedia(id: Int!): Boolean! @deprecated(reason: "Use deleteMediaWithResult for deletion status")
+  """Delete or queue cleanup. Owner, `media.delete_all`, or `superadmin`."""
+  deleteMediaWithResult(id: Int!): MediaDeletionResult!
 }

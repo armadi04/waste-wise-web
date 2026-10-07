@@ -1,5 +1,11 @@
 import { Module } from '@nestjs/common';
-import { AvatarCleanupService } from '@/media/avatar-cleanup.service';
+import { MediaStorageService } from './storage/media-storage.service';
+import { MediaCleanupService } from './media-cleanup.service';
+import {
+  MediaUploadPipe,
+  DEFAULT_MEDIA_MAX_FILE_SIZE,
+} from './media-upload.pipe';
+import { MediaUploadAdmissionInterceptor } from './media-upload-admission.interceptor';
 import { MediaService } from './media.service';
 import { MediaController } from './media.controller';
 import { TypeOrmModule } from '@nestjs/typeorm';
@@ -12,9 +18,21 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 @Module({
   imports: [
     TypeOrmModule.forFeature([Media]),
-    // Use memory storage - the Depot SDK handles the upload to S3
-    MulterModule.register({
-      storage: multer.memoryStorage(),
+    // Storage adapters upload the validated in-memory file.
+    MulterModule.registerAsync({
+      imports: [ConfigModule],
+      inject: [ConfigService],
+      useFactory: (config: ConfigService) => ({
+        storage: multer.memoryStorage(),
+        limits: {
+          fileSize: Number(
+            config.get('MEDIA_MAX_FILE_SIZE') ?? DEFAULT_MEDIA_MAX_FILE_SIZE,
+          ),
+          files: 1,
+          fields: 20,
+          parts: 21,
+        },
+      }),
     }),
     JwtModule.registerAsync({
       imports: [ConfigModule],
@@ -27,7 +45,18 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
     ConfigModule,
   ],
   controllers: [MediaController],
-  providers: [MediaService, AvatarCleanupService],
-  exports: [MediaService, MulterModule],
+  providers: [
+    MediaService,
+    MediaStorageService,
+    MediaCleanupService,
+    MediaUploadPipe,
+    MediaUploadAdmissionInterceptor,
+  ],
+  exports: [
+    MediaService,
+    MediaStorageService,
+    MulterModule,
+    MediaUploadAdmissionInterceptor,
+  ],
 })
 export class MediaModule {}

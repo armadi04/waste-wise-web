@@ -1,12 +1,10 @@
 import {
   Badge,
-  Button,
   Card,
   CardBody,
   CardFooter,
   CardHeader,
   Divider,
-  Popover,
   PopoverContent,
   PopoverTrigger,
   ScrollShadow,
@@ -16,6 +14,7 @@ import { useNavigate } from '@tanstack/react-router'
 import { formatDistanceToNow } from 'date-fns'
 import { Bell, Check, ExternalLink, Info } from 'lucide-react'
 import { useEffect, useState } from 'react'
+import { Button, Popover } from '@/components/shared/controls'
 import {
   useMarkAllAsRead,
   useMarkAsRead,
@@ -152,18 +151,20 @@ export const NotificationDropdown = () => {
                       key={notification.id}
                       onClick={() => handleNotificationClick(notification)}
                       className={`flex items-start gap-3 border-b border-default-100 p-3.5 text-left outline-none transition-colors hover:bg-default-50 focus-visible:bg-default-100 ${
-                        !notification.isRead ? 'bg-primary/5' : ''
+                        !notification.isRead
+                          ? 'bg-[var(--app-selected-background)]'
+                          : ''
                       }`}
                     >
                       <div
                         className={`mt-0.5 flex size-8 shrink-0 items-center justify-center rounded-medium ${
                           notification.type === 'success'
-                            ? 'bg-success/10 text-success'
+                            ? 'app-status-success bg-[var(--app-success-background)] text-[var(--app-success-foreground)] text-[var(--app-success)]'
                             : notification.type === 'error'
-                              ? 'bg-danger/10 text-danger'
+                              ? 'app-status-danger bg-[var(--app-danger-background)] text-[var(--app-danger-foreground)] text-[var(--app-danger)]'
                               : notification.type === 'warning'
-                                ? 'bg-warning/10 text-warning'
-                                : 'bg-primary/10 text-primary'
+                                ? 'app-status-warning bg-[var(--app-warning-background)] text-[var(--app-warning-foreground)] text-[var(--app-warning)]'
+                                : 'bg-[var(--app-selected-background)] text-[var(--app-link)]'
                         }`}
                       >
                         {notification.link ? (
@@ -211,7 +212,7 @@ export const NotificationDropdown = () => {
           <CardFooter className="justify-center py-2.5">
             <button
               type="button"
-              className="text-xs font-medium text-primary transition-colors hover:text-primary-600 hover:underline"
+              className="text-xs font-medium text-[var(--app-link)] transition-colors hover:text-[var(--app-link-hover)] hover:underline"
               onClick={() => {
                 setIsOpen(false)
                 navigate({ to: '/notifications' } as any)

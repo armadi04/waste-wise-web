@@ -1,6 +1,7 @@
 // @vitest-environment jsdom
 import { act, cleanup, render, renderHook } from '@testing-library/react'
 import { afterEach, describe, expect, it, vi } from 'vitest'
+import type * as HeroUI from '@heroui/react'
 import { GoogleLoginButton } from '@/components/ui/google-login-button'
 import { useLogin } from '@/hooks/auth'
 
@@ -14,7 +15,8 @@ const mocks = vi.hoisted(() => ({
   navigate: vi.fn(),
   reset: vi.fn(),
 }))
-vi.mock('@heroui/react', () => ({
+vi.mock('@heroui/react', async (importOriginal) => ({
+  ...(await importOriginal<typeof HeroUI>()),
   addToast: vi.fn(),
   Button: ({ children }: { children: React.ReactNode }) => (
     <button>{children}</button>

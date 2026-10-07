@@ -4,8 +4,6 @@ import type { OAuthClient } from '@/lib/services/oauth-client.service'
 import type { Invitation, PaginatedData } from '@/types/api'
 import type { Permission, Role, UserProfile } from '@/types/auth'
 import type { Media } from '@/types/media'
-import type { PortalRecord, PortalResource } from '@/types/portal'
-import { portalResourceConfig } from '@/components/features/portal/lib/config'
 import { apiGet } from '@/lib/api'
 import { getAuditActions, getAuditLogs } from '@/lib/services/audit.service'
 import {
@@ -22,12 +20,6 @@ import {
 } from '@/lib/services/notification.service'
 import { getOAuthClients } from '@/lib/services/oauth-client.service'
 import { getPermissions } from '@/lib/services/permission.service'
-import {
-  getPortalContentList,
-  getPortalCustomer,
-  getPortalDashboard,
-  getPortalRecords,
-} from '@/lib/services/portal.service'
 import { getRoles } from '@/lib/services/role.service'
 import { getMySessions, getSessions } from '@/lib/services/session.service'
 import { getSignupsTrend, getStatsOverview } from '@/lib/services/stats.service'
@@ -218,27 +210,6 @@ export function sessionsQueryOptions(params: TableSearch) {
   })
 }
 
-export function portalRecordsQueryOptions(
-  resource: PortalResource,
-  params: TableSearch,
-) {
-  const { page, limit, search, sort, direction } = params
-  return queryOptions({
-    queryKey: ['portal', resource, { page, limit, search, sort, direction }],
-    queryFn: async () =>
-      (await getPortalRecords(resource, {
-        page: page || 1,
-        limit: limit || 20,
-        search: search || '',
-        sort: sort || 'createdAt',
-        direction: direction || 'desc',
-        paginated: true,
-      })) as PaginatedData<PortalRecord>,
-    placeholderData: keepPreviousData,
-    enabled: Boolean(portalResourceConfig(resource)),
-  })
-}
-
 export function statsOverviewQueryOptions(enabled = true) {
   return queryOptions({
     queryKey: ['stats', 'overview'],
@@ -328,13 +299,6 @@ export function changelogQueryOptions() {
   })
 }
 
-export function portalDashboardQueryOptions(canRead = true) {
-  return queryOptions({
-    queryKey: ['portal', 'dashboard'],
-    queryFn: getPortalDashboard,
-    enabled: canRead,
-  })
-}
 export const sessionQueryOptions = () =>
   queryOptions({
     queryKey: ['session'],
@@ -342,66 +306,3 @@ export const sessionQueryOptions = () =>
     staleTime: 30_000,
     retry: false,
   })
-
-export function portalCustomerQueryOptions(customerId: number, canRead = true) {
-  return queryOptions({
-    queryKey: ['portal', 'customers', customerId],
-    queryFn: () => getPortalCustomer(customerId),
-    enabled: canRead && customerId > 0,
-  })
-}
-
-/** One customer's records of a resource, via the admin list `userId` filter. */
-export function portalCustomerRecordsQueryOptions(
-  resource: PortalResource,
-  customerId: number,
-  page = 1,
-  enabled = true,
-) {
-  return queryOptions({
-    queryKey: ['portal', resource, { userId: customerId, page }],
-    queryFn: async () =>
-      (await getPortalRecords(resource, {
-        page,
-        limit: 10,
-        sort: 'createdAt',
-        direction: 'desc',
-        paginated: true,
-        userId: customerId,
-      })) as PaginatedData<PortalRecord>,
-    placeholderData: keepPreviousData,
-    enabled: enabled && customerId > 0,
-  })
-}
-
-export function portalContentQueryOptions(canRead = true) {
-  return queryOptions({
-    queryKey: ['portal', 'content'],
-    queryFn: getPortalContentList,
-    enabled: canRead,
-  })
-}
-
-/** Unpaginated curated lists (categories, cities) for form selects. */
-export function portalLookupQueryOptions(resource: PortalResource) {
-  return queryOptions({
-    queryKey: ['portal', resource, 'lookup'],
-    queryFn: async () =>
-      (await getPortalRecords(resource, {
-        paginated: false,
-      })) as Array<PortalRecord>,
-    staleTime: 60_000,
-  })
-}
-
-export function portalBundleComponentQueryOptions(
-  resource: 'coupons' | 'events' | 'event-tickets',
-) {
-  return queryOptions({
-    queryKey: ['portal', resource, 'bundle-components'],
-    queryFn: async () =>
-      (await getPortalRecords(resource, {
-        paginated: false,
-      })) as Array<PortalRecord>,
-  })
-}

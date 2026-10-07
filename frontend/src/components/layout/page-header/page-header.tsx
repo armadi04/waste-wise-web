@@ -20,11 +20,7 @@ interface PageHeaderProps {
   children?: React.ReactNode
 }
 
-/**
- * Publishes the page title + breadcrumb trail to the top bar (rendered there
- * on the left). Renders only the page-level actions / description / children
- * inline — the title band itself now lives in the Header.
- */
+/** Owns the page title, description, and actions; publishes breadcrumbs to the top bar. */
 export function PageHeader({
   title,
   description,
@@ -44,33 +40,32 @@ export function PageHeader({
     return () => clear()
   }, [title, crumbsKey, setHeader, clear])
 
-  const hasInline = Boolean(actions || description || leading || children)
-  if (!hasInline) return null
-
   return (
     <div className="mb-6">
-      {(actions || description || leading) && (
-        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-          {leading ? (
-            <div className="flex shrink-0 items-center">{leading}</div>
-          ) : description ? (
-            <p className="max-w-2xl text-sm text-default-500">{description}</p>
-          ) : (
-            <span />
-          )}
-          {actions && (
-            <div
-              className={
-                fullWidthActions
-                  ? 'flex min-w-0 flex-1 items-center gap-2'
-                  : 'flex shrink-0 flex-wrap items-center gap-2 sm:justify-end'
-              }
-            >
-              {actions}
-            </div>
-          )}
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+        <div className="flex min-w-0 items-center gap-3">
+          {leading && <div className="shrink-0">{leading}</div>}
+          <div className="min-w-0">
+            <h1 className="text-2xl font-semibold text-foreground">{title}</h1>
+            {description && (
+              <p className="mt-1 max-w-2xl text-sm text-default-500">
+                {description}
+              </p>
+            )}
+          </div>
         </div>
-      )}
+        {actions && (
+          <div
+            className={
+              fullWidthActions
+                ? 'flex min-w-0 flex-1 items-center gap-2'
+                : 'flex shrink-0 flex-wrap items-center gap-2 sm:justify-end'
+            }
+          >
+            {actions}
+          </div>
+        )}
+      </div>
       {children && <div className="mt-4">{children}</div>}
     </div>
   )

@@ -73,12 +73,13 @@ export class StatsService {
           createdAt: MoreThan(dayjsAgo(1)),
         },
       }),
-      this.media.count(),
+      this.media.count({ where: { state: 'ready' } }),
       this.notifications.count({ where: { isRead: false } }),
       this.media
         .createQueryBuilder('media')
         .select('COALESCE(SUM(media.size), 0)', 'total')
         .where('media.deletedAt IS NULL')
+        .andWhere('media.state = :state', { state: 'ready' })
         .getRawOne<{ total: string }>(),
     ]);
 

@@ -1,13 +1,7 @@
-import {
-  Button,
-  Image,
-  Modal,
-  ModalBody,
-  ModalContent,
-  Snippet,
-} from '@heroui/react'
+import { Image, ModalBody, ModalContent } from '@heroui/react'
 import { Download, FileIcon } from 'lucide-react'
 import type { MediaDetailModalProps } from '@/components/features/media/modal/media-detail-modal/types'
+import { Button, Modal, Snippet } from '@/components/shared/controls'
 import { useTimeZone } from '@/lib/stores/time-zone'
 import { downloadFile } from '@/lib/utils/download'
 import { formatBytes } from '@/lib/utils/format'
@@ -25,19 +19,18 @@ export function MediaDetailModal({
       isOpen={isOpen}
       onOpenChange={onOpenChange}
       size="2xl"
-      backdrop="blur"
       scrollBehavior="inside"
       classNames={{
         base: 'bg-content1 border border-default-200 rounded-large overflow-hidden',
         closeButton:
-          'z-50 top-4 right-4 bg-black/20 hover:bg-black/40 text-white backdrop-blur-md',
+          'z-50 top-4 right-4 bg-content1 hover:bg-[var(--app-surface-hover)] text-foreground',
       }}
     >
       <ModalContent className="p-0">
         {() => (
           <div className="flex flex-col w-full">
             {/* Improved Media Display Area */}
-            <div className="relative flex h-[50vh] min-h-[300px] w-full items-center justify-center bg-default-100/50 p-8 dark:bg-black/40">
+            <div className="relative flex h-[50vh] min-h-[300px] w-full items-center justify-center bg-content1 p-8">
               {media.mimetype.startsWith('image/') ? (
                 <Image
                   src={media.url || undefined}

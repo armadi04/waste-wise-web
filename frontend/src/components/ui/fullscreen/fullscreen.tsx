@@ -1,6 +1,7 @@
-import { Button, cn } from '@heroui/react'
+import { cn } from '@heroui/react'
 import { Maximize, Minimize } from 'lucide-react'
 import type { ButtonProps } from '@heroui/react'
+import { Button } from '@/components/shared/controls'
 import { useFullscreen } from '@/hooks/global'
 
 interface FullscreenToggleProps extends ButtonProps {}

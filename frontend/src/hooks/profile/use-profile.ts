@@ -1,7 +1,7 @@
-import { addToast } from '@heroui/react'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import type { UpdateProfileFormData } from '@/lib/schemas/users'
 import type { UserProfile } from '@/types/auth'
+import { addToast } from '@/components/shared/controls/toast'
 import { apiPatch } from '@/lib/api'
 
 export const useUpdateProfile = (user: UserProfile | null) => {

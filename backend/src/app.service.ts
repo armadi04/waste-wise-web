@@ -14,7 +14,7 @@ export interface ApiInfo {
 export class AppService {
   getApiInfo(): ApiInfo {
     return {
-      name: 'Kupon Malam API',
+      name: 'Nestplate API',
       status: 'ok',
       version: process.env.npm_package_version ?? '0.0.0',
       environment: process.env.NODE_ENV ?? 'development',

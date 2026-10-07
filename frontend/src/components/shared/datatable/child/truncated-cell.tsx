@@ -1,5 +1,6 @@
-import { Popover, PopoverContent, PopoverTrigger } from '@heroui/react'
+import { PopoverContent, PopoverTrigger } from '@heroui/react'
 import React from 'react'
+import { Popover } from '@/components/shared/controls'
 
 export function TruncatedCell({
   children,

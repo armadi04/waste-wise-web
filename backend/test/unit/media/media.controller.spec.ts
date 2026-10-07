@@ -1,12 +1,14 @@
 import 'reflect-metadata';
-import { describe, expect, it } from 'bun:test';
+import { describe, expect, it, mock } from 'bun:test';
+import type { IAuthRequest } from '@/auth/interfaces/auth-request.interface';
 
-// Bun's test runner cannot statically load @nestjs/throttler (pulled in by the
-// auth guards) — see pass-qr.controller.spec.ts — so Nest-side imports are
-// dynamic, in dependency order.
+// Load Nest-side modules dynamically in dependency order under Bun's test runner.
 await import('@nestjs/core');
 const { CacheInterceptor } = await import('@nestjs/cache-manager');
 const { MediaController } = await import('@/media/media.controller');
+const { NotFoundException } = await import('@nestjs/common');
+const { instanceToPlain } = await import('class-transformer');
+const { Media } = await import('@/media/entities/media.entity');
 // INTERCEPTORS_METADATA from @nestjs/common/constants.
 const INTERCEPTORS_METADATA = '__interceptors__';
 
@@ -24,5 +26,70 @@ describe('MediaController caching', () => {
     expect(interceptorsOf(MediaController.prototype.findOne)).not.toContain(
       CacheInterceptor,
     );
+  });
+});
+
+describe('media deletion authorization and serialization', () => {
+  const actor = {
+    user: { userId: 7, roles: [], permissions: ['media.delete'] },
+  } as unknown as IAuthRequest;
+  it('rejects the entire batch before deleting any foreign-owned record', async () => {
+    const deleteMany = mock(async () => ({ results: [] }));
+    const service = {
+      findForDeletion: mock(async (id: number) => ({
+        id,
+        userId: id === 1 ? 7 : 8,
+      })),
+      deleteMany,
+    };
+    const controller = new MediaController(service, {
+      clearKeys: mock(async () => undefined),
+    });
+    await expect(controller.bulkRemove({ ids: [1, 2] }, actor)).rejects.toThrow(
+      'permission',
+    );
+    expect(deleteMany).not.toHaveBeenCalled();
+  });
+  it('allows missing IDs to appear as partial outcomes while checking existing ownership', async () => {
+    const result = {
+      deleted: 1,
+      queued: 0,
+      failed: 1,
+      results: [
+        { id: 1, status: 'failed', code: 'NOT_FOUND' },
+        { id: 2, status: 'deleted' },
+      ],
+    };
+    const service = {
+      findForDeletion: mock()
+        .mockRejectedValueOnce(new NotFoundException())
+        .mockResolvedValueOnce({ userId: 7 }),
+      deleteMany: mock(async () => result),
+    };
+    const controller = new MediaController(service, {
+      clearKeys: mock(async () => undefined),
+    });
+    expect(await controller.bulkRemove({ ids: [1, 2] }, actor)).toEqual(result);
+  });
+  it('does not serialize internal cleanup capabilities or location bindings', () => {
+    const media = Object.assign(new Media(), {
+      id: 1,
+      state: 'pending',
+      cleanupLeaseToken: 'test-lease',
+      cleanupAt: new Date(),
+      storageFingerprint: '0'.repeat(64),
+      remoteName: 'internal-key',
+      filename: 'public.pdf',
+    });
+    const serialized = instanceToPlain(media);
+    for (const key of [
+      'state',
+      'cleanupLeaseToken',
+      'cleanupAt',
+      'storageFingerprint',
+      'remoteName',
+    ])
+      expect(serialized[key]).toBeUndefined();
+    expect(serialized.filename).toBe('public.pdf');
   });
 });

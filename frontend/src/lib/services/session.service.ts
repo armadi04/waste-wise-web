@@ -14,8 +14,8 @@ export interface UserSession {
   isSso: boolean
   /** Set when an administrator opened this session by signing in as the user. */
   impersonatedById: number | null
-  /** Staff dashboard session or customer portal session; decides its lifetime. */
-  audience: 'admin' | 'portal'
+  /** Starter dashboard session policy. */
+  audience: 'admin'
   lastActiveAt: string
   /** Idle deadline; slides on refresh, never past `absoluteExpiresAt`. */
   expiresAt: string

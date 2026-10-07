@@ -7,13 +7,11 @@ import {
 import type { IncomingMessage } from 'node:http';
 
 describe('request logging', () => {
-  it('drops query strings and masks gift codes', () => {
-    expect(redactRequestUrl('/api/portal/me/orders?token=secret')).toBe(
-      '/api/portal/me/orders',
+  it('drops query strings containing credentials', () => {
+    expect(redactRequestUrl('/api/auth/verify-email?token=secret')).toBe(
+      '/api/auth/verify-email',
     );
-    expect(redactRequestUrl('/api/portal/gifts/GFT-ABC/redeem')).toBe(
-      '/api/portal/gifts/:code/redeem',
-    );
+    expect(redactRequestUrl(undefined)).toBe('');
   });
 
   it('never serializes headers or cookies', () => {

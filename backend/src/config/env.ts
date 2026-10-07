@@ -3,6 +3,7 @@ process.env.TZ = 'UTC';
 
 import { z } from 'zod';
 import { resolveTurnstileConfig } from '@/auth/turnstile-config';
+import { resolveStorageProfiles } from './media-storage.config';
 
 /**
  * Strict boolean env parser. `z.coerce.boolean()` uses `Boolean(string)`, which
@@ -29,15 +30,6 @@ const baseEnvSchema = z.object({
   APP_DEFAULT_TIME_ZONE: z
     .enum(['Asia/Jakarta', 'Asia/Makassar', 'Asia/Jayapura'])
     .default('Asia/Jakarta'),
-  PORTAL_PAYMENT_MODE: z
-    .enum(['disabled', 'sandbox'])
-    .default(
-      ['production', 'staging'].includes(process.env.NODE_ENV ?? '')
-        ? 'disabled'
-        : 'sandbox',
-    ),
-  PORTAL_PAYMENT_WEBHOOK_SECRET: z.string().optional(),
-  PORTAL_APP_URL: z.string().optional(),
 
   // Database
   DB_HOST: z.string().min(1),
@@ -47,8 +39,6 @@ const baseEnvSchema = z.object({
   DB_NAME: z.string().min(1),
   DB_SYNCHRONIZE: boolFromEnv(false),
   DB_SEED: boolFromEnv(true),
-  PORTAL_SEED_EMAIL: z.string().email().optional(),
-  PORTAL_SEED_NAME: z.string().min(1).max(120).optional(),
 
   // JWT
   JWT_SECRET: z.string().min(16),
@@ -57,21 +47,44 @@ const baseEnvSchema = z.object({
   // between refreshes; absolute = hard limit since login.
   SESSION_ADMIN_IDLE_MINUTES: z.coerce.number().int().positive().default(120),
   SESSION_ADMIN_ABSOLUTE_HOURS: z.coerce.number().int().positive().default(8),
-  SESSION_PORTAL_IDLE_DAYS: z.coerce.number().int().positive().default(14),
-  SESSION_PORTAL_ABSOLUTE_DAYS: z.coerce.number().int().positive().default(30),
-
-  // Customer voucher/ticket QR tokens. Optional: falls back to a key derived
-  // from JWT_SECRET (never the login secret itself). Set explicitly in production.
-  PASS_QR_SECRET: z.string().min(32).optional(),
-  PASS_QR_TTL_SECONDS: z.coerce.number().int().min(15).max(600).default(60),
 
   // Admin seed
   ADMIN_EMAIL: z.string().email(),
   ADMIN_PASSWORD: z.string().min(8),
 
-  // Depot media service (required)
-  DEPOT_BASE_URL: z.string().url(),
-  DEPOT_API_KEY: z.string().min(1),
+  // Only the selected storage provider requires credentials at startup.
+  MEDIA_PROVIDER: z.enum(['depot', 's3']).default('depot'),
+  MEDIA_STORAGE_PROFILE: z
+    .string()
+    .regex(/^[a-zA-Z0-9][a-zA-Z0-9_-]{0,63}$/)
+    .optional(),
+  MEDIA_STORAGE_PROFILES: z.string().optional(),
+  MEDIA_MAX_FILE_SIZE: z.coerce
+    .number()
+    .int()
+    .min(1)
+    .max(100 * 1024 * 1024)
+    .default(20 * 1024 * 1024),
+  MEDIA_MAX_CONCURRENT_UPLOADS: z.coerce
+    .number()
+    .int()
+    .min(1)
+    .max(16)
+    .default(4),
+  MEDIA_ALLOWED_MIME_TYPES: z
+    .string()
+    .min(1)
+    .default(
+      'image/jpeg,image/png,image/webp,image/gif,application/pdf,video/mp4,audio/mpeg,audio/wav,application/zip',
+    ),
+  DEPOT_BASE_URL: z.string().url().optional(),
+  DEPOT_API_KEY: z.string().min(1).optional(),
+  S3_ENDPOINT: z.string().url().optional(),
+  S3_REGION: z.string().min(1).optional(),
+  S3_BUCKET: z.string().min(1).optional(),
+  S3_ACCESS_KEY_ID: z.string().min(1).optional(),
+  S3_SECRET_ACCESS_KEY: z.string().min(1).optional(),
+  S3_FORCE_PATH_STYLE: boolFromEnv(false),
 
   // Redis (optional)
   REDIS_HOST: z.string().optional(),
@@ -125,9 +138,9 @@ const baseEnvSchema = z.object({
   GRAPHQL_PERSISTED_ONLY: boolFromEnv(false),
 
   // App
-  APP_URL: z.string().url().default('http://localhost:3000'),
+  APP_URL: z.string().url().default('http://localhost:3001'),
   // Shown as the issuer in authenticator apps for two-factor codes.
-  APP_NAME: z.string().default('Kupon Malam'),
+  APP_NAME: z.string().default('Nestplate'),
   ALLOWED_ORIGINS: z.string().default('*'),
   // Express `trust proxy`: unset/false, a hop count or proxy addresses/subnets.
   TRUST_PROXY: z.string().optional(),
@@ -137,6 +150,18 @@ const baseEnvSchema = z.object({
 });
 
 export const envSchema = baseEnvSchema.superRefine((env, context) => {
+  try {
+    resolveStorageProfiles(env);
+  } catch (error) {
+    context.addIssue({
+      code: 'custom',
+      path: ['MEDIA_STORAGE_PROFILE'],
+      message:
+        error instanceof Error
+          ? error.message
+          : 'Invalid media storage configuration',
+    });
+  }
   try {
     resolveTurnstileConfig(env);
   } catch (error) {

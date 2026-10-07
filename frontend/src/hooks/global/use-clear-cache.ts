@@ -1,8 +1,8 @@
-import { addToast } from '@heroui/react'
 import { useQueryClient } from '@tanstack/react-query'
 import { useNavigate } from '@tanstack/react-router'
 import Cookies from 'js-cookie'
 import { useCallback, useState } from 'react'
+import { addToast } from '@/components/shared/controls/toast'
 import { useConfirmation } from '@/hooks/global/use-confirmation'
 
 /** Clears all app data (query cache, localStorage, sessionStorage, cookies) and redirects to login. */

@@ -1,12 +1,7 @@
-import {
-  Button,
-  Dropdown,
-  DropdownItem,
-  DropdownMenu,
-  DropdownTrigger,
-} from '@heroui/react'
+import { DropdownMenu, DropdownTrigger } from '@heroui/react'
 import { MoreVertical } from 'lucide-react'
 import type React from 'react'
+import { Button, Dropdown, DropdownItem } from '@/components/shared/controls'
 
 export interface RowAction {
   key: string
@@ -48,7 +43,7 @@ export function ActionMenu({ actions }: { actions: Array<RowAction> }) {
             key={action.key}
             startContent={action.icon}
             color={action.danger ? 'danger' : 'default'}
-            className={action.danger ? 'text-danger' : undefined}
+            className={action.danger ? 'text-[var(--app-danger)]' : undefined}
             onPress={action.onPress}
           >
             {action.label}

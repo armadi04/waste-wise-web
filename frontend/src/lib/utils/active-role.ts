@@ -5,7 +5,7 @@
  * active role; this is only the "last choice" hint used by the selection gate.
  */
 
-const keyFor = (userSub: number) => `kuponmalam.active-role.${userSub}`
+const keyFor = (userSub: number) => `nestplate.active-role.${userSub}`
 
 export function rememberActiveRole(userSub: number, role: string): void {
   try {

@@ -171,8 +171,8 @@ describe('Users (e2e)', () => {
   });
 
   it('migrates historic registration methods conservatively and supports reversal', async () => {
-    // All DDL and fixtures stay inside a transaction on kuponmalam_test.
-    expect(ctx.dataSource.options.database).toBe('kuponmalam_test');
+    // All DDL and fixtures stay inside a transaction on nestplate_test.
+    expect(ctx.dataSource.options.database).toBe('nestplate_test');
     const runner = ctx.dataSource.createQueryRunner();
     await runner.connect();
     await runner.startTransaction();

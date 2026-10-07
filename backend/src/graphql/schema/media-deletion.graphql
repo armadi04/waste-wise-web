@@ -1,0 +1,6 @@
+"""Deletion is idempotent. queued means durable remote cleanup is pending."""
+type MediaDeletionResult {
+  id: Int!
+  status: String!
+  code: String
+}

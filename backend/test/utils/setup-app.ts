@@ -9,11 +9,11 @@ import { AppModule } from '@/app.module';
 import { AllExceptionsFilter } from '@/common/filters/all-exceptions.filter';
 import { MailService } from '@/mail/mail.service';
 import { TurnstileService } from '@/auth/turnstile.service';
-import { MediaService } from '@/media/media.service';
+import { MediaStorageService } from '@/media/storage/media-storage.service';
 import { NotificationsListener } from '@/notifications/notifications.listener';
 import {
   makeFakeMail,
-  makeFakeDepot,
+  makeFakeStorage,
   fakeTurnstile,
   passThroughGuard,
   type FakeMailService,
@@ -35,12 +35,23 @@ export async function setupTestApp(
   dataSourceOverride?: DataSource,
 ): Promise<TestContext> {
   const mail = makeFakeMail();
+  const storage = makeFakeStorage();
 
   const builder = Test.createTestingModule({ imports: [AppModule] })
     .overrideProvider(MailService)
     .useValue(mail)
     .overrideProvider(TurnstileService)
     .useValue(fakeTurnstile)
+    .overrideProvider(MediaStorageService)
+    .useValue({
+      selected: {
+        provider: 'depot',
+        profile: 'depot-default',
+        fingerprint: '0'.repeat(64),
+        adapter: storage,
+      },
+      forMedia: () => storage,
+    })
     // The notifications listener writes notification rows asynchronously
     // (fire-and-forget) on user events. In tests those writes race the
     // between-test cleanup and cause lock contention, so disable it — the
@@ -62,12 +73,6 @@ export async function setupTestApp(
   app.useGlobalPipes(new ValidationPipe({ transform: true, whitelist: true }));
 
   await app.init();
-
-  // The real MediaService keeps all DB-backed logic; only its Depot client is
-  // swapped so uploads / views never reach Depot or object storage.
-  const mediaService = app.get(MediaService);
-  (mediaService as unknown as { depot: unknown }).depot = makeFakeDepot();
-  mediaService.putAvatarBytes = async () => undefined;
 
   const dataSource = app.get(DataSource);
 

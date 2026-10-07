@@ -1,39 +1,68 @@
 import {
   Entity,
   Column,
-  Index,
   PrimaryGeneratedColumn,
   CreateDateColumn,
   UpdateDateColumn,
   DeleteDateColumn,
   ManyToOne,
   JoinColumn,
+  Check,
+  Index,
 } from 'typeorm';
 import { Exclude } from 'class-transformer';
 import type { User } from '../../users/entities/user.entity';
 import { ApiProperty } from '@nestjs/swagger';
+import type { MediaProvider } from '../storage/media-storage';
 
 @Entity('media')
-@Index('IDX_media_avatarCleanup', [
-  'managedAvatar',
-  'cleanupAt',
-  'cleanupLeaseUntil',
-])
+@Check('CHK_media_provider', "\"provider\" IN ('depot', 's3')")
+@Check('CHK_media_state', "\"state\" IN ('pending', 'ready', 'deleting')")
+@Check(
+  'CHK_media_size',
+  '"size" IS NULL OR ("size" >= 0 AND "size" <= 9007199254740991)',
+)
+@Check(
+  'CHK_media_ready_object',
+  '"state" <> \'ready\' OR ("path" IS NOT NULL AND ("provider" <> \'depot\' OR "depotFileId" IS NOT NULL))',
+)
+@Index('IDX_media_cleanup', ['state', 'cleanupAt', 'cleanupLeaseUntil'])
 export class Media {
   @ApiProperty()
   @PrimaryGeneratedColumn({ name: 'id' })
   id: number;
 
+  @ApiProperty({ enum: ['depot', 's3'] })
+  @Column({ name: 'provider', type: 'varchar', default: 'depot' })
+  provider: MediaProvider;
+
+  @ApiProperty()
+  @Column({ name: 'storageProfile', type: 'varchar', length: 64 })
+  storageProfile: string;
+
   @Exclude()
-  @Column({ name: 'managedAvatar', default: false })
-  managedAvatar: boolean;
+  @Column({
+    name: 'storageFingerprint',
+    type: 'varchar',
+    length: 64,
+    nullable: true,
+  })
+  storageFingerprint: string | null;
+
+  @Exclude()
+  @Column({ name: 'state', type: 'varchar', default: 'ready' })
+  state: 'pending' | 'ready' | 'deleting';
+
+  @Exclude()
+  @Column({ name: 'remoteName', type: 'varchar', nullable: true })
+  remoteName: string | null;
 
   @Exclude()
   @Column({
     name: 'cleanupAt',
     type: 'timestamptz',
-    nullable: true,
     precision: 3,
+    nullable: true,
   })
   cleanupAt: Date | null;
 
@@ -41,50 +70,76 @@ export class Media {
   @Column({
     name: 'cleanupLeaseUntil',
     type: 'timestamptz',
-    nullable: true,
     precision: 3,
+    nullable: true,
   })
   cleanupLeaseUntil: Date | null;
+
+  @Exclude()
+  @Column({ name: 'cleanupLeaseToken', type: 'uuid', nullable: true })
+  cleanupLeaseToken: string | null;
+
+  @Exclude()
+  @Column({ name: 'cleanupAttempts', type: 'int', default: 0 })
+  cleanupAttempts: number;
+
+  @Exclude()
+  @Column({ name: 'cleanupErrorCode', type: 'varchar', nullable: true })
+  cleanupErrorCode: string | null;
 
   @ApiProperty()
   @Column({ name: 'filename' })
   filename: string;
 
-  @ApiProperty()
+  @ApiProperty({ type: String, nullable: true })
   @Column({ name: 'originalName', type: 'varchar', nullable: true })
-  originalName: string;
+  originalName: string | null;
 
   @ApiProperty()
   @Column({ name: 'mimetype' })
   mimetype: string;
 
-  @ApiProperty()
-  @Column({ name: 'size', type: 'bigint', nullable: true })
-  size: number;
+  @ApiProperty({ type: Number, nullable: true })
+  @Column({
+    name: 'size',
+    type: 'bigint',
+    nullable: true,
+    transformer: {
+      to: (value: number | null) => value,
+      from: (value: string | number | null) => {
+        if (value === null) return null;
+        const size = Number(value);
+        if (!Number.isSafeInteger(size) || size < 0)
+          throw new Error('Invalid media size');
+        return size;
+      },
+    },
+  })
+  size: number | null;
 
   @ApiProperty({ nullable: true })
   @Column({ name: 'path', type: 'varchar', nullable: true })
-  path: string;
+  path: string | null;
 
-  @ApiProperty({ nullable: true })
+  @ApiProperty({ type: Number, nullable: true })
   @Column({ name: 'depotFileId', type: 'int', nullable: true })
-  depotFileId: number;
+  depotFileId: number | null;
 
   @ApiProperty({ nullable: true })
   @Column({ name: 'url', type: 'varchar', nullable: true })
-  url: string;
+  url: string | null;
 
   @ApiProperty({ nullable: true })
   @Column({ name: 'driveId', type: 'varchar', nullable: true })
-  driveId: string;
+  driveId: string | null;
 
   @ApiProperty({ nullable: true })
   @Column({ name: 'webviewLink', type: 'varchar', nullable: true })
-  webviewLink: string;
+  webviewLink: string | null;
 
   @ApiProperty({ nullable: true })
   @Column({ name: 'userId', type: 'int', nullable: true })
-  userId: number;
+  userId: number | null;
 
   @ApiProperty()
   @Column({ name: 'isPrivate', default: false })

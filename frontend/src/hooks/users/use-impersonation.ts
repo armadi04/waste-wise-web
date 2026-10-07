@@ -1,5 +1,5 @@
-import { addToast } from '@heroui/react'
 import { useState } from 'react'
+import { addToast } from '@/components/shared/controls/toast'
 import { useAuth } from '@/hooks/auth/use-auth'
 
 /**

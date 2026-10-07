@@ -9,7 +9,7 @@ export function DetailRow({
 }) {
   return (
     <div className="flex flex-col gap-1 py-3 px-4 rounded-large bg-default-50 border border-default-100">
-      <span className="text-[10px] font-bold text-default-400 uppercase tracking-widest">
+      <span className="text-[10px] font-semibold text-default-400 uppercase tracking-widest">
         {label}
       </span>
       <span

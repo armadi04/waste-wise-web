@@ -60,7 +60,3 @@ integration. [Development](DEVELOPMENT.md) explains commands and ports.
 
 For documentation-only work, verify local links/headings and `git diff --check`.
 Follow repo-wide commit/release policy; never report a failing/unrun check as passed.
-
-Portal forms serialize create and update separately: coupon creation includes extension-derived price/stock/cover summaries, voucher/ticket creation sends `Issued`, and voucher/ticket updates send changed normalized fields. Orders remain checkout-owned.
-
-Portal field configuration declares `createWritable` and `createDefault`; `readOnly` controls presentation and normal update serialization. Only voucher/ticket resources opt into `partialUpdate`; other resource editors preserve their full schedule, package, image and rules payloads. Nullable numeric fields preserve null.

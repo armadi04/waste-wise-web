@@ -6,7 +6,6 @@ import { Role } from '../../roles/entities/role.entity';
 import { RegisterMethodEnum } from '@/users/register-method.enum';
 import { User } from '../../users/entities/user.entity';
 import * as bcrypt from 'bcrypt';
-import { PortalSeedService } from '@/portal/seed/portal-seed.service';
 import type { PermissionType } from '@/auth/permissions.type';
 
 /**
@@ -15,47 +14,6 @@ import type { PermissionType } from '@/auth/permissions.type';
  * separately, a newly seeded permission was silently deleted before each test
  * and its guard then rejected the superadmin.
  */
-const CRUD = ['create', 'read', 'update', 'delete'] as const;
-type CrudAction = (typeof CRUD)[number];
-const CRUD_LABELS: Record<CrudAction, string> = {
-  create: 'Create',
-  read: 'Read',
-  update: 'Update',
-  delete: 'Delete',
-};
-
-/** Read-mostly customer/system portal data plus its dedicated audited actions. */
-export const PORTAL_RECORD_PERMISSIONS: Array<{
-  name: PermissionType;
-  description: string;
-}> = [
-  { name: 'portal.customers.read', description: 'Read portal customers' },
-  { name: 'portal.gifts.read', description: 'Read portal gifts' },
-  {
-    name: 'portal.gifts.revoke',
-    description: 'Revoke unredeemed portal gifts',
-  },
-  { name: 'portal.referrals.read', description: 'Read portal referrals' },
-  { name: 'portal.wallets.read', description: 'Read portal wallets' },
-  {
-    name: 'portal.wallets.adjust',
-    description: 'Manually adjust portal wallet balances',
-  },
-  {
-    name: 'portal.wallet_transactions.read',
-    description: 'Read portal wallet transactions',
-  },
-  { name: 'portal.saved_offers.read', description: 'Read portal saved offers' },
-  {
-    name: 'portal.campaign_ledger.read',
-    description: 'Read the portal campaign points ledger',
-  },
-  {
-    name: 'portal.commerce_outbox.read',
-    description: 'Read the portal commerce event outbox',
-  },
-];
-
 export const SEEDED_PERMISSIONS: Array<{
   name: PermissionType;
   description: string;
@@ -140,56 +98,6 @@ export const SEEDED_PERMISSIONS: Array<{
 
   // Dashboard
   { name: 'stats.read', description: 'Read dashboard statistics' },
-
-  // Portal administration
-  { name: 'menu.portal', description: 'View portal management in sidebar' },
-  { name: 'portal.dashboard.read', description: 'Read portal dashboard' },
-  ...(<Array<[string, string, ReadonlyArray<CrudAction>]>>[
-    ['coupons', 'coupons', CRUD],
-    ['events', 'events', CRUD],
-    ['event_tickets', 'event tickets', CRUD],
-    ['bundles', 'bundles', CRUD],
-    ['campaigns', 'campaigns', CRUD],
-    ['faqs', 'FAQs', CRUD],
-    ['vouchers', 'vouchers', CRUD],
-    ['tickets', 'tickets', CRUD],
-    ['orders', 'orders', CRUD],
-    ['order_items', 'order items', CRUD],
-    ['follows', 'follows', CRUD],
-    // Progress changes only through the audited points ledger (adjust).
-    ['campaign_progress', 'campaign progress', ['read']],
-    ['email_otp_challenges', 'email OTP challenges', CRUD],
-    ['reviews', 'reviews', ['read', 'update', 'delete']],
-    ['promo_codes', 'promo codes', CRUD],
-    ['booking_slots', 'booking slots', CRUD],
-    ['bookings', 'bookings', ['read', 'update', 'delete']],
-    ['coupon_categories', 'coupon categories', CRUD],
-    ['cities', 'cities', CRUD],
-    ['content', 'site content', ['read', 'update']],
-    ['broadcasts', 'customer broadcasts', ['create', 'read']],
-  ]).flatMap(([key, label, actions]) =>
-    actions.map((action) => ({
-      name: `portal.${key}.${action}` as PermissionType,
-      description: `${CRUD_LABELS[action]} portal ${label}`,
-    })),
-  ),
-  {
-    name: 'portal.vouchers.redeem',
-    description: 'Redeem portal vouchers by id or QR scan',
-  },
-  {
-    name: 'portal.tickets.check_in',
-    description: 'Check in portal tickets by id or QR scan',
-  },
-  {
-    name: 'portal.orders.refund',
-    description: 'Approve or reject portal order refunds',
-  },
-  {
-    name: 'portal.campaign_progress.adjust',
-    description: 'Adjust portal campaign points through the ledger',
-  },
-  ...PORTAL_RECORD_PERMISSIONS,
 ];
 
 @Injectable()
@@ -203,7 +111,6 @@ export class SeederService implements OnApplicationBootstrap {
     private readonly roleRepository: Repository<Role>,
     @InjectRepository(User)
     private readonly userRepository: Repository<User>,
-    private readonly portalSeedService: PortalSeedService,
   ) {}
 
   async onApplicationBootstrap() {
@@ -225,7 +132,6 @@ export class SeederService implements OnApplicationBootstrap {
     await this.seedPermissions();
     await this.seedRoles();
     await this.seedUsers();
-    await this.portalSeedService.seed();
     this.logger.log('Seeding complete!');
   }
 

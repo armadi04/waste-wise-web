@@ -1,0 +1,30 @@
+name: Backend CI
+on:
+  pull_request:
+    paths: ['backend/**', '.github/workflows/backend-ci.yml']
+  push:
+    branches: [master]
+    paths: ['backend/**', '.github/workflows/backend-ci.yml']
+  workflow_dispatch:
+permissions:
+  contents: read
+  packages: read
+jobs:
+  backend:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: backend
+    steps:
+      - uses: actions/checkout@v4
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: '1.3.14'
+      - name: Authenticate SDK registry
+        run: npm config set '//npm.pkg.github.com/:_authToken' "$NODE_AUTH_TOKEN" --location=user
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NODE_AUTH_TOKEN || github.token }}
+      - run: bun install --frozen-lockfile
+      - run: bun run lint
+      - run: bun run test
+      - run: bun run build

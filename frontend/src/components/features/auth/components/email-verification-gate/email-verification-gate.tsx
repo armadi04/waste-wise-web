@@ -1,5 +1,6 @@
-import { Button, Spinner } from '@heroui/react'
+import { Spinner } from '@heroui/react'
 import { CheckCircle, Mail } from 'lucide-react'
+import { Button } from '@/components/shared/controls'
 import { AuthPageShell } from '@/components/layout/auth-page-shell'
 import {
   useAuth,
@@ -36,18 +37,20 @@ export function EmailVerificationGate({
           <div className="flex justify-center">
             <div
               className={`w-14 h-14 rounded-full flex items-center justify-center ${
-                sent ? 'bg-success/10' : 'bg-primary/10'
+                sent
+                  ? 'app-status-success bg-[var(--app-success-background)] text-[var(--app-success-foreground)]'
+                  : 'bg-[var(--app-selected-background)]'
               }`}
             >
               {sent ? (
-                <CheckCircle className="w-7 h-7 text-success" />
+                <CheckCircle className="w-7 h-7 text-[var(--app-success)]" />
               ) : (
-                <Mail className="w-7 h-7 text-primary" />
+                <Mail className="w-7 h-7 text-[var(--app-link)]" />
               )}
             </div>
           </div>
           <div className="space-y-1.5">
-            <h1 className="text-2xl font-bold tracking-tight text-default-800">
+            <h1 className="text-2xl font-semibold tracking-tight text-default-800">
               {sent ? 'Check your inbox' : 'Verify your email'}
             </h1>
             <p className="text-sm text-default-500 leading-relaxed">
@@ -86,7 +89,7 @@ export function EmailVerificationGate({
             </Button>
           )}
           {state === 'error' && (
-            <p className="text-center text-xs text-danger">
+            <p className="text-center text-xs text-[var(--app-danger)]">
               Failed to send. Please try again.
             </p>
           )}

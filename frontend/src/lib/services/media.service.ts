@@ -1,4 +1,4 @@
-import type { Media, PaginatedData  } from '@/types/api'
+import type { Media, PaginatedData, components } from '@/types/api'
 import { apiDelete, apiGet, apiPost } from '@/lib/api'
 
 export const getMediaList = (params?: {
@@ -19,11 +19,16 @@ export const getMedia = (id: number) => {
 }
 
 export const deleteMedia = (id: number) => {
-  return apiDelete<void>(`/api/media/${id}`)
+  return apiDelete<MediaDeletionResult>(`/api/media/${id}`)
 }
 
+export type MediaDeletionResult =
+  components['schemas']['MediaDeletionResultDto']
+export type MediaBulkDeleteResult =
+  components['schemas']['MediaBulkDeleteResultDto']
+
 export const bulkDeleteMedia = (ids: Array<number>) => {
-  return apiPost<{ deleted: number }>('/api/media/bulk-delete', { ids })
+  return apiPost<MediaBulkDeleteResult>('/api/media/bulk-delete', { ids })
 }
 
 export const uploadMedia = (file: File) => {

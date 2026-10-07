@@ -1,6 +1,5 @@
 import {
   Injectable,
-  BadRequestException,
   NotFoundException,
   ConflictException,
   ForbiddenException,
@@ -91,10 +90,8 @@ export class UsersService extends BaseService<User> {
       const media = await this.mediaRepository.findOneBy({
         id: userData.avatarId,
       });
-      if (media?.managedAvatar)
-        throw new BadRequestException(
-          'Portal avatars are managed through the customer profile endpoint',
-        );
+      if (media && media.state !== 'ready')
+        throw new ForbiddenException('Avatar media is not ready');
       if (media) {
         newUser.avatar = media;
       }
@@ -331,10 +328,8 @@ export class UsersService extends BaseService<User> {
       const media = await this.mediaRepository.findOneBy({
         id: updateUserDto.avatarId,
       });
-      if (media?.managedAvatar)
-        throw new BadRequestException(
-          'Portal avatars are managed through the customer profile endpoint',
-        );
+      if (media && media.state !== 'ready')
+        throw new ForbiddenException('Avatar media is not ready');
       if (media) {
         user.avatar = media;
       }

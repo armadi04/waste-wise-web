@@ -1,7 +1,8 @@
-import { Popover, PopoverContent, PopoverTrigger, Tooltip } from '@heroui/react'
-import { AnimatePresence, motion } from 'framer-motion'
+import { PopoverContent, PopoverTrigger } from '@heroui/react'
+import { AnimatePresence, motion, useReducedMotion } from 'framer-motion'
 import { ChevronRight } from 'lucide-react'
 import type { NavItem } from '@/lib/constants/sidebar'
+import { Popover, Tooltip } from '@/components/shared/controls'
 
 export const SidebarItem = ({
   item,
@@ -18,6 +19,7 @@ export const SidebarItem = ({
   onToggle: (key: string) => void
   onSelect: (key: string, href?: string) => void
 }) => {
+  const reducedMotion = useReducedMotion()
   const isActive = activeKey === item.key
   const hasChildren = item.children && item.children.length > 0
 
@@ -33,26 +35,22 @@ export const SidebarItem = ({
     relative flex items-center rounded-large cursor-pointer transition-all duration-200
     ${
       isActive
-        ? 'bg-primary/10 text-primary font-bold'
+        ? 'app-selected font-medium'
         : 'text-default-500 hover:text-default-900 hover:bg-default-100'
     }
     ${isCollapsed ? 'size-11 shrink-0 justify-center px-0' : 'w-full min-h-[40px] h-10 gap-3 px-3'}
   `
 
   const ButtonContent = (
-    <div
+    <button
+      type="button"
+      aria-current={isActive && !hasChildren ? 'page' : undefined}
+      aria-expanded={hasChildren ? isExpanded : undefined}
       className={buttonClasses}
       onClick={handlePress}
-      role="button"
-      tabIndex={0}
-      onKeyDown={(e) => {
-        if (e.key === 'Enter' || e.key === ' ') {
-          handlePress()
-        }
-      }}
     >
       <span
-        className={`shrink-0 transition-colors ${isActive ? 'text-primary' : 'text-default-500'}`}
+        className={`shrink-0 transition-colors ${isActive ? 'text-[var(--app-selected-foreground)]' : 'text-default-500'}`}
       >
         {item.icon}
       </span>
@@ -62,7 +60,7 @@ export const SidebarItem = ({
           initial={{ opacity: 0, width: 0 }}
           animate={{ opacity: 1, width: 'auto' }}
           exit={{ opacity: 0, width: 0 }}
-          transition={{ duration: 0.2 }}
+          transition={{ duration: reducedMotion ? 0 : 0.2 }}
           className="flex-1 text-left truncate text-sm ml-1"
         >
           {item.label}
@@ -72,13 +70,13 @@ export const SidebarItem = ({
       {!isCollapsed && hasChildren && (
         <motion.span
           animate={{ rotate: isExpanded ? 90 : 0 }}
-          transition={{ duration: 0.2 }}
+          transition={{ duration: reducedMotion ? 0 : 0.2 }}
           className="text-default-400"
         >
           <ChevronRight size={16} />
         </motion.span>
       )}
-    </div>
+    </button>
   )
 
   // Collapsed state with children - show popover

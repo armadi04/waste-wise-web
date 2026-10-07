@@ -6,6 +6,7 @@ export interface Column<T> {
   name: string
   uid: string
   sortable?: boolean
+  align?: 'start' | 'center' | 'end'
   /** Truncate cell text with ellipsis and show full content on hover */
   truncate?: boolean
   /** Max width in px for truncated cells (default: 200) */

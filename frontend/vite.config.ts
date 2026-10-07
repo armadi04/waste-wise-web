@@ -27,13 +27,13 @@ export default defineConfig(({ mode, command }) => {
         registerType: 'autoUpdate',
         injectRegister: 'auto',
         manifest: {
-          name: 'Kupon Malam',
-          short_name: 'Kupon Malam',
-          description: 'Kupon Malam API',
+          name: 'Nestplate Starter',
+          short_name: 'Nestplate',
+          description: 'Nestplate Starter dashboard',
           start_url: '/',
           display: 'standalone',
-          theme_color: '#002855',
-          background_color: '#ffffff',
+          theme_color: '#f8fafc',
+          background_color: '#f8fafc',
           icons: [
             {
               src: 'favicon.ico',
@@ -70,7 +70,11 @@ export default defineConfig(({ mode, command }) => {
           // Without this the service worker hijacks a full-page nav to an /api
           // endpoint (e.g. an OAuth/SSO redirect or file download) and renders the
           // SPA 404 instead of letting the browser reach the backend.
-          navigateFallbackDenylist: [/^\/api\//, /^\/socket\.io\//],
+          navigateFallbackDenylist: [
+            /^\/api(?:\/|$)/,
+            /^\/socket\.io(?:\/|$)/,
+            /^\/graphql(?:\/|$)/,
+          ],
           globPatterns: ['**/*.{js,css,html,ico,svg,png}'],
           maximumFileSizeToCacheInBytes: 4 * 1024 * 1024, // 4 MiB
         },
@@ -104,10 +108,16 @@ export default defineConfig(({ mode, command }) => {
     },
     server: {
       port: 3001,
+      strictPort: true,
       proxy: {
         '/api': {
           target: 'http://localhost:3000',
           changeOrigin: true,
+        },
+        '/socket.io': {
+          target: 'http://localhost:3000',
+          changeOrigin: true,
+          ws: true,
         },
       },
     },

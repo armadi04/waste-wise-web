@@ -20,18 +20,12 @@ import { Route as authResetPasswordRouteImport } from './routes/(auth)/reset-pas
 import { Route as authVerifyEmailRouteImport } from './routes/(auth)/verify-email'
 import { Route as contentNotificationsRouteImport } from './routes/(content)/notifications'
 import { Route as mediaMediaRouteImport } from './routes/(media)/media'
-import { Route as portalPortalRouteImport } from './routes/(portal)/portal'
 import { Route as sessionsSessionsRouteImport } from './routes/(sessions)/sessions'
 import { Route as usersInvitationsRouteImport } from './routes/(users)/invitations'
 import { Route as usersUsersRouteImport } from './routes/(users)/users'
 import { Route as databasesoauthOauthClientsRouteImport } from './routes/(databases)/(oauth)/oauth-clients'
 import { Route as databasespermissionsPermissionsRouteImport } from './routes/(databases)/(permissions)/permissions'
 import { Route as databasesrolesRolesRouteImport } from './routes/(databases)/(roles)/roles'
-import { Route as portalPortalIndexRouteImport } from './routes/(portal)/portal.index'
-import { Route as portalPortalResourceRouteImport } from './routes/(portal)/portal.$resource'
-import { Route as portalPortalContentRouteImport } from './routes/(portal)/portal.content'
-import { Route as portalPortalScanRouteImport } from './routes/(portal)/portal.scan'
-import { Route as portalPortalCustomersCustomerIdRouteImport } from './routes/(portal)/portal.customers.$customerId'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -88,11 +82,6 @@ const mediaMediaRoute = mediaMediaRouteImport.update({
   path: '/media',
   getParentRoute: () => rootRouteImport,
 } as any)
-const portalPortalRoute = portalPortalRouteImport.update({
-  id: '/(portal)/portal',
-  path: '/portal',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const sessionsSessionsRoute = sessionsSessionsRouteImport.update({
   id: '/(sessions)/sessions',
   path: '/sessions',
@@ -125,32 +114,6 @@ const databasesrolesRolesRoute = databasesrolesRolesRouteImport.update({
   path: '/roles',
   getParentRoute: () => rootRouteImport,
 } as any)
-const portalPortalIndexRoute = portalPortalIndexRouteImport.update({
-  id: '/',
-  path: '/',
-  getParentRoute: () => portalPortalRoute,
-} as any)
-const portalPortalResourceRoute = portalPortalResourceRouteImport.update({
-  id: '/$resource',
-  path: '/$resource',
-  getParentRoute: () => portalPortalRoute,
-} as any)
-const portalPortalContentRoute = portalPortalContentRouteImport.update({
-  id: '/content',
-  path: '/content',
-  getParentRoute: () => portalPortalRoute,
-} as any)
-const portalPortalScanRoute = portalPortalScanRouteImport.update({
-  id: '/scan',
-  path: '/scan',
-  getParentRoute: () => portalPortalRoute,
-} as any)
-const portalPortalCustomersCustomerIdRoute =
-  portalPortalCustomersCustomerIdRouteImport.update({
-    id: '/customers/$customerId',
-    path: '/customers/$customerId',
-    getParentRoute: () => portalPortalRoute,
-  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -164,18 +127,12 @@ export interface FileRoutesByFullPath {
   '/verify-email': typeof authVerifyEmailRoute
   '/notifications': typeof contentNotificationsRoute
   '/media': typeof mediaMediaRoute
-  '/portal': typeof portalPortalRouteWithChildren
   '/sessions': typeof sessionsSessionsRoute
   '/invitations': typeof usersInvitationsRoute
   '/users': typeof usersUsersRoute
   '/oauth-clients': typeof databasesoauthOauthClientsRoute
   '/permissions': typeof databasespermissionsPermissionsRoute
   '/roles': typeof databasesrolesRolesRoute
-  '/portal/$resource': typeof portalPortalResourceRoute
-  '/portal/content': typeof portalPortalContentRoute
-  '/portal/scan': typeof portalPortalScanRoute
-  '/portal/': typeof portalPortalIndexRoute
-  '/portal/customers/$customerId': typeof portalPortalCustomersCustomerIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -195,11 +152,6 @@ export interface FileRoutesByTo {
   '/oauth-clients': typeof databasesoauthOauthClientsRoute
   '/permissions': typeof databasespermissionsPermissionsRoute
   '/roles': typeof databasesrolesRolesRoute
-  '/portal/$resource': typeof portalPortalResourceRoute
-  '/portal/content': typeof portalPortalContentRoute
-  '/portal/scan': typeof portalPortalScanRoute
-  '/portal': typeof portalPortalIndexRoute
-  '/portal/customers/$customerId': typeof portalPortalCustomersCustomerIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -214,18 +166,12 @@ export interface FileRoutesById {
   '/(auth)/verify-email': typeof authVerifyEmailRoute
   '/(content)/notifications': typeof contentNotificationsRoute
   '/(media)/media': typeof mediaMediaRoute
-  '/(portal)/portal': typeof portalPortalRouteWithChildren
   '/(sessions)/sessions': typeof sessionsSessionsRoute
   '/(users)/invitations': typeof usersInvitationsRoute
   '/(users)/users': typeof usersUsersRoute
   '/(databases)/(oauth)/oauth-clients': typeof databasesoauthOauthClientsRoute
   '/(databases)/(permissions)/permissions': typeof databasespermissionsPermissionsRoute
   '/(databases)/(roles)/roles': typeof databasesrolesRolesRoute
-  '/(portal)/portal/$resource': typeof portalPortalResourceRoute
-  '/(portal)/portal/content': typeof portalPortalContentRoute
-  '/(portal)/portal/scan': typeof portalPortalScanRoute
-  '/(portal)/portal/': typeof portalPortalIndexRoute
-  '/(portal)/portal/customers/$customerId': typeof portalPortalCustomersCustomerIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -241,18 +187,12 @@ export interface FileRouteTypes {
     | '/verify-email'
     | '/notifications'
     | '/media'
-    | '/portal'
     | '/sessions'
     | '/invitations'
     | '/users'
     | '/oauth-clients'
     | '/permissions'
     | '/roles'
-    | '/portal/$resource'
-    | '/portal/content'
-    | '/portal/scan'
-    | '/portal/'
-    | '/portal/customers/$customerId'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -272,11 +212,6 @@ export interface FileRouteTypes {
     | '/oauth-clients'
     | '/permissions'
     | '/roles'
-    | '/portal/$resource'
-    | '/portal/content'
-    | '/portal/scan'
-    | '/portal'
-    | '/portal/customers/$customerId'
   id:
     | '__root__'
     | '/'
@@ -290,18 +225,12 @@ export interface FileRouteTypes {
     | '/(auth)/verify-email'
     | '/(content)/notifications'
     | '/(media)/media'
-    | '/(portal)/portal'
     | '/(sessions)/sessions'
     | '/(users)/invitations'
     | '/(users)/users'
     | '/(databases)/(oauth)/oauth-clients'
     | '/(databases)/(permissions)/permissions'
     | '/(databases)/(roles)/roles'
-    | '/(portal)/portal/$resource'
-    | '/(portal)/portal/content'
-    | '/(portal)/portal/scan'
-    | '/(portal)/portal/'
-    | '/(portal)/portal/customers/$customerId'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -316,7 +245,6 @@ export interface RootRouteChildren {
   authVerifyEmailRoute: typeof authVerifyEmailRoute
   contentNotificationsRoute: typeof contentNotificationsRoute
   mediaMediaRoute: typeof mediaMediaRoute
-  portalPortalRoute: typeof portalPortalRouteWithChildren
   sessionsSessionsRoute: typeof sessionsSessionsRoute
   usersInvitationsRoute: typeof usersInvitationsRoute
   usersUsersRoute: typeof usersUsersRoute
@@ -404,13 +332,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof mediaMediaRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/(portal)/portal': {
-      id: '/(portal)/portal'
-      path: '/portal'
-      fullPath: '/portal'
-      preLoaderRoute: typeof portalPortalRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/(sessions)/sessions': {
       id: '/(sessions)/sessions'
       path: '/sessions'
@@ -453,63 +374,8 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof databasesrolesRolesRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/(portal)/portal/': {
-      id: '/(portal)/portal/'
-      path: '/'
-      fullPath: '/portal/'
-      preLoaderRoute: typeof portalPortalIndexRouteImport
-      parentRoute: typeof portalPortalRoute
-    }
-    '/(portal)/portal/$resource': {
-      id: '/(portal)/portal/$resource'
-      path: '/$resource'
-      fullPath: '/portal/$resource'
-      preLoaderRoute: typeof portalPortalResourceRouteImport
-      parentRoute: typeof portalPortalRoute
-    }
-    '/(portal)/portal/content': {
-      id: '/(portal)/portal/content'
-      path: '/content'
-      fullPath: '/portal/content'
-      preLoaderRoute: typeof portalPortalContentRouteImport
-      parentRoute: typeof portalPortalRoute
-    }
-    '/(portal)/portal/scan': {
-      id: '/(portal)/portal/scan'
-      path: '/scan'
-      fullPath: '/portal/scan'
-      preLoaderRoute: typeof portalPortalScanRouteImport
-      parentRoute: typeof portalPortalRoute
-    }
-    '/(portal)/portal/customers/$customerId': {
-      id: '/(portal)/portal/customers/$customerId'
-      path: '/customers/$customerId'
-      fullPath: '/portal/customers/$customerId'
-      preLoaderRoute: typeof portalPortalCustomersCustomerIdRouteImport
-      parentRoute: typeof portalPortalRoute
-    }
   }
 }
-
-interface portalPortalRouteChildren {
-  portalPortalResourceRoute: typeof portalPortalResourceRoute
-  portalPortalContentRoute: typeof portalPortalContentRoute
-  portalPortalScanRoute: typeof portalPortalScanRoute
-  portalPortalIndexRoute: typeof portalPortalIndexRoute
-  portalPortalCustomersCustomerIdRoute: typeof portalPortalCustomersCustomerIdRoute
-}
-
-const portalPortalRouteChildren: portalPortalRouteChildren = {
-  portalPortalResourceRoute: portalPortalResourceRoute,
-  portalPortalContentRoute: portalPortalContentRoute,
-  portalPortalScanRoute: portalPortalScanRoute,
-  portalPortalIndexRoute: portalPortalIndexRoute,
-  portalPortalCustomersCustomerIdRoute: portalPortalCustomersCustomerIdRoute,
-}
-
-const portalPortalRouteWithChildren = portalPortalRoute._addFileChildren(
-  portalPortalRouteChildren,
-)
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
@@ -523,7 +389,6 @@ const rootRouteChildren: RootRouteChildren = {
   authVerifyEmailRoute: authVerifyEmailRoute,
   contentNotificationsRoute: contentNotificationsRoute,
   mediaMediaRoute: mediaMediaRoute,
-  portalPortalRoute: portalPortalRouteWithChildren,
   sessionsSessionsRoute: sessionsSessionsRoute,
   usersInvitationsRoute: usersInvitationsRoute,
   usersUsersRoute: usersUsersRoute,

@@ -12,12 +12,16 @@ const toDate = (value: string | Date | null | undefined): Date | null => {
   return isValid(date) ? date : null
 }
 
-export const formatBytes = (bytes: number, decimals = 2) => {
+export const formatBytes = (bytes: number | null | undefined, decimals = 2) => {
+  if (bytes == null || !Number.isFinite(bytes) || bytes < 0) return '—'
   if (!+bytes) return '0 Bytes'
   const k = 1024
   const dm = decimals < 0 ? 0 : decimals
-  const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB']
-  const i = Math.floor(Math.log(bytes) / Math.log(k))
+  const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB', 'PB']
+  const i = Math.min(
+    sizes.length - 1,
+    Math.floor(Math.log(bytes) / Math.log(k)),
+  )
   return `${parseFloat((bytes / Math.pow(k, i)).toFixed(dm))} ${sizes[i]}`
 }
 

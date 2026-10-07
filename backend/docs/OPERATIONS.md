@@ -2,134 +2,144 @@
 
 ## Build and deployment
 
-Install with frozen lockfile; run lint, tests against the test database, build and schema:check.
-Review migration SQL and environment before deploying. Build uses tsc-alias; deploy compiled
-dist output through the backend Dockerfile, not a bare Nest build.
-
-Private package installation uses a BuildKit node_auth secret:
+Build from `backend/`. SDK installation uses a GitHub Packages package-read token:
 
 ```bash
-docker build --secret id=node_auth,src="$HOME/.npmrc" -t kuponmalam-api .
+docker build --secret id=node_auth,env=NODE_AUTH_TOKEN -t nestplate-api .
 ```
 
-Keep NODE_ENV=production, DB_SYNCHRONIZE=false and DB_SEED=false. Production seed boot is
-skipped; import business/catalog data through controlled processes. Container entrypoint
-applies pending migrations with migration:run:prod before starting Bun dist/main.js.
-App boot also checks pending migrations when synchronize is disabled. Do not edit applied
-migrations or use migrate:fresh in production. Schema rollback needs backup/compatibility
-review; reverting an image alone does not revert the database.
+The secret contains the raw token, not an entire `.npmrc`. Runtime uses Bun and UTC.
+Supply DB/JWT/storage and optional Redis/SMTP/OIDC credentials at runtime.
+Keep `NODE_ENV=production`, `DB_SYNCHRONIZE=false`, `DB_SEED=false`.
+Entrypoint runs pending compiled migrations before starting the API on port 3000.
+The starter baseline requires a new database with schema-creation privileges.
 
-Fresh database deployment requires an existing PostgreSQL database with schema creation
-privileges. Set `LEGACY_TIMESTAMP_TIME_ZONE=UTC` for the historical timezone conversion even
-when there are no rows yet. Never enable synchronize or fabricate migration history.
-Migration `1791219000000-NormalizeLegacyCommerceIndexes` deliberately sorts before
-`1791220000000-PartialUniqueIndexesForSoftDelete`: it bridges explicit historical index names
-and schema-sync generated names without changing applied migrations. Existing partial indexes
-are preserved; redundant global indexes are removed so deleted keys can be reused. Rollback of
-the partial-unique migration requires resolving duplicates allowed by its soft-delete policy.
-Production seeding remains disabled; provision initial roles, permissions and the administrator
-through a controlled bootstrap process before opening admin access.
+For initial account provisioning, run `migration:run` and `seed` in a controlled non-production
+bootstrap environment against the new deployment database before opening traffic. Then switch
+runtime to production and disable seed. Automatic production seeding is intentionally disabled.
+Back up schema/data before later migrations; reverting an image does not revert a database.
 
-Supply PostgreSQL, JWT, Depot and any configured Redis/SMTP/OIDC/payment credentials through
-runtime secret management. Set exact ALLOWED_ORIGINS for credentialed browser requests.
-Use HTTPS and correct public APP_URL/SSO callback/logout URLs. Never log tokens or credentials.
+Frontend Caddy proxies `/api`, `/socket.io` and `/graphql` to this service. Use HTTPS, exact
+origins, browser-facing `APP_URL`, matching SSO callback/logout URLs and appropriate `TRUST_PROXY`.
+
+## Media providers
+
+Default:
+
+```env
+MEDIA_PROVIDER=depot
+DEPOT_BASE_URL=https://depot.example.com
+DEPOT_API_KEY=your_write_scoped_key
+```
+
+`DEPOT_BASE_URL` is an origin without `/api/v1`. Depot owns its S3 configuration.
+
+Direct AWS or compatible storage:
+
+```env
+MEDIA_PROVIDER=s3
+S3_REGION=us-east-1
+S3_BUCKET=your_bucket
+S3_ACCESS_KEY_ID=your_key
+S3_SECRET_ACCESS_KEY=your_secret
+# S3_ENDPOINT=https://s3.example.com
+# S3_FORCE_PATH_STYLE=true
+```
+
+Direct S3 uses Bun S3Client, opaque per-user keys and 5-minute GET URLs. Path-style supports
+compatible endpoints such as MinIO; AWS can infer the endpoint from region/bucket.
+Legacy env keys create `depot-default` and `s3-default` profiles. New rows record the selected
+profile and a fingerprint of its physical location (not credentials). Reads/deletes fail closed
+if the location changes or the profile disappears. Credential rotation remains supported.
+
+For multiple locations, configure `MEDIA_STORAGE_PROFILES` as a JSON object keyed by immutable
+profile IDs and choose `MEDIA_STORAGE_PROFILE`. Example shape:
+
+```json
+{
+  "primary": { "provider": "depot", "baseUrl": "https://depot.example.com", "apiKey": "runtime-secret" },
+  "archive": { "provider": "s3", "region": "us-east-1", "bucket": "archive", "accessKeyId": "runtime-secret", "secretAccessKey": "runtime-secret", "forcePathStyle": false }
+}
+```
+
+S3 profiles optionally accept `endpoint`. Switch to a NEW profile when changing a bucket or
+Depot service, retaining the old profile for its existing files/cleanup jobs. Never reuse an
+existing ID for another location. Profiles/credentials load per process; restart on change.
+Switching defaults does not migrate objects. Rotated keys must retain the same bucket/Depot app
+scope; location fingerprints do not identify a provider's credential scope.
+
+### Media hardening migration
+
+Apply `HardenMediaLifecycle` after the starter baseline. Existing rows receive their legacy
+profile ID but deliberately have no guessed location fingerprint. Before changing storage
+configuration, bind them with the ORIGINAL provider locations configured:
+
+```bash
+bun run migration:run
+bun run media:bind-storage
+```
+
+Binding only fills missing fingerprints, locks rows and runs transactionally; it cannot
+overwrite existing bindings. Until bound, legacy signed URLs return 503 and deletion remains
+queued without touching remote storage. Fresh
+installations need no binding. Invalid legacy provider/size/object data must be repaired before
+adding CHECK constraints. Reverting hardening refuses active jobs/named live profiles;
+drain/migrate them before an application/schema rollback.
+
+### Upload and cleanup lifecycle
+
+Default upload limit: 20 MiB, one file, at most 20 fields/21 multipart parts. Media uploads and
+avatar updates share per-instance admission (four requests by default) before buffering.
+Tune `MEDIA_MAX_FILE_SIZE` and `MEDIA_MAX_CONCURRENT_UPLOADS` together for the memory budget.
+`MEDIA_ALLOWED_MIME_TYPES` controls content-signature detection; declared MIME is not trusted.
+SVG/HTML/plain text are excluded by default. Signature detection is not malware scanning.
+Missing/empty files return 400, oversize 413, unsupported content 415, saturated admission 429.
+
+Before remote I/O, a pending row persists its UUID key/name and location identity. Depot stores
+the reservation ID before PUT; crashes before that write recover by exact name and owner.
+S3 PUT/DELETE have abortable 30-second requests; Depot requests have 15-second timeouts.
+Only ready rows are listed or served. Failed/abandoned uploads are reclaimed after a 15-minute
+safety window. The UTC worker runs every minute, uses SKIP LOCKED, renewable fenced leases and
+bounded batches. Failed cleanup retries indefinitely with backoff capped at one hour.
+Monitor pending/deleting age, cleanupAttempts and cleanupErrorCode; investigate sustained retries.
+
+Local ownership and `media.read_all`/`media.delete_all` gates remain provider-independent.
+OAuth clients cannot upload user-owned media; a client with only `media.read` has no owned
+records. Global client lists require `media.read_all` in addition to `media.read`.
+Public view redirects honor `isPrivate`; metadata/stream routes require authorization.
+Deletion first durably marks the row deleting and detaches avatar references, then removes the
+remote object and soft-deletes metadata. `queued` means the worker will retry; the file is already
+hidden from the library. Repeated deletion is idempotent. Internal leases/fingerprints/errors
+are excluded from serialized REST responses.
+
+Single DELETE returns `{ id, status }`; bulk deletion returns `{ deleted, queued, failed, results }`
+with per-item status/code. Batches accept 1–100 unique positive int4 IDs. Authorization is checked
+before any item executes; partial provider/DB failures do not hide other outcomes.
+GraphQL `deleteMediaWithResult` returns `MediaDeletionResult`. The existing Boolean
+`deleteMedia` remains a deprecated compatibility alias; true means durable acceptance,
+not necessarily completed remote cleanup. New clients should select status explicitly.
 
 ## Health and acceptance
 
-GET `/api/health` checks PostgreSQL and a 300 MiB heap threshold and skips rate throttling.
-It does not prove SMTP, Depot, OIDC or payment providers are healthy. Swagger is non-production;
-generate static OpenAPI only in a suitable environment if needed.
-
-Before traffic promotion, verify migration completion, health, admin/portal auth and ownership,
-refresh/CSRF, active-role permissions, notification websocket routing, media redirects,
-real email/provider delivery and payment callback verification. Portal Start receives public
-traffic separately; its proxy deliberately excludes provider webhook/admin routes.
-
-Rollback the backend image only if current schema/contracts remain compatible. Destructive
-migrations require a separate reviewed restore/rollback procedure. Observe error rates,
-request IDs, latency, DB health, queue failures and resource usage across canary traffic.
+`GET /api/health` checks PostgreSQL and a 300 MiB heap threshold. It does not probe storage,
+SMTP or OIDC. Verify health, migrations, cookies/CSRF, active-role permissions, media URLs,
+real mail delivery and socket routing in the deployment environment.
 
 ## Integration diagnostics
 
-| Symptom | Checks/action |
+| Symptom | Check |
 |---|---|
-| Env validation failure | Run from backend root; compare required keys with env schema/template; do not hardcode a secret |
-| PostgreSQL failure | Host/port/credentials/database, network, migration:show/run after connection is restored |
-| Schema mismatch | Entity/migration diff and schema:check; never enable production synchronize to hide drift |
-| Redis unavailable | Connection logs and credentials; fallback is per-process memory, not shared multi-instance cache |
-| Cookie/CORS/CSRF failure | Exact origin, credentials, HTTPS, csrfToken versus X-CSRF-Token; inspect actual protected endpoint policy |
-| Missing seed | Non-production NODE_ENV, DB_SEED, migrations, demo email configuration; authorized seed rerun is idempotent |
-| Missing OTP/email | SMTP setup, outbound_emails status/lastError/retry/lease and MAIL_FROM; queued is not delivered |
-| Media failure | DEPOT_BASE_URL is origin without /api/v1, API key scope, network, signed URL and ownership |
-| SSO unavailable | SSO_ISSUER/client/callback configuration, discovery logs, provider machine-endpoint network/WAF policy |
-| Payment callback rejection | Secret configured and matching, verified provider adapter, backend routing (not portal proxy) |
+| Startup validation fails | Required env and selected provider keys |
+| Database error | Host/port/credentials, migration history, schema check |
+| Redis unavailable | Connection logs; fallback is per-process memory |
+| Cookies/CSRF fail | Exact origin, credentials, HTTPS, cookie/header match |
+| Missing admin | New DB, controlled seed, ADMIN_EMAIL/PASSWORD |
+| Email not delivered | SMTP setup, outbound_emails status/lastError and MAIL_FROM |
+| Storage fails | Recorded provider, key scope, bucket/endpoint, network, signed URL |
+| SSO unavailable | Discovery/client/callback configuration and provider connectivity |
 
-Depot owns object storage; this API delegates through DepotClient. Local Media metadata is
-soft-deleted; remote deletion is best-effort and remote 404 must not block local removal.
-Public media view redirects are intentionally different from authenticated stream/metadata.
-
-MailOutboxService dispatches every 30 seconds, leases rows with SKIP LOCKED for multiple workers,
-and retries with 1m/5m/15m/60m backoff up to five attempts. Without SMTP_HOST messages fail
-rather than falsely succeeding. Investigate lastError before resending; avoid duplicate manual
-SMTP senders. JWT_SECRET also protects encrypted 2FA secrets: rotation requires a key/data
-migration strategy, not an arbitrary value swap.
-
-For read caching use existing CacheInterceptor/CacheService conventions and invalidate writes
-with resource patterns such as */users*. Check authenticated cache partitioning before extending
-shared caching. SSO discovery failure leaves SSO disabled; do not treat graceful startup as
-provider availability. Auth protocol and revocation details: [Auth](AUTH.md).
-
-
-## Campaign reconciliation and transaction signals
-
-A read-only reconciliation runs hourly in UTC. A PostgreSQL advisory transaction lock prevents
-multiple app replicas from scanning simultaneously. It uses a repeatable-read snapshot and
-15-second statement timeout; concurrent uncommitted awards do not create false mismatches.
-The job compares signed ledger totals with progress, frozen targets/status, missing rewards,
-discount terms, consumption counts, eligibility and checkout reservations. Expired/consumed
-reward policy and legacy baseline-only campaigns are respected. No balances are rewritten and
-no replacement codes are issued.
-
-Run `bun run campaigns:check` for an on-demand report. It prints category counts and at most
-20 internal campaign/user ID samples, without reward/referral codes, tokens or personal contact
-data. Exit 0 means no inconsistencies; exit 1 means mismatch, failure or an overlapping check
-that should be retried. Application DB access is required, but the task disables migrations,
-synchronize and seeding. Deploy the campaign migration before enabling this feature.
-
-Structured backend log events are the monitoring contract:
-
-| Event | Action |
-|---|---|
-| `campaign_reconciliation_ok` | Record hourly completion; investigate absence across two expected runs |
-| `campaign_reconciliation_mismatch` | Alert on any nonzero count; inspect the CLI report and impacted orders |
-| `campaign_reconciliation_failed` | Alert on failed scan; check database access/schema/query latency |
-| `campaign_lock_wait` | Tracks waits of at least 250ms; investigate sustained contention |
-| `campaign_transaction_slow` | Tracks successful commerce/campaign operations taking at least 1000ms |
-| `campaign_transaction_failed` | Track failure rate and safe database/connection codes, without query/secret payloads |
-
-These signals use existing structured logging. Configure the deployment's log collector to
-route alerts; no external notification destination is provisioned by this change. Compare
-latency/failure baselines during staging/canary traffic and keep the local load report separate
-from production capacity measurements.
-
-On mismatch, preserve logs and take a reviewed backup/snapshot before correction. Fix the
-underlying source path first. Incorrect business credits use audited adjustments with a stable
-key; projection drift requires a reviewed rebuild from the ledger, since adding an adjustment
-to both ledger and progress cannot repair an existing difference. Missing reward or reservation
-state also needs case review; do not directly reset points, replay historical payments, mint
-replacement discounts, or enable synchronize as a repair.
-
-Transient failures return 503 with bounded five-second lock waits and fifteen-second statement
-limits. Retry the original request/key after contention or connection recovery. Never retry
-with a fresh key simply because the client timed out; a committed transaction may already exist.
-
-## Auth and admin pass update rollout
-
-Deploy backend before admin/portal: it accepts the complete Following type set and returns
-the notification read-all message expected by the portal. Refresh tokens without `jti` remain
-valid until normal expiry/revocation; do not clear sessions as part of rollout.
-Pass metadata edits use a row lock and selective updates. Compare 409/500 rates and request
-latency during staging/canary traffic. Exercise metadata edits alongside redeem/check-in and
-refund in the isolated test environment before production promotion. Unit transaction fixtures
-cover ordering but do not establish actual PostgreSQL contention behavior or browser cookie
-behavior. No schema migration is required for these changes.
+SMTP dispatches every 30 seconds using SKIP LOCKED leases and bounded retries (five attempts).
+OTP helper messages expire and redact after delivery/failure. Queued is not delivered.
+JWT_SECRET also protects encrypted 2FA secrets; key rotation needs a data migration strategy.
+Logs omit credential headers/query strings. Observe request IDs, error rates, queue failures,
+DB health and resource usage. Auth/revocation contracts: [Auth](AUTH.md).

@@ -1,5 +1,5 @@
-import { Button, Chip } from '@heroui/react'
 import { Download, MonitorSmartphone } from 'lucide-react'
+import { Button, Chip } from '@/components/shared/controls'
 import {
   SettingRow,
   SettingsCard,
@@ -17,8 +17,8 @@ export function InstallSection() {
         label="Install App"
         description={
           isInstalled
-            ? 'Kupon Malam is installed and running as a native app on this device'
-            : 'Add Kupon Malam to your home screen for a faster, native-like experience'
+            ? 'Nestplate is installed and running as a native app on this device'
+            : 'Add Nestplate to your home screen for a faster, native-like experience'
         }
         action={
           isInstalled ? (

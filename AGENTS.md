@@ -1,4 +1,4 @@
-# KuponMalam API agent entry point
+# Nestplate Starter agent entry point
 
 Read [shared working rules](CLAUDE.md), then the relevant project guide:
 

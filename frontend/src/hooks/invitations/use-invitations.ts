@@ -1,7 +1,7 @@
-import { addToast } from '@heroui/react'
 import { useQuery } from '@tanstack/react-query'
 import { getRouteApi } from '@tanstack/react-router'
 import type { Invitation } from '@/types/api'
+import { addToast } from '@/components/shared/controls/toast'
 import { getColumns } from '@/components/features/invitations/components/table-columns'
 import { useConfirmation } from '@/hooks/global/use-confirmation'
 import { useDataTable } from '@/hooks/global/use-data-table'

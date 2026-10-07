@@ -1,8 +1,8 @@
-import { Chip } from '@heroui/react'
 import { Copy, RefreshCw, Trash2 } from 'lucide-react'
 import type { GetColumnsParams } from '@/components/features/invitations/components/table-columns/types'
 import type { Column } from '@/components/shared/datatable'
 import type { Invitation } from '@/types/api'
+import { Chip } from '@/components/shared/controls'
 import { ActionMenu } from '@/components/shared/action-menu'
 import { formatBusinessDate as format } from '@/lib/utils/format'
 

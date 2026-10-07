@@ -59,13 +59,15 @@ describe('MailService', () => {
     expect(message.html).toContain('http://reset/abc');
   });
 
-  it('queues the portal OTP email with the one-time code', async () => {
-    await service.sendPortalOtp('user@b.com', '123456');
+  it('queues the OTP email with the one-time code', async () => {
+    await service.sendLoginOtp('user@b.com', '123456');
 
     const [message] = enqueue.mock.calls[0] as [
       { subject: string; html: string; text: string },
     ];
-    expect(message.subject).toBe('Kode masuk KuponMalam');
+    expect(message.subject).toBe(
+      `Kode masuk ${process.env.APP_NAME || 'Nestplate'}`,
+    );
     expect(message.html).toContain('123456');
     expect(message.html).toContain('10 menit');
     expect(message.text).toContain('123456');

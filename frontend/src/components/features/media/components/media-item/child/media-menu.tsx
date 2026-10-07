@@ -1,10 +1,4 @@
-import {
-  Button,
-  Dropdown,
-  DropdownItem,
-  DropdownMenu,
-  DropdownTrigger,
-} from '@heroui/react'
+import { DropdownMenu, DropdownTrigger } from '@heroui/react'
 import {
   Copy,
   Download,
@@ -14,6 +8,7 @@ import {
 } from 'lucide-react'
 import type { MediaActions } from '@/components/features/media/components/media-item/types'
 import type { Media } from '@/types/media'
+import { Button, Dropdown, DropdownItem } from '@/components/shared/controls'
 import { useTimeZone } from '@/lib/stores/time-zone'
 
 export function MediaMenu({
@@ -62,7 +57,7 @@ export function MediaMenu({
         {actions.hasPermission('media.delete') ? (
           <DropdownItem
             key="delete"
-            className="text-danger"
+            className="text-[var(--app-danger)]"
             color="danger"
             startContent={<Trash2 size={15} />}
             onPress={() => actions.onDelete(media)}

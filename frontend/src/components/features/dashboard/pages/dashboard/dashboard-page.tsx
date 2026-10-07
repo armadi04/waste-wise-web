@@ -99,7 +99,7 @@ export function Dashboard() {
             Zona laporan
             <select
               aria-label="Zona laporan statistik"
-              className="ml-3 rounded-lg border border-default-200 bg-default-50 p-2"
+              className="app-field-control ml-3 rounded-lg p-2"
               value={reportTimeZone}
               onChange={(event) => setReportTimeZone(event.target.value)}
             >
@@ -116,7 +116,7 @@ export function Dashboard() {
             className="mb-6"
           />
 
-          <h2 className="mb-3 text-sm font-semibold text-default-500">
+          <h2 className="mb-3 text-lg font-semibold text-foreground">
             System &amp; Operations
           </h2>
           <div className="mb-6 grid w-full grid-cols-2 gap-4 lg:grid-cols-4">

@@ -34,6 +34,7 @@ import { PermissionsGuard } from '../auth/permissions.guard';
 import { OwnerOrPermissionGuard } from '../auth/owner-or-permission.guard';
 import { FileInterceptor, NoFilesInterceptor } from '@nestjs/platform-express';
 import { MediaService } from '../media/media.service';
+import { MediaUploadAdmissionInterceptor } from '../media/media-upload-admission.interceptor';
 import { CacheService } from '../common/cache/cache.service';
 import { CacheInterceptor } from '@nestjs/cache-manager';
 import type { IAuthRequest } from '../auth/interfaces/auth-request.interface';
@@ -96,7 +97,7 @@ export class UsersController {
   @ApiOperation({ summary: 'Update a user' })
   @ApiConsumes('multipart/form-data')
   @ApiResponse({ status: 200, type: User })
-  @UseInterceptors(FileInterceptor('avatar'))
+  @UseInterceptors(MediaUploadAdmissionInterceptor, FileInterceptor('avatar'))
   async update(
     @Param('id') id: string,
     @Body() updateUserDto: UpdateUserDto,
@@ -107,7 +108,11 @@ export class UsersController {
     // access fields need manage_* and may only grant what the caller holds)
     // live in UsersService.updateAs so GraphQL enforces the same ones.
     if (file) {
-      const media = await this.mediaService.uploadFile(file, req.user.userId);
+      const media = await this.mediaService.uploadFile(
+        file,
+        req.user.userId,
+        true,
+      );
       updateUserDto.avatarId = media.id;
     }
     const result = await this.usersService.updateAs(

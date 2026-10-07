@@ -1,7 +1,8 @@
-import { Button, cn } from '@heroui/react'
+import { cn } from '@heroui/react'
 import { Moon, Sun } from 'lucide-react'
 import { useRef } from 'react'
 import type { ButtonProps } from '@heroui/react'
+import { Button } from '@/components/shared/controls'
 import { useTheme } from '@/hooks/global'
 
 interface ThemeToggleProps extends ButtonProps {
@@ -28,7 +29,7 @@ export const ThemeToggle = ({
       {...props}
     >
       {isDark ? (
-        <Sun className="transition-colors duration-300 hover:text-warning" />
+        <Sun className="transition-colors duration-300 hover:text-[var(--app-warning)]" />
       ) : (
         <Moon className="transition-colors duration-300 hover:text-default-400" />
       )}

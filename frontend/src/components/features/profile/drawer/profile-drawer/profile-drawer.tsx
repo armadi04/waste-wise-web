@@ -1,12 +1,9 @@
 import {
   Avatar,
-  Button,
-  Drawer,
   DrawerBody,
   DrawerContent,
   DrawerFooter,
   DrawerHeader,
-  Input,
 } from '@heroui/react'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Pencil } from 'lucide-react'
@@ -14,6 +11,7 @@ import { useEffect, useRef, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import type { UpdateProfileFormData } from '@/lib/schemas/users'
 import type { ProfileDrawerProps } from '@/components/features/profile/drawer/profile-drawer/types'
+import { Button, Drawer, Input } from '@/components/shared/controls'
 import { updateProfileSchema } from '@/lib/schemas/users'
 import { useAvatarCrop, useUpdateProfile } from '@/hooks/profile'
 import { AvatarCropModal } from '@/components/ui/modal/avatar-crop-modal'
@@ -92,7 +90,6 @@ export function ProfileDrawer({
         isOpen={isOpen}
         onOpenChange={onOpenChange}
         placement="right"
-        backdrop="blur"
         size="md"
       >
         <DrawerContent>
@@ -163,9 +160,9 @@ export function ProfileDrawer({
                   />
                 </div>
 
-                <div className="mt-4 p-4 rounded-medium bg-warning-50 border border-warning-200">
+                <div className="mt-4 p-4 rounded-medium app-status-warning bg-[var(--app-warning-background)] text-[var(--app-warning-foreground)] border border-[var(--app-warning-border)]">
                   <div className="flex items-center gap-2 mb-2">
-                    <span className="text-warning font-semibold text-small uppercase tracking-wider">
+                    <span className="text-[var(--app-warning)] font-semibold text-small uppercase tracking-wider">
                       Security Zone
                     </span>
                   </div>
@@ -179,7 +176,7 @@ export function ProfileDrawer({
                     type="password"
                     classNames={{
                       inputWrapper:
-                        'bg-background border-warning-200 hover:border-warning-400 focus-within:border-warning-500',
+                        'bg-background border-[var(--app-warning-border)] hover:border-warning-400 focus-within:border-warning-500',
                       innerWrapper: 'bg-transparent',
                     }}
                     {...register('password')}

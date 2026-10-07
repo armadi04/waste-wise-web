@@ -1,5 +1,6 @@
-import { Chip, Spinner } from '@heroui/react'
+import { Spinner } from '@heroui/react'
 import { History } from 'lucide-react'
+import { Chip } from '@/components/shared/controls'
 import { ReleaseCard } from '@/components/features/changelog/components/release-card'
 import { PageHeader } from '@/components/layout/page-header'
 import { useChangelog } from '@/hooks/changelog'
@@ -21,7 +22,7 @@ export function ChangelogPage() {
         <div className="flex flex-wrap items-center gap-3 rounded-large border border-default-200 bg-content1 px-6 py-5">
           <div className="flex min-w-0 flex-1 flex-col gap-1">
             <p className="text-base font-semibold text-default-700">
-              What's new in Kupon Malam
+              What's new in Nestplate
             </p>
             <p className="max-w-2xl text-sm leading-relaxed text-default-500">
               Every update is recorded here — new features, fixes, and changes
@@ -41,7 +42,7 @@ export function ChangelogPage() {
           </div>
         ) : releases.length === 0 ? (
           <div className="flex flex-col items-center justify-center gap-3 rounded-large border border-dashed border-default-200 py-16 text-center">
-            <span className="flex size-12 items-center justify-center rounded-full bg-primary/10 text-primary">
+            <span className="flex size-12 items-center justify-center rounded-full bg-[var(--app-selected-background)] text-[var(--app-link)]">
               <History size={22} />
             </span>
             <p className="text-sm font-semibold text-default-700">

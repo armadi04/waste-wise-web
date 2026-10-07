@@ -1,6 +1,7 @@
-import { Button, Input, Spinner } from '@heroui/react'
+import { Spinner } from '@heroui/react'
 import { AlertTriangle, CheckCircle, Mail } from 'lucide-react'
 import { useState } from 'react'
+import { Button, Input } from '@/components/shared/controls'
 import { useResendVerification } from '@/hooks/auth'
 import { BackToLogin } from '@/components/features/auth/pages/verify-email/child/back-to-login'
 
@@ -12,12 +13,12 @@ export function ErrorState({ message }: { message: string }) {
     return (
       <div className="text-center space-y-4">
         <div className="flex justify-center">
-          <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center">
-            <CheckCircle className="w-8 h-8 text-primary" />
+          <div className="w-16 h-16 rounded-full bg-[var(--app-selected-background)] flex items-center justify-center">
+            <CheckCircle className="w-8 h-8 text-[var(--app-link)]" />
           </div>
         </div>
         <div className="space-y-2">
-          <h1 className="text-xl font-bold tracking-tight text-foreground">
+          <h1 className="text-xl font-semibold tracking-tight text-foreground">
             Email Sent
           </h1>
           <p className="text-sm text-default-500 leading-relaxed">
@@ -35,12 +36,12 @@ export function ErrorState({ message }: { message: string }) {
     <div className="space-y-5">
       <div className="text-center space-y-3">
         <div className="flex justify-center">
-          <div className="w-16 h-16 rounded-full bg-danger/10 flex items-center justify-center">
-            <AlertTriangle className="w-8 h-8 text-danger" />
+          <div className="w-16 h-16 rounded-full app-status-danger bg-[var(--app-danger-background)] text-[var(--app-danger-foreground)] flex items-center justify-center">
+            <AlertTriangle className="w-8 h-8 text-[var(--app-danger)]" />
           </div>
         </div>
         <div className="space-y-2">
-          <h1 className="text-xl font-bold tracking-tight text-foreground">
+          <h1 className="text-xl font-semibold tracking-tight text-foreground">
             Verification Failed
           </h1>
           <p className="text-sm text-default-500 leading-relaxed">
@@ -63,7 +64,7 @@ export function ErrorState({ message }: { message: string }) {
           classNames={{ inputWrapper: 'border-default-200' }}
         />
         {state === 'error' && (
-          <p className="text-xs text-danger">
+          <p className="text-xs text-[var(--app-danger)]">
             Failed to send. Please try again.
           </p>
         )}

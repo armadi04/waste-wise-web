@@ -1,4 +1,5 @@
-import { Select, SelectItem } from '@heroui/react'
+import { Select, SelectItem } from '@/components/shared/controls'
+
 import { DataTable } from '@/components/shared/datatable'
 import { PageHeader } from '@/components/layout/page-header'
 import { TableSkeleton } from '@/components/shared/datatable/skeletons'

@@ -2,11 +2,10 @@ import type { IncomingMessage, ServerResponse } from 'node:http';
 
 /**
  * Request log fields without secrets: no headers (cookies, Authorization), no
- * query string (`?token=`), and gift codes in paths replaced by a placeholder.
+ * query string (`?token=`).
  */
 export function redactRequestUrl(url: string | undefined): string {
-  const path = (url ?? '').split('?')[0];
-  return path.replace(/\/portal\/gifts\/[^/]+/, '/portal/gifts/:code');
+  return (url ?? '').split('?')[0];
 }
 
 export const requestLogSerializers = {
@@ -21,7 +20,7 @@ export const requestLogSerializers = {
 /**
  * Express `trust proxy` from TRUST_PROXY. Unset/"false" keeps the default (the
  * direct peer is the client). A hop count or an address/subnet list trusts only
- * those proxies' X-Forwarded-For, e.g. the portal BFF in front of the API.
+ * those proxies' X-Forwarded-For, e.g. Caddy in front of the API.
  */
 export function parseTrustProxy(
   value: string | undefined,

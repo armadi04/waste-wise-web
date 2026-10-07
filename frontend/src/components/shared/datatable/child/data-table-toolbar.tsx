@@ -1,14 +1,13 @@
+import { DropdownMenu, DropdownTrigger } from '@heroui/react'
+import { ChevronDown, FileOutput, Plus, Search, Trash2 } from 'lucide-react'
+import type { DataTableProps } from '@/components/shared/datatable/types'
+import type { useDataTableState } from '@/hooks/global/use-data-table-state'
 import {
   Button,
   Dropdown,
   DropdownItem,
-  DropdownMenu,
-  DropdownTrigger,
   Input,
-} from '@heroui/react'
-import { ChevronDown, FileOutput, Plus, Search, Trash2 } from 'lucide-react'
-import type { DataTableProps } from '@/components/shared/datatable/types'
-import type { useDataTableState } from '@/hooks/global/use-data-table-state'
+} from '@/components/shared/controls'
 
 type Props<T extends { id: string | number }> = Pick<
   ReturnType<typeof useDataTableState<T>>,
@@ -70,6 +69,7 @@ export function DataTableToolbar<T extends { id: string | number }>({
               box on a static table is misleading (finding #24). */}
         {onSearch && (
           <Input
+            aria-label={searchPlaceholder}
             placeholder={searchPlaceholder}
             size="sm"
             startContent={<Search size={16} className="text-default-400" />}

@@ -1,4 +1,4 @@
-import { Chip, Divider } from '@heroui/react'
+import { Divider } from '@heroui/react'
 import {
   AtSign,
   BadgeCheck,
@@ -9,6 +9,7 @@ import {
   User,
 } from 'lucide-react'
 import type { ProfileDetailsCardProps } from '@/components/features/profile/components/profile-details-card/types'
+import { Chip } from '@/components/shared/controls'
 
 import { DetailsSkeleton } from '@/components/features/profile/components/profile-details-card/child/details-skeleton'
 
@@ -69,8 +70,8 @@ export function ProfileDetailsCard({
           {/* Roles */}
           <div className="flex flex-col gap-3">
             <div className="flex items-center gap-2">
-              <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-large bg-primary/10">
-                <Shield size={16} className="text-primary" />
+              <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-large bg-[var(--app-selected-background)]">
+                <Shield size={16} className="text-[var(--app-link)]" />
               </div>
               <div>
                 <p className="text-sm font-semibold text-foreground">Roles</p>
@@ -99,7 +100,7 @@ export function ProfileDetailsCard({
                 })}
               </div>
             ) : (
-              <p className="pl-1 text-xs text-default-300 italic">
+              <p className="pl-1 text-xs text-default-500 italic">
                 No roles assigned
               </p>
             )}
@@ -110,8 +111,8 @@ export function ProfileDetailsCard({
           {/* Permissions */}
           <div className="flex flex-col gap-3">
             <div className="flex items-center gap-2">
-              <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-large bg-warning/10">
-                <KeyRound size={16} className="text-warning" />
+              <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-large app-status-warning bg-[var(--app-warning-background)] text-[var(--app-warning-foreground)]">
+                <KeyRound size={16} className="text-[var(--app-warning)]" />
               </div>
               <div>
                 <p className="text-sm font-semibold text-foreground">
@@ -137,7 +138,7 @@ export function ProfileDetailsCard({
                 ))}
               </div>
             ) : (
-              <p className="pl-1 text-xs text-default-300 italic">
+              <p className="pl-1 text-xs text-default-500 italic">
                 No direct permissions
               </p>
             )}

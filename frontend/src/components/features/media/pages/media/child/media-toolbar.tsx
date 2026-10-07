@@ -1,13 +1,5 @@
-import {
-  Button,
-  Dropdown,
-  DropdownItem,
-  DropdownMenu,
-  DropdownTrigger,
-  Input,
-  Tab,
-  Tabs,
-} from '@heroui/react'
+import { DropdownMenu, DropdownTrigger, Tab } from '@heroui/react'
+
 import {
   ArrowDownWideNarrow,
   ArrowUpDown,
@@ -23,6 +15,13 @@ import {
 } from 'lucide-react'
 import type { MediaSortKey } from '@/lib/schemas/media'
 import type { useMediaPageState } from '@/hooks/media/use-media-page-state'
+import {
+  Button,
+  Dropdown,
+  DropdownItem,
+  Input,
+  Tabs,
+} from '@/components/shared/controls'
 import { SORT_LABELS } from '@/components/features/media/pages/media/lib/media-page-helpers'
 import { MEDIA_SORT_KEYS } from '@/lib/schemas/media'
 

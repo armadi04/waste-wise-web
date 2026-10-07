@@ -1,5 +1,5 @@
-import { Button } from '@heroui/react'
 import { RadioTower } from 'lucide-react'
+import { Button } from '@/components/shared/controls'
 import {
   SettingRow,
   SettingsCard,

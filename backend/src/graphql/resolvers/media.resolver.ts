@@ -13,6 +13,7 @@ import { PermissionsGuard } from '@/auth/permissions.guard';
 import { Permissions } from '@/auth/permissions.decorator';
 import { MediaService } from '@/media/media.service';
 import { Media } from '@/media/entities/media.entity';
+import { MediaDeletionResultDto } from '@/media/dto/media-deletion.dto';
 import { GqlCurrentUser } from '../decorators/gql-current-user.decorator';
 import type { AuthenticatedUser } from '@/auth/interfaces/auth-request.interface';
 import type { PaginationInput } from '../generated/graphql';
@@ -82,15 +83,24 @@ export class MediaResolver {
     @GqlCurrentUser() user: AuthenticatedUser,
     @Args('id') id: number,
   ): Promise<boolean> {
-    const media = await this.mediaService.findOne(id);
+    await this.removeWithResult(user, id);
+    return true;
+  }
+
+  @Mutation('deleteMediaWithResult')
+  @Permissions('media.delete')
+  async removeWithResult(
+    @GqlCurrentUser() user: AuthenticatedUser,
+    @Args('id') id: number,
+  ): Promise<MediaDeletionResultDto> {
+    const media = await this.mediaService.findForDeletion(id);
     if (
       !this.canAccessAll(user, 'media.delete_all') &&
       media.userId !== user.userId
     ) {
       throw new ForbiddenException('You do not have access to this media.');
     }
-    await this.mediaService.remove(id);
-    return true;
+    return this.mediaService.deleteMedia(id);
   }
 
   @ResolveField('user')

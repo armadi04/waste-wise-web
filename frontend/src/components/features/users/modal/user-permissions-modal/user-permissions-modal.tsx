@@ -1,8 +1,4 @@
 import {
-  Button,
-  Checkbox,
-  Input,
-  Modal,
   ModalBody,
   ModalContent,
   ModalFooter,
@@ -12,6 +8,7 @@ import {
 import { Search } from 'lucide-react'
 import { useMemo } from 'react'
 import type { UserPermissionsModalProps } from '@/components/features/users/modal/user-permissions-modal/types'
+import { Button, Checkbox, Input, Modal } from '@/components/shared/controls'
 import { useUsersUiStore } from '@/lib/stores/users-ui.store'
 
 export function UserPermissionsModal({
@@ -61,7 +58,6 @@ export function UserPermissionsModal({
     <Modal
       isOpen={isOpen}
       onOpenChange={onOpenChange}
-      backdrop="blur"
       size="2xl"
       scrollBehavior="inside"
     >
@@ -73,6 +69,7 @@ export function UserPermissionsModal({
             </ModalHeader>
             <ModalBody>
               <Input
+                aria-label="Search permissions..."
                 placeholder="Search permissions..."
                 startContent={<Search size={16} className="text-default-400" />}
                 value={search}
@@ -105,13 +102,14 @@ export function UserPermissionsModal({
                         flex items-start gap-2 p-3 rounded-large border-2 cursor-pointer transition-colors
                         ${
                           selectedPermissions.has(permission.id)
-                            ? 'border-primary border-1 bg-primary-50'
+                            ? 'border-primary border-1 bg-[var(--app-selected-background)]'
                             : 'border-transparent bg-default-100 hover:bg-default-200'
                         }
                       `}
                       onClick={() => handleTogglePermission(permission.id)}
                     >
                       <Checkbox
+                        aria-label={permission.name}
                         isSelected={selectedPermissions.has(permission.id)}
                         onValueChange={() =>
                           handleTogglePermission(permission.id)

@@ -1,6 +1,7 @@
 // @vitest-environment jsdom
 import { cleanup, fireEvent, render, screen } from '@testing-library/react'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+import type * as HeroUI from '@heroui/react'
 import type { ReactNode } from 'react'
 import { LoginPage } from '@/components/features/auth/pages/login'
 
@@ -15,7 +16,8 @@ vi.mock('@tanstack/react-router', () => ({
   getRouteApi: () => ({ useSearch: () => ({}) }),
   Link: ({ children }: { children: ReactNode }) => <a>{children}</a>,
 }))
-vi.mock('@heroui/react', () => ({
+vi.mock('@heroui/react', async (importOriginal) => ({
+  ...(await importOriginal<typeof HeroUI>()),
   Input: ({ label }: { label: string }) => <input aria-label={label} />,
   Divider: () => <hr />,
   Button: ({

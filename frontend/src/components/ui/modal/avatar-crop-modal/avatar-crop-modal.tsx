@@ -1,6 +1,4 @@
 import {
-  Button,
-  Modal,
   ModalBody,
   ModalContent,
   ModalFooter,
@@ -10,6 +8,7 @@ import { Crop as CropIcon, ScanLine } from 'lucide-react'
 import { useEffect, useRef } from 'react'
 import ReactCrop from 'react-image-crop'
 import type { AvatarCropModalProps } from '@/components/ui/modal/avatar-crop-modal/types'
+import { Button, Modal } from '@/components/shared/controls'
 import 'react-image-crop/dist/ReactCrop.css'
 
 import { PREVIEW_SIZE } from '@/components/ui/modal/avatar-crop-modal/lib/avatar-crop-modal-helpers'
@@ -66,7 +65,6 @@ export function AvatarCropModal({
       }}
       size="lg"
       radius="lg"
-      backdrop="opaque"
       isDismissable={!isApplying}
       classNames={{
         backdrop: '!z-[150]',
@@ -78,8 +76,8 @@ export function AvatarCropModal({
     >
       <ModalContent>
         <ModalHeader className="flex gap-3 items-start">
-          <div className="flex items-center justify-center w-9 h-9 rounded-large bg-primary/10 shrink-0 mt-0.5">
-            <CropIcon size={18} className="text-primary" />
+          <div className="flex items-center justify-center w-9 h-9 rounded-large bg-[var(--app-selected-background)] shrink-0 mt-0.5">
+            <CropIcon size={18} className="text-[var(--app-link)]" />
           </div>
           <div className="flex flex-col gap-0.5">
             <span className="text-default-800 font-semibold">
@@ -127,7 +125,7 @@ export function AvatarCropModal({
               style={{ width: PREVIEW_SIZE, height: PREVIEW_SIZE }}
             />
             <div className="flex flex-col gap-0.5">
-              <span className="text-[10px] font-bold text-default-400 uppercase tracking-wider">
+              <span className="text-[10px] font-semibold text-default-400 uppercase tracking-wider">
                 Preview
               </span>
               <span className="text-sm text-default-600">
@@ -147,7 +145,7 @@ export function AvatarCropModal({
           <Button
             variant="flat"
             size="sm"
-            className="font-bold"
+            className="font-semibold"
             onPress={onClose}
             isDisabled={isApplying}
           >

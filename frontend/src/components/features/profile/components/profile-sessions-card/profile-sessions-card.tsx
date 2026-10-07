@@ -1,6 +1,7 @@
-import { Button, Chip, Skeleton } from '@heroui/react'
+import { Skeleton } from '@heroui/react'
 import { formatDistanceToNow } from 'date-fns'
 import { Monitor, Smartphone } from 'lucide-react'
+import { Button, Chip } from '@/components/shared/controls'
 import { describeUserAgent, isMobileUserAgent } from '@/lib/utils/user-agent'
 import { useMySessionsCard } from '@/hooks/sessions'
 
@@ -52,7 +53,7 @@ export function ProfileSessionsCard() {
           ))}
         </div>
       ) : sessions.length === 0 ? (
-        <p className="text-xs text-default-300 italic">No active sessions</p>
+        <p className="text-xs text-default-500 italic">No active sessions</p>
       ) : (
         <div className="flex flex-col divide-y divide-default-100">
           {sessions.map((session) => {
@@ -65,8 +66,8 @@ export function ProfileSessionsCard() {
                 key={session.id}
                 className="flex items-center gap-3 py-3 first:pt-0 last:pb-0"
               >
-                <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-medium bg-primary/10">
-                  <Icon size={16} className="text-primary" />
+                <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-medium bg-[var(--app-selected-background)]">
+                  <Icon size={16} className="text-[var(--app-link)]" />
                 </div>
 
                 <div className="min-w-0 flex-1">

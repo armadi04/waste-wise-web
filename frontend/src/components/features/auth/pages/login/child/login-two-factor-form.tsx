@@ -1,6 +1,6 @@
-import { Button, Input } from '@heroui/react'
 import { ShieldCheck } from 'lucide-react'
 import type { useLogin } from '@/hooks/auth'
+import { Button, Input } from '@/components/shared/controls'
 import { AuthPageShell } from '@/components/layout/auth-page-shell'
 
 type Props = Pick<
@@ -21,10 +21,10 @@ export function LoginTwoFactorForm({
   return (
     <AuthPageShell>
       <div className="space-y-3">
-        <span className="text-xs font-bold tracking-widest text-default-500 uppercase">
+        <span className="text-xs font-semibold tracking-widest text-default-500 uppercase">
           Two-factor authentication
         </span>
-        <h1 className="text-3xl font-bold tracking-tight text-foreground sm:text-4xl">
+        <h1 className="text-2xl font-semibold tracking-tight text-foreground sm:text-[28px]">
           Enter your code
         </h1>
         <p className="text-sm text-default-500">
@@ -57,8 +57,9 @@ export function LoginTwoFactorForm({
         />
 
         <Button
+          color="primary"
           type="submit"
-          className="h-12 w-full bg-primary font-medium text-primary-foreground hover:bg-primary-700 disabled:opacity-60"
+          className="h-12 w-full bg-primary font-medium text-primary-foreground hover:bg-primary-700 "
           isLoading={isLoading}
           isDisabled={isLoading || twoFactorCode.trim().length < 6}
           startContent={!isLoading && <ShieldCheck className="h-4 w-4" />}

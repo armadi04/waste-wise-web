@@ -1,7 +1,6 @@
 import type { TableSearch } from '@/lib/query/options'
 import type { CurrentUser } from '@/types/auth'
 import type { QueryClient } from '@tanstack/react-query'
-import { portalResourceConfig } from '@/components/features/portal/lib/config'
 import {
   auditLogsQueryOptions,
   changelogQueryOptions,
@@ -10,10 +9,6 @@ import {
   notificationsQueryOptions,
   oauthClientsQueryOptions,
   permissionsQueryOptions,
-  portalContentQueryOptions,
-  portalCustomerQueryOptions,
-  portalDashboardQueryOptions,
-  portalRecordsQueryOptions,
   profileQueryOptions,
   rolesQueryOptions,
   sessionQueryOptions,
@@ -28,7 +23,6 @@ export async function loadAdminRoute(
   context: LoaderContext,
   route: string,
   search: TableSearch = {},
-  resource?: string,
 ) {
   const session = context.session ?? (await requireAuth({ context })).session
   const queryClient = context.queryClient
@@ -79,28 +73,6 @@ export async function loadAdminRoute(
       )
     case '/changelog':
       return queryClient.ensureQueryData(changelogQueryOptions())
-    case '/portal':
-      if (allowed('portal.dashboard.read'))
-        return queryClient.ensureQueryData(portalDashboardQueryOptions())
-      return null
-    case '/portal/content':
-      if (allowed('portal.content.read'))
-        return queryClient.ensureQueryData(portalContentQueryOptions())
-      return null
-    case '/portal/customers/$customerId':
-      if (allowed('portal.customers.read'))
-        return queryClient.ensureQueryData(
-          portalCustomerQueryOptions(Number(resource)),
-        )
-      return null
-    case '/portal/$resource': {
-      const config = portalResourceConfig(resource ?? '')
-      if (config && allowed(config.permission + '.read'))
-        return queryClient.ensureQueryData(
-          portalRecordsQueryOptions(config.resource, search),
-        )
-      return null
-    }
     default:
       return queryClient.ensureQueryData(sessionQueryOptions())
   }

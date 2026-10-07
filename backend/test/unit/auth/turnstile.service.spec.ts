@@ -1,12 +1,4 @@
-import {
-  afterAll,
-  afterEach,
-  describe,
-  expect,
-  it,
-  jest,
-  spyOn,
-} from 'bun:test';
+import { afterAll, afterEach, describe, expect, it, spyOn } from 'bun:test';
 import {
   BadRequestException,
   Logger,
@@ -19,8 +11,6 @@ import {
   TURNSTILE_TEST_SECRETS,
   type TurnstileEnvironment,
 } from '@/auth/turnstile-config';
-import { PortalAuthController } from '@/portal/auth/portal-auth.controller';
-import { PortalAuthService } from '@/portal/auth/portal-auth.service';
 
 const fetchSpy = spyOn(globalThis, 'fetch');
 const warnSpy = spyOn(Logger.prototype, 'warn').mockImplementation(() => {});
@@ -33,13 +23,13 @@ const success = (overrides = {}) =>
   new Response(
     JSON.stringify({
       success: true,
-      action: 'portal-email-otp',
-      hostname: 'portal.example.test',
+      action: 'admin-login',
+      hostname: 'app.example.test',
       ...overrides,
     }),
   );
 const verify = (service: TurnstileService, token = 'test-token') =>
-  service.verify(token, '1.2.3.4', 'portal-email-otp');
+  service.verify(token, '1.2.3.4', 'admin-login');
 
 afterEach(() => {
   fetchSpy.mockReset();
@@ -66,10 +56,9 @@ describe('Turnstile configuration policy', () => {
         resolveTurnstileConfig({
           NODE_ENV,
           TURNSTILE_SECRET: 'real-secret',
-          TURNSTILE_ALLOWED_HOSTNAMES:
-            'portal.example.test, ADMIN.example.test',
+          TURNSTILE_ALLOWED_HOSTNAMES: 'app.example.test, ADMIN.example.test',
         }).hostnames,
-      ).toEqual(['portal.example.test', 'admin.example.test']);
+      ).toEqual(['app.example.test', 'admin.example.test']);
       expect(
         resolveTurnstileConfig({ NODE_ENV, TURNSTILE_ENABLED: 'false' })
           .enabled,
@@ -100,8 +89,8 @@ describe('Turnstile configuration policy', () => {
       'TURNSTILE_SECRET',
     );
     for (const host of [
-      'https://portal.example.test',
-      'localhost:3002',
+      'https://app.example.test',
+      'localhost:3001',
       '*.example.test',
       'example.test/path',
     ])
@@ -152,13 +141,13 @@ describe('Turnstile provider validation', () => {
       expect(logSpy).toHaveBeenCalledWith(
         expect.objectContaining({
           outcome: 'verified',
-          action: 'portal-email-otp',
+          action: 'admin-login',
         }),
       );
     },
   );
   it.each([
-    { action: 'admin-login' },
+    { action: 'other-action' },
     { action: undefined },
     { hostname: 'attacker.example.test' },
     { hostname: undefined },
@@ -168,13 +157,13 @@ describe('Turnstile provider validation', () => {
       verify(
         build({
           TURNSTILE_SECRET: 'real-secret',
-          TURNSTILE_ALLOWED_HOSTNAMES: 'portal.example.test,admin.example.test',
+          TURNSTILE_ALLOWED_HOSTNAMES: 'app.example.test,admin.example.test',
         }),
       ),
     ).rejects.toBeInstanceOf(BadRequestException);
   });
-  it('isolates admin actions from portal actions even with a shared secret', async () => {
-    fetchSpy.mockResolvedValue(success());
+  it('rejects unrelated actions even with a shared secret', async () => {
+    fetchSpy.mockResolvedValue(success({ action: 'other-action' }));
     await expect(
       build({ TURNSTILE_SECRET: 'real-secret' }).verify(
         'token',
@@ -238,54 +227,4 @@ describe('Turnstile provider validation', () => {
       verify(build({ TURNSTILE_SECRET: 'real-secret' })),
     ).rejects.toBeInstanceOf(ServiceUnavailableException);
   });
-});
-
-describe('portal OTP boundary', () => {
-  it('sends OTP only once when a used token is rejected by Siteverify', async () => {
-    fetchSpy.mockResolvedValueOnce(success()).mockResolvedValueOnce(
-      new Response(
-        JSON.stringify({
-          success: false,
-          'error-codes': ['timeout-or-duplicate'],
-        }),
-      ),
-    );
-    const requestEmailOtp = jest.fn().mockResolvedValue({ message: 'sent' });
-    const controller = new PortalAuthController(
-      { requestEmailOtp } as unknown as PortalAuthService,
-      build({ TURNSTILE_SECRET: 'real-secret' }),
-    );
-    const dto = { email: 'user@example.test', turnstileToken: 'test-token' };
-    await controller.requestEmailOtp(dto, '1.2.3.4');
-    await expect(
-      controller.requestEmailOtp(dto, '1.2.3.4'),
-    ).rejects.toBeInstanceOf(BadRequestException);
-    expect(requestEmailOtp).toHaveBeenCalledTimes(1);
-  });
-  it.each(['missing', 'invalid', 'unavailable'])(
-    'does not send email for %s verification',
-    async (scenario) => {
-      if (scenario === 'unavailable')
-        fetchSpy.mockRejectedValue(new Error('network'));
-      else
-        fetchSpy.mockResolvedValue(
-          new Response(JSON.stringify({ success: false })),
-        );
-      const requestEmailOtp = jest.fn();
-      const controller = new PortalAuthController(
-        { requestEmailOtp } as unknown as PortalAuthService,
-        build({ TURNSTILE_SECRET: 'real-secret' }),
-      );
-      await expect(
-        controller.requestEmailOtp(
-          {
-            email: 'user@example.test',
-            turnstileToken: scenario === 'missing' ? undefined : 'token',
-          },
-          '1.2.3.4',
-        ),
-      ).rejects.toThrow();
-      expect(requestEmailOtp).not.toHaveBeenCalled();
-    },
-  );
 });

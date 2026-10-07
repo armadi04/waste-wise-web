@@ -61,8 +61,8 @@ export class UserSession {
   @Column({ name: 'isSso', default: false })
   isSso: boolean;
 
-  /** Which policy governs this session: staff dashboard or customer portal. */
-  @ApiProperty({ enum: ['admin', 'portal'] })
+  /** Starter dashboard session policy. */
+  @ApiProperty({ enum: ['admin'] })
   @Column({ name: 'audience', type: 'varchar', length: 16, default: 'admin' })
   audience: SessionAudience;
 

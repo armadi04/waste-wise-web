@@ -1,5 +1,5 @@
-import { Pagination } from '@heroui/react'
 import { UploadCloud } from 'lucide-react'
+import { Pagination } from '@/components/shared/controls'
 import { DropOverlay } from '@/components/features/media/components/drop-overlay'
 import { MediaCard } from '@/components/features/media/components/media-item'
 import { MediaRow } from '@/components/features/media/components/media-item/child'
@@ -10,7 +10,7 @@ import {
   MediaListSkeleton,
 } from '@/components/features/media/skeletons'
 import { PageHeader } from '@/components/layout/page-header'
-import { filesFromList, useMediaPageState  } from '@/hooks/media'
+import { filesFromList, useMediaPageState } from '@/hooks/media'
 
 export function MediaPage() {
   const {
@@ -107,7 +107,7 @@ export function MediaPage() {
         )
       ) : items.length === 0 ? (
         <div className="flex flex-col items-center justify-center gap-3 rounded-large border border-dashed border-default-200 py-16 text-center">
-          <span className="flex size-12 items-center justify-center rounded-full bg-primary/10 text-primary">
+          <span className="flex size-12 items-center justify-center rounded-full bg-[var(--app-selected-background)] text-[var(--app-link)]">
             <UploadCloud size={22} />
           </span>
           <p className="text-sm font-semibold text-default-700">
@@ -166,7 +166,7 @@ export function MediaPage() {
           {marquee.rect && (
             <div
               aria-hidden
-              className="pointer-events-none absolute z-20 rounded-medium border border-primary bg-primary/10"
+              className="pointer-events-none absolute z-20 rounded-medium border border-primary bg-[var(--app-selected-background)]"
               style={{
                 left: marquee.rect.left,
                 top: marquee.rect.top,

@@ -1,13 +1,13 @@
 name: Release
 
-# Automated SemVer releases via semantic-release. On every push/merge to `main`,
+# Automated SemVer releases via semantic-release. On every push/merge to `master`,
 # semantic-release reads the Conventional Commit messages since the last release
 # and:
 #   - decides the next version (fix→patch, feat→minor, BREAKING CHANGE→major)
 #   - creates the `v<version>` git tag + a GitHub Release with generated notes
 #
-# It does NOT commit anything back to `main`. The release notes live on the
-# GitHub Release, so `main` stays free of `chore(release)` bot commits. The
+# It does NOT commit anything back to `master`. The release notes live on the
+# GitHub Release, so `master` stays free of `chore(release)` bot commits. The
 # in-app Changelog page reads those notes at runtime through
 # `GET /api/changelog`, which proxies the GitHub Releases API — see RELEASING.md.
 #

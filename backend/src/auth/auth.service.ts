@@ -24,11 +24,7 @@ import { OAuth2Client } from 'google-auth-library';
 import { MailService } from '../mail/mail.service';
 
 import { User } from '../users/entities/user.entity';
-import {
-  audienceForRoles,
-  sessionPolicy,
-  type SessionAudience,
-} from '@/sessions/session-policy';
+import { sessionPolicy, type SessionAudience } from '@/sessions/session-policy';
 import { JwtPayload } from './interfaces/jwt-payload.interface';
 
 /** Tokens for one device session plus its absolute deadline (cookie lifetime). */
@@ -334,7 +330,7 @@ export class AuthService {
       sid?: string;
       context?: SessionContext;
       impersonatorId?: number;
-      /** `portal` for customer logins; everything else is a staff session. */
+      /** Session lifetime policy. */
       audience?: SessionAudience;
     } = {},
   ) {
@@ -604,7 +600,7 @@ export class AuthService {
       if (!session) throw new UnauthorizedException('Session has been revoked');
     } else {
       session = await this.sessionsService.start(user.id, context, {
-        audience: audienceForRoles(user.roles?.map((r) => r.name) ?? []),
+        audience: 'admin',
         isSso: !!payload.sid,
       });
     }

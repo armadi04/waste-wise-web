@@ -26,7 +26,7 @@ describe('AppController', () => {
   describe('root', () => {
     it('should return API metadata with ok status', () => {
       const info = appController.getApiInfo();
-      expect(info.name).toBe('Kupon Malam API');
+      expect(info.name).toBe('Nestplate API');
       expect(info.status).toBe('ok');
       expect(info.docs).toBe('/api/docs');
       expect(typeof info.version).toBe('string');

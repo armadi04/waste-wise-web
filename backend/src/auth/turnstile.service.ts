@@ -7,7 +7,7 @@ import {
 import { ConfigService } from '@nestjs/config';
 import { resolveTurnstileConfig } from '@/auth/turnstile-config';
 
-export type TurnstileAction = 'admin-login' | 'portal-email-otp';
+export type TurnstileAction = 'admin-login';
 
 @Injectable()
 export class TurnstileService {

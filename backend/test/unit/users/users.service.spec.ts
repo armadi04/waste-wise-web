@@ -140,7 +140,10 @@ describe('UsersService', () => {
       (permissionsRepository.findBy as jest.Mock).mockResolvedValue([
         { id: 2 },
       ]);
-      (mediaRepository.findOneBy as jest.Mock).mockResolvedValue({ id: 3 });
+      (mediaRepository.findOneBy as jest.Mock).mockResolvedValue({
+        id: 3,
+        state: 'ready',
+      });
 
       await service.create({
         email: 'x@b.com',

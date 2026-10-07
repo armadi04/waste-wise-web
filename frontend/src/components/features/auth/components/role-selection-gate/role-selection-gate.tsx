@@ -1,5 +1,6 @@
-import { Button, Spinner } from '@heroui/react'
+import { Spinner } from '@heroui/react'
 import { useEffect, useRef, useState } from 'react'
+import { Button } from '@/components/shared/controls'
 import { AuthPageShell } from '@/components/layout/auth-page-shell'
 import { useAuth, useProfile } from '@/hooks/auth'
 import { getRememberedActiveRole } from '@/lib/utils/active-role'
@@ -73,7 +74,7 @@ export function RoleSelectionGate({ children }: { children: React.ReactNode }) {
     <AuthPageShell morph={false}>
       <div className="flex flex-col gap-6">
         <div className="space-y-1.5">
-          <h1 className="text-2xl font-bold tracking-tight text-default-900">
+          <h1 className="text-2xl font-semibold tracking-tight text-default-900">
             Choose a role
           </h1>
           <p className="text-sm leading-relaxed text-default-500">

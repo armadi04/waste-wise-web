@@ -10,7 +10,7 @@ Browser sessions use HttpOnly `accessToken` and `refreshToken` cookies. The read
 `authenticated` flag is a UI hint, never proof of authorization. The readable `csrfToken`
 is echoed as `X-CSRF-Token` on protected mutations. Cookies are Secure in production;
 access/refresh/flag use SameSite strict and CSRF uses lax. Existing login responses may
-include accessToken for non-browser clients; the portal/admin browser applications do not
+include accessToken for non-browser clients; the browser application does not
 store or decode that token.
 
 Session lifetimes follow OWASP idle + absolute timeouts, per session `audience`
@@ -19,16 +19,13 @@ Session lifetimes follow OWASP idle + absolute timeouts, per session `audience`
 | Audience | Opened by | Access JWT | Idle (max gap between refreshes) | Absolute (since login) |
 |---|---|---|---|---|
 | `admin` | dashboard password/Google/2FA, SSO, impersonation | 15 min | 2 h (`SESSION_ADMIN_IDLE_MINUTES`) | 8 h (`SESSION_ADMIN_ABSOLUTE_HOURS`) |
-| `portal` | customer email OTP / Google | 15 min | 14 d (`SESSION_PORTAL_IDLE_DAYS`) | 30 d (`SESSION_PORTAL_ABSOLUTE_DAYS`) |
 
 The `user_sessions` row is authoritative: `expiresAt` is the idle deadline, slid by each
 refresh but never past `absoluteExpiresAt`; refresh and every request are refused once either
 passes. Refresh JWTs expire after the idle window and session cookies after the absolute
 deadline. Clients refresh on 401, so the short access TTL is transparent; after the absolute
-limit staff sign in again (silent SSO may re-authenticate through the IdP). Migration
-`1791210000000-AddSessionAudienceAndAbsoluteExpiry` classifies existing sessions
-(customer-only accounts → `portal`) and applies the deadlines from login time, so staff
-sessions older than 8 h end at deploy.
+limit users sign in again (silent SSO may re-authenticate through the IdP). The starter
+baseline includes session deadlines; no legacy audience backfill is needed.
 
 Access tokens carry `tokenType: 'user'` and refresh tokens `tokenType: 'refresh'`. The JWT
 strategy and the notification socket reject refresh and two-factor challenge tokens;
@@ -41,34 +38,23 @@ JWT strategy reloads permissions from the database on every request. Keep claims
 browsers silently drop cookies over ~4 KB, and a superadmin token that listed every permission
 did exactly that, bouncing every login back to the sign-in page.
 
-Login/Google/OTP/SSO issue backend cookies after their provider/credential checks. Refresh
+Login/Google/2FA/SSO issue backend cookies after their provider/credential checks. Refresh
 rotates tokens/cookies: the used refresh token is blacklisted with reason `rotated`. It stays
 spendable for 30 seconds (`REFRESH_REUSE_GRACE_MS`) so tabs refreshing together don't sign
 each other out; a rotated token presented after that window is treated as stolen — its device
 session is revoked and `auth.refresh_reuse` is audited. Tokens revoked at logout carry reason
-`logout` (migration `1791191000000-AddBlacklistReason`). Logout revokes the device session, blacklists the token and clears
+`logout`. Logout revokes the device session, blacklists the token and clears
 session cookies.
 
-The portal (`/portal/auth/email/*`, `/portal/auth/google`) signs in customers only: an
-account with any non-customer role or with two-factor enabled gets 403 and must use the
-dashboard login, which enforces 2FA and lockout. Portal logins check the lockout and write
-`auth.login` / `auth.login_failed` audit records. Email OTP keeps 5 guesses per code, reserved
-atomically before comparison, plus a rolling hour budget per email of 5 codes sent and 10
-guesses across codes; a correct code is consumed atomically. Portal Google login fails closed
-(503) without `GOOGLE_CLIENT_ID` and answers 401 for invalid ID tokens. Portal logout needs no
-valid access token: it identifies the session from the signed access or refresh cookie
-(expiry ignored), revokes it, blacklists only signed tokens and always clears cookies; the
-cookie CSRF guard applies.
-
-Login code emails are queued with `redactAfterSend` and a 10-minute `expiresAt`: the outbox
+The reusable login-code mail helper queues messages with `redactAfterSend` and a 10-minute `expiresAt`: the outbox
 clears their body once delivery succeeds or gives up, drops a code that expired while queued,
-and logs row ids instead of recipient addresses (migration
-`1791190000000-AddOutboundEmailRedaction` also clears codes already stored).
+and logs row ids instead of recipient addresses. Starter login uses passwords/Google,
+TOTP and optional SSO; the helper is not a public email-OTP login endpoint.
 
-Request logs carry method, path (no query string, gift codes masked) and status — never
+Request logs carry method, path (no query string) and status — never
 headers or cookies. Set `TRUST_PROXY` (hop count or proxy addresses/subnets) when the API sits
-behind the portal BFF or another proxy so throttling and sessions see client IPs. Browser identity is read through `/api/auth/me` (admin) or
-`/api/portal/auth/me` (portal). Mobile/machine clients may use explicit Bearer authorization.
+behind Caddy or another proxy so throttling and sessions see client IPs. Browser identity
+is read through `/api/auth/me`. Mobile/machine clients may use explicit Bearer authorization.
 
 ## Endpoints
 
@@ -121,14 +107,14 @@ All under `/api/auth`. Tighter throttles protect the credential routes.
   Required by default in staging/production; local development activates when a secret is set.
   `TURNSTILE_ENABLED=false` is an explicit opt-out. Startup rejects deployed test secrets and
   requires `TURNSTILE_ALLOWED_HOSTNAMES` when enabled in staging/production.
-  Password login requires action `admin-login`; portal OTP requests require `portal-email-otp`.
+   Password login requires action `admin-login`.
   Real tokens must match the expected action and configured hostname allowlist. Official dummy
   secrets are allowed locally and skip dummy origin/action metadata checks only.
   Invalid/expired/replayed challenges answer 400; provider/network/secret errors answer 503.
   Structured `turnstile.verification` logs include outcome, action and safe failure category,
   never tokens, secret keys or raw provider responses. Group these events for verified/rejected/
   unavailable counts; alert on unavailable spikes and track `expired-or-duplicate` failures.
-  Google login and OTP code verification do not require Turnstile. Deploy both updated frontend
+   Google login and TOTP code verification do not require Turnstile. Deploy the updated frontend
   builds with the backend: earlier widgets do not send the required action.
 - **JWT config** — `AuthModule` registers `JwtModule` with `JWT_SECRET` and
   `signOptions: { expiresIn: '60m' }`.
@@ -187,7 +173,7 @@ same rules (`GrantPolicyService`, `src/roles/grant-policy.service.ts`):
 > Every permission string is a member of the `PermissionType` union in
 > `src/auth/permissions.type.ts`. **Add the string there first** — `@Permissions(...)` is
 > typed against it, so an unknown key won't compile. Then add it to the seeder's
-> `permissionsData` so it exists in the DB.
+> `SEEDED_PERMISSIONS` so it exists in the DB.
 
 Seeded catalogue (see `src/database/seeder/seeder.service.ts`): menu visibility
 (`menu.dashboard`, `menu.users`, …), `users.*` (`invite/read/update/delete/manage_roles/manage_permissions`),
@@ -273,7 +259,7 @@ behind a bot-protection proxy (Cloudflare), add a WAF skip for its `/oidc/*` mac
 | `PasswordResetToken` | `password_reset_tokens` | ~30 min | One-time password reset |
 | `EmailVerificationToken` | `email_verification_tokens` | 24 h | Email verification |
 | `RevokedSsoSession` | `revoked_sso_sessions` | permanent | SSO `sid`s revoked via back-channel logout |
-| `UserSession` | `user_sessions` | 7 days, sliding | Device sessions — see below |
+| `UserSession` | `user_sessions` | 2 h idle / 8 h absolute by default | Device sessions — see below |
 | `TwoFactorRecoveryCode` | `two_factor_recovery_codes` | until used | Single-use 2FA backup codes |
 
 ## Audit trail
@@ -399,8 +385,9 @@ check does not override backend guards, ownership or active-role scoping.
 ## Account registration method
 
 Users record their original creation method as `registerMethod`: `EMAIL_OTP`, `GOOGLE`,
-`INVITATION`, `SSO`, `SEEDER`, or `UNKNOWN`. Portal OTP and Google provisioning, invitation
-acceptance, SSO provisioning, and new seeded identities supply this value internally.
+`INVITATION`, `SSO`, `SEEDER`, or `UNKNOWN`. Google provisioning, invitation acceptance,
+SSO provisioning, and new seeded identities supply this value internally. `EMAIL_OTP` remains
+an enum value for extensions; starter has no email-OTP login route.
 Later login, verification, or profile/password changes do not overwrite it.
 
 `GET /api/users` accepts `createdIn=today|7d|1m|3m` and `registerMethod` for both paginated
@@ -408,17 +395,14 @@ and unpaginated lists, combined with email/name search. Invalid values return 40
 Creation windows use server time and WIB (Asia/Jakarta): today begins at midnight;
 7d begins six days ago; 1m/3m begin 30/90 days ago, ending at now.
 
-The registration-method migration backfills only the configured superadmin seeder identity
-and accepted invitations with the same email within 60 seconds after user creation.
-Other historic accounts remain UNKNOWN; login history is not registration evidence.
-Apply the migration before deploying the updated admin.
+The starter baseline includes the registration-method column. Login history is not
+registration evidence; set the value only at account creation.
 
 
 ## Email identity and concurrent revocation
 
 Live account email lookup is case-insensitive and newly saved email addresses are trimmed and
-lowercase. Migration `1791220000000-PartialUniqueIndexesForSoftDelete` enforces live uniqueness
-on `LOWER(email)` and refuses existing case-only duplicates rather than choosing an account.
+lowercase. The starter baseline enforces live uniqueness on `LOWER(email)` for active rows.
 
 Refresh updates only activity and idle expiry with a `revokedAt IS NULL` condition. If a revoke
 wins between the read and update, refresh returns no session and cannot revive it. Sign out
