@@ -1,5 +1,6 @@
-import { Button, Pagination, Spinner } from '@heroui/react'
+import { Spinner } from '@heroui/react'
 import { Check, CheckCircle2, ExternalLink, Info, MailOpen } from 'lucide-react'
+import { Button, Pagination } from '@/components/shared/controls'
 import { LottieAnimation } from '@/components/atoms/lottie-animation'
 import { PageHeader } from '@/components/layout/page-header'
 import { useNotificationPage } from '@/hooks/notifications'
@@ -63,14 +64,24 @@ export function NotificationsPage() {
             </p>
           </div>
         ) : (
-          <div className="bg-content1/60 backdrop-blur-xl rounded-large overflow-hidden flex flex-col divide-y divide-default-100 border border-default-200">
+          <div className="bg-content1 rounded-large overflow-hidden flex flex-col divide-y divide-default-100 border border-default-200">
             {data.data.map((notification) => (
               <div
                 key={notification.id}
+                role="button"
+                tabIndex={0}
+                aria-label={notification.title}
+                onKeyDown={(event) => {
+                  if (event.target !== event.currentTarget) return
+                  if (event.key === 'Enter' || event.key === ' ') {
+                    event.preventDefault()
+                    handleNotificationClick(notification)
+                  }
+                }}
                 onClick={() => handleNotificationClick(notification)}
-                className={`group relative flex items-start gap-6 p-7 cursor-pointer transition-all hover:bg-default-100/40 ${
+                className={`group relative flex items-start gap-6 p-7 cursor-pointer transition-all hover:bg-[var(--app-surface-hover)] ${
                   !notification.isRead
-                    ? 'bg-primary-50/60 dark:bg-primary-900/30'
+                    ? 'bg-[var(--app-selected-background)] '
                     : ''
                 }`}
               >
@@ -78,12 +89,12 @@ export function NotificationsPage() {
                   <div
                     className={`p-3 rounded-large ${
                       notification.type === 'success'
-                        ? 'bg-success-50 text-success-600 dark:bg-success-900/20'
+                        ? 'app-status-success bg-[var(--app-success-background)] text-[var(--app-success-foreground)] '
                         : notification.type === 'error'
-                          ? 'bg-danger-50 text-danger-600 dark:bg-danger-900/20'
+                          ? 'app-status-danger bg-[var(--app-danger-background)] text-[var(--app-danger-foreground)] '
                           : notification.type === 'warning'
-                            ? 'bg-warning-50 text-warning-600 dark:bg-warning-900/20'
-                            : 'bg-primary-50 text-primary-600 dark:bg-primary-900/20'
+                            ? 'app-status-warning bg-[var(--app-warning-background)] text-[var(--app-warning-foreground)] '
+                            : 'bg-[var(--app-selected-background)] text-[var(--app-selected-foreground)] '
                     }`}
                   >
                     {notification.type === 'success' ? (
@@ -98,7 +109,7 @@ export function NotificationsPage() {
                   <div className="flex items-start justify-between gap-4">
                     <div className="flex items-center gap-2 min-w-0">
                       <h3
-                        className={`text-base font-bold truncate ${
+                        className={`text-base font-semibold truncate ${
                           !notification.isRead
                             ? 'text-foreground'
                             : 'text-default-600 font-semibold'
@@ -110,7 +121,7 @@ export function NotificationsPage() {
                         <div className="h-3 w-3 rounded-full bg-primary shrink-0" />
                       )}
                     </div>
-                    <span className="text-xs text-default-400 whitespace-nowrap font-bold uppercase tracking-wider">
+                    <span className="text-xs text-default-400 whitespace-nowrap font-semibold uppercase tracking-wider">
                       {format(new Date(notification.createdAt), 'MMM d, HH:mm')}
                     </span>
                   </div>
@@ -123,7 +134,7 @@ export function NotificationsPage() {
                         size="sm"
                         variant="flat"
                         color="primary"
-                        className="font-bold px-6"
+                        className="font-semibold px-6"
                         endContent={<ExternalLink size={14} />}
                       >
                         View Details
@@ -132,7 +143,7 @@ export function NotificationsPage() {
                   )}
                 </div>
 
-                <div className="shrink-0 flex items-center h-full opacity-0 group-hover:opacity-100 transition-opacity">
+                <div className="shrink-0 flex items-center h-full opacity-0 group-hover:opacity-100 group-focus-within:opacity-100 transition-opacity">
                   {!notification.isRead ? (
                     <Button
                       isIconOnly
@@ -143,7 +154,7 @@ export function NotificationsPage() {
                     >
                       <MailOpen
                         size={15}
-                        className="text-default-400 hover:text-primary transition-colors"
+                        className="text-default-400 hover:text-[var(--app-link)] transition-colors"
                       />
                     </Button>
                   ) : (
