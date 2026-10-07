@@ -1,6 +1,7 @@
 import { HeroUIProvider } from '@heroui/react'
 import { GoogleOAuthProvider } from '@react-oauth/google'
 import { RouterProvider, createRouter } from '@tanstack/react-router'
+import { MotionConfig } from 'framer-motion'
 import { StrictMode } from 'react'
 import ReactDOM from 'react-dom/client'
 
@@ -52,10 +53,12 @@ if (rootElement && !rootElement.innerHTML) {
   const root = ReactDOM.createRoot(rootElement)
   const app = (
     <TanStackQueryProvider.Provider {...TanStackQueryProviderContext}>
-      <HeroUIProvider>
-        <ConfirmationRoot />
-        <RouterProvider router={router} />
-      </HeroUIProvider>
+      <MotionConfig reducedMotion="user">
+        <HeroUIProvider>
+          <ConfirmationRoot />
+          <RouterProvider router={router} />
+        </HeroUIProvider>
+      </MotionConfig>
     </TanStackQueryProvider.Provider>
   )
   root.render(

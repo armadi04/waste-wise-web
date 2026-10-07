@@ -18,7 +18,10 @@ export const useTheme = (duration = 400) => {
   const toggleTheme = useCallback(
     async (anchor?: Element | null) => {
       // Browsers without view transitions still need the theme to flip.
-      if (!('startViewTransition' in document)) {
+      if (
+        window.matchMedia('(prefers-reduced-motion: reduce)').matches ||
+        !('startViewTransition' in document)
+      ) {
         useThemeStore.getState().toggle()
         return
       }

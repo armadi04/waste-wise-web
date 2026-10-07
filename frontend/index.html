@@ -6,19 +6,45 @@
 
     <!-- Primary -->
     <title>Nestplate Starter</title>
-    <meta
-      name="description"
-      content="Nestplate Starter dashboard"
-    />
-    <meta name="theme-color" content="#FFFFFF" />
+    <meta name="description" content="Nestplate Starter dashboard" />
+    <meta name="theme-color" content="#F8FAFC" />
     <meta name="color-scheme" content="light dark" />
     <meta name="referrer" content="strict-origin-when-cross-origin" />
 
-    <!-- Fonts: DM Sans (design system typeface) -->
+    <script>
+      ;(() => {
+        let preference
+        try {
+          const saved = JSON.parse(
+            localStorage.getItem('theme-store') || 'null',
+          )
+          if (typeof saved?.state?.isDark === 'boolean')
+            preference = saved.state.isDark
+          else {
+            const legacy = localStorage.getItem('theme')
+            if (legacy === 'dark' || legacy === 'light')
+              preference = legacy === 'dark'
+          }
+        } catch {
+          /* Unavailable or malformed storage: use the system preference. */
+        }
+        const dark =
+          preference ??
+          window.matchMedia('(prefers-color-scheme: dark)').matches
+        document.documentElement.classList.remove('light', 'dark')
+        document.documentElement.classList.add(dark ? 'dark' : 'light')
+        document.documentElement.style.colorScheme = dark ? 'dark' : 'light'
+        document.querySelector('meta[name="theme-color"]').content = dark
+          ? '#0F172A'
+          : '#F8FAFC'
+      })()
+    </script>
+
+    <!-- Fonts: Plus Jakarta Sans (design system typeface) -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
-      href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600;9..40,700;9..40,800;9..40,900&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600&display=swap"
       rel="stylesheet"
     />
 
@@ -36,10 +62,7 @@
     <!-- Open Graph -->
     <meta property="og:type" content="website" />
     <meta property="og:title" content="Nestplate Starter" />
-    <meta
-      property="og:description"
-      content="Nestplate Starter dashboard"
-    />
+    <meta property="og:description" content="Nestplate Starter dashboard" />
     <meta property="og:site_name" content="Nestplate" />
   </head>
   <body>
