@@ -269,3 +269,97 @@ JSON/YAML URLs. No documentation aliases or version 2 document are provided. The
 Swagger Bearer authentication remains configured; operation paths contain the
 complete `/api/v1` prefix and `servers` contains no extra prefix. Thus Swagger
 "Try it out" executes versioned operations at the origin serving the docs.
+
+
+## Fastify migration validation and rollback
+
+Nest common/core/testing and the Socket.IO platform packages are pinned to 12.1.2;
+Fastify is pinned to 5.12.5. Further Nest minor upgrades require compatibility analysis.
+REST/OpenAPI, cookie/SSO routes, optional `/graphql` and `/socket.io` paths are unchanged.
+The frontend and database schema need no changes.
+
+### Compatibility audit
+
+| Surface | Migration and evidence |
+|---|---|
+| Cookies / Passport / SSO | Fastify request/reply, cookie hook, seconds conversion at the serialization boundary; isolated HTTP tests cover legacy unsigned cookies, JWT signatures, cookie flags/lifetimes, PKCE, redirects and logout. No signed-cookie secret existed; none is introduced. |
+| CSRF | Global SessionCsrfGuard runs before throttling and Passport on refresh/logout/switch-role, including Bearer requests. Conditional CookieCsrfGuard semantics remain unchanged. |
+| Multipart | Native Nest Fastify interceptors; media/avatar memory storage explicitly retains fileSize from MEDIA_MAX_FILE_SIZE, files=1, fields=20, parts=21. Form-only routes retain their previous module/default limits. Admission precedes buffering. HTTP tests check exact limit boundaries, statuses and error payloads; unexpected-field wording is normalized to the previous Multer wording. |
+| Parsers / errors | 100 KiB JSON/urlencoded limit, empty JSON bodies and indexed form arrays are preserved. Known HTTP status/error codes and masking of unknown errors remain. |
+| GraphQL | Apollo Fastify integration receives request/reply separately; req/res context and fresh DataLoaders remain. Tests boot the actual GraphQL module/schema with feature modules mocked and exercise JWT, ownership and rate-limit headers. |
+| Socket.IO | Gateway remains on the same underlying HTTP server. Loopback HTTP polling tests exercise the namespace, cookie/auth-token/Bearer handshake, refresh replay and rejection of invalid/refresh/2FA JWTs. |
+| Logging / middleware | No application Express middleware remains. nestjs-pino still uses supported Nest middleware over raw Node request/response through Fastify middie; request URL/header redaction is retained; injected and loopback HTTP tests verify correlation and credential redaction. |
+| Dependencies | Direct platform-express, Apollo Express integration, Multer, cookie-parser and their direct types were removed after all callers were migrated. Bun retains optional Express peer packages in its resolved tree; they are not application imports or a runtime adapter fallback. |
+
+The controller/DTO OpenAPI comparison before and after migration is structurally identical
+(72 paths), and regeneration preserves the checked-in document byte for byte. Baseline
+SHA-256: `aa1259fcdfd115de8223ff0a8eae636166cc8b832620fa11b831ee1ee7918748`.
+`bun run test:http` compares current real-controller metadata with `swagger.json` without a DB.
+
+### Reverse proxy acceptance
+
+The repository Caddy config proxies to the backend, but an additional upstream proxy was
+reported and its topology/CIDRs/header rewriting rules have not been supplied. Actual
+deployment proxy acceptance remains pending; synthetic tests cannot establish it.
+
+Leave TRUST_PROXY unset/false until the chain is verified. Set an explicit comma-separated
+allowlist of the actual proxy IPs/CIDRs; do not invent addresses or trust all private networks.
+Blanket true and numeric hop counts fail startup validation because they cannot authenticate
+the immediate peer. Existing deployments using those values must replace them with their
+verified proxy allowlist before starting this backend.
+
+Record the complete Internet → ingress/CDN → Caddy → backend chain and backend port exposure.
+Require each trusted ingress to overwrite or sanitize incoming forwarding headers, and
+restrict backend network access to intended proxies. Through that chain verify the observed
+client IP used for throttling/session/audit, HTTPS scheme and host. Also send forged
+X-Forwarded-For/Proto/Host directly from an untrusted peer: they must not alter those values.
+Synthetic HTTP tests cover this direct attack and a two-proxy allowlist chain that stops
+at the first untrusted address, ignoring attacker-supplied addresses further left.
+
+### Transport microbenchmark
+
+Recorded on 2026-10-26 with Bun 1.3.14. Both adapters serve the same deterministic JSON
+endpoint with ten items: 1,000 warmup requests, then three trials of 10,000 requests,
+concurrency 20. No database or external services. Raw trials and the baseline Git commit
+are in [transport-comparison.json](../test/performance/transport-comparison.json); the
+repeatable harness is [http-benchmark.ts](../test/performance/http-benchmark.ts).
+
+| Median metric | Express / Nest 12.0.1 | Fastify / Nest 12.1.2 |
+|---|---:|---:|
+| Throughput (requests/s) | 5,268 | 5,993 |
+| p50 latency (ms) | 2.782 | 2.286 |
+| p95 latency (ms) | 9.138 | 9.260 |
+| CPU per 10,000 requests (ms) | 3,441 | 3,129 |
+| CPU utilization (% of one core) | 181.25 | 187.53 |
+| RSS (MiB) | 128.38 | 129.23 |
+| Heap used (MiB) | 21.31 | 24.57 |
+
+Client fetches and server run in one process, so CPU/memory include both; CPU can exceed
+100% across cores. RSS/heap are sampled after each trial, not peak usage. Adapter runs
+were sequential on a shared host and variance is substantial: throughput medians improve,
+but p95 and memory do not. This microbenchmark does not establish a production speedup
+or measure real auth, uploads, GraphQL, logging or database workloads. Repeat on controlled
+hardware with representative traffic before making capacity claims.
+
+### Git and lockfile rollback
+
+The pre-migration source/manifest/lockfile is retained on `backup/express-before-fastify`
+at `59fc731acf7bc371dd3cd72673ce7fbb3766fe6b`; migration commits are on `refactor/backend-fastify`.
+Preserve any later work before switching branches. For a fresh clone without the local
+backup branch, recreate it with `git branch backup/express-before-fastify 59fc731acf7bc371dd3cd72673ce7fbb3766fe6b`.
+For an uncommitted checkout, from backend/ use a named stash including untracked backend
+files, record its stash ID, then switch to the backup branch:
+
+```bash
+git stash push --include-untracked -m fastify-rollback-checkpoint -- .
+git switch backup/express-before-fastify
+bun install --frozen-lockfile
+bun run build
+```
+
+Restart only when explicitly authorized, using the previous runtime configuration and
+`DB_SKIP_MIGRATIONS=true DB_SEED=false` to avoid startup migrations/seeding. Do not run
+migration:revert, reset the database, change frontend assets, or rotate JWT_SECRET for
+this transport rollback. Returning to the migration branch and applying the recorded
+stash restores uncommitted migration work. Deployment/real-proxy acceptance and full
+E2E remain separate, explicitly authorized operations.
