@@ -31,7 +31,8 @@
     "migration:revert": "bun run node_modules/typeorm/cli.js migration:revert -d src/database/data-source.ts",
     "migration:show": "bun run node_modules/typeorm/cli.js migration:show -d src/database/data-source.ts",
     "spec:generate": "bun --no-env-file test/run-unit.ts src/scripts/generate-spec.ts",
-    "graphql:types": "bun run src/scripts/generate-graphql-types.ts"
+    "graphql:types": "bun run src/scripts/generate-graphql-types.ts",
+    "test:http": "bun --no-env-file test/run-unit.ts test ./test/http --max-concurrency=1 --timeout=30000"
   },
   "dependencies": {
     "@apollo/server": "^5.5.1",
