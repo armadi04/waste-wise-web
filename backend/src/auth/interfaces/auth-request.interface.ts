@@ -1,4 +1,4 @@
-import type { Request } from 'express';
+import type { FastifyRequest as Request } from 'fastify';
 
 export interface AuthenticatedUser {
   userId: number;
@@ -22,6 +22,8 @@ export interface AuthenticatedUser {
   clientId?: string;
 }
 
-export interface IAuthRequest extends Request {
+export interface IAuthRequest extends Request<{
+  Params: Record<string, string>;
+}> {
   user: AuthenticatedUser;
 }

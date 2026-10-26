@@ -31,7 +31,7 @@ describe('Auth (e2e)', () => {
 
   beforeAll(async () => {
     ctx = await setupTestApp();
-    server = ctx.app.getHttpServer() as App;
+    server = ctx.app.getHttpServer();
   });
 
   beforeEach(async () => {

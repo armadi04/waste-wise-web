@@ -1,3 +1,5 @@
+import type { NestFastifyApplication } from '@nestjs/platform-fastify';
+import { createHttpAdapter } from '@/config/http';
 import {
   afterAll,
   beforeAll,
@@ -7,7 +9,6 @@ import {
   it,
   mock,
 } from 'bun:test';
-import type { INestApplication } from '@nestjs/common';
 import { Test } from '@nestjs/testing';
 import { MemoryHealthIndicator } from '@nestjs/terminus';
 import { HEALTH_DATABASE_POOL } from '@/health/database-health.service';
@@ -28,7 +29,7 @@ const connect = mock(async () => ({ query, release }));
 const checkHeap = mock(async () => ({ memory_heap: { status: 'up' } }));
 
 describe('Health HTTP contract with real Terminus checks and a database driver mock', () => {
-  let app: INestApplication;
+  let app: NestFastifyApplication;
 
   beforeAll(async () => {
     const module = await Test.createTestingModule({
@@ -41,12 +42,16 @@ describe('Health HTTP contract with real Terminus checks and a database driver m
       .overrideProvider(MemoryHealthIndicator)
       .useValue({ checkHeap })
       .compile();
-    app = module.createNestApplication({ logger: false });
+    app = module.createNestApplication<NestFastifyApplication>(
+      createHttpAdapter(),
+      { logger: false },
+    );
     configureApiRouting(app);
     app.useGlobalFilters(
       new AllExceptionsFilter({ error: mock() } as unknown as Logger),
     );
     await app.init();
+    await app.getHttpAdapter().getInstance().ready();
   });
 
   beforeEach(() => {

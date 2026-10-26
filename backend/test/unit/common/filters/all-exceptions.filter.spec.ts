@@ -6,15 +6,15 @@ import { AllExceptionsFilter } from '../../../../src/common/filters/all-exceptio
 describe('AllExceptionsFilter', () => {
   let filter: AllExceptionsFilter;
   let logger: { error: jest.Mock };
-  let json: jest.Mock;
+  let send: jest.Mock;
   let status: jest.Mock;
   let host: ArgumentsHost;
 
   beforeEach(() => {
     logger = { error: jest.fn() };
     filter = new AllExceptionsFilter(logger as unknown as Logger);
-    json = jest.fn();
-    status = jest.fn(() => ({ json }));
+    send = jest.fn();
+    status = jest.fn(() => ({ send }));
     host = {
       getType: () => 'http',
       switchToHttp: () => ({
@@ -28,7 +28,7 @@ describe('AllExceptionsFilter', () => {
     filter.catch(new NotFoundException('nope'), host);
 
     expect(status).toHaveBeenCalledWith(404);
-    expect(json).toHaveBeenCalledWith(
+    expect(send).toHaveBeenCalledWith(
       expect.objectContaining({ message: 'nope', code: 'NOT_FOUND' }),
     );
     expect(logger.error).not.toHaveBeenCalled();
@@ -39,7 +39,7 @@ describe('AllExceptionsFilter', () => {
 
     expect(logger.error).toHaveBeenCalled();
     expect(status).toHaveBeenCalledWith(500);
-    expect(json).toHaveBeenCalledWith(
+    expect(send).toHaveBeenCalledWith(
       expect.objectContaining({
         statusCode: 500,
         message: 'Internal server error',

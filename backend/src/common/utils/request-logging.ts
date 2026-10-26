@@ -18,16 +18,22 @@ export const requestLogSerializers = {
 };
 
 /**
- * Express `trust proxy` from TRUST_PROXY. Unset/"false" keeps the default (the
- * direct peer is the client). A hop count or an address/subnet list trusts only
- * those proxies' X-Forwarded-For, e.g. Caddy in front of the API.
+ * Fastify `trustProxy` from TRUST_PROXY. Unset/"false" keeps the default (the
+ * direct peer is the client). Only an address/subnet list authenticates the
+ * immediate proxy peer. Hop counts and blanket trust permit direct spoofing.
  */
 export function parseTrustProxy(
   value: string | undefined,
-): boolean | number | string | undefined {
+): string[] | undefined {
   const trimmed = value?.trim();
   if (!trimmed || trimmed === 'false') return undefined;
-  if (trimmed === 'true') return true;
-  if (/^\d+$/.test(trimmed)) return Number(trimmed);
-  return trimmed;
+  if (trimmed === 'true' || /^\d+$/.test(trimmed)) {
+    throw new Error(
+      'TRUST_PROXY must list trusted proxy addresses/CIDRs, not true or a hop count',
+    );
+  }
+  return trimmed
+    .split(',')
+    .map((address) => address.trim())
+    .filter(Boolean);
 }

@@ -1,5 +1,6 @@
+import type { NestFastifyApplication } from '@nestjs/platform-fastify';
+import { createHttpAdapter } from '@/config/http';
 import { afterAll, beforeAll, describe, expect, it } from 'bun:test';
-import type { INestApplication } from '@nestjs/common';
 import { Test } from '@nestjs/testing';
 import request from 'supertest';
 import { DataSource } from 'typeorm';
@@ -22,7 +23,7 @@ interface InspectablePool extends HealthDatabasePool {
 describe('PostgreSQL health probes on a disposable database', () => {
   let db: DataSource;
   let pool: InspectablePool;
-  let app: INestApplication;
+  let app: NestFastifyApplication;
   let sql = 'SELECT 1';
   let sqlState: string | undefined;
 
@@ -68,12 +69,16 @@ describe('PostgreSQL health probes on a disposable database', () => {
         end: () => pool.end(),
       })
       .compile();
-    app = module.createNestApplication({ logger: false });
+    app = module.createNestApplication<NestFastifyApplication>(
+      createHttpAdapter(),
+      { logger: false },
+    );
     configureApiRouting(app);
     const { AllExceptionsFilter } =
       await import('@/common/filters/all-exceptions.filter');
     app.useGlobalFilters(new AllExceptionsFilter({ error: () => {} }));
     await app.init();
+    await app.getHttpAdapter().getInstance().ready();
   });
 
   afterAll(async () => {

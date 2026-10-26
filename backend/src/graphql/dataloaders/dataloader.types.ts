@@ -1,5 +1,8 @@
 import type DataLoader from 'dataloader';
-import type { Request, Response } from 'express';
+import type {
+  FastifyRequest as Request,
+  FastifyReply as Response,
+} from 'fastify';
 import type { Role } from '@/roles/entities/role.entity';
 import type { Permission } from '@/permissions/entities/permission.entity';
 import type { User } from '@/users/entities/user.entity';

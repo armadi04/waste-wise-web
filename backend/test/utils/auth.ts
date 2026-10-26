@@ -2,7 +2,6 @@ import { JwtService } from '@nestjs/jwt';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { In, Repository } from 'typeorm';
 import request from 'supertest';
-import type { App } from 'supertest/types';
 import { UsersService } from '@/users/users.service';
 import { User } from '@/users/entities/user.entity';
 import { Permission } from '@/permissions/entities/permission.entity';
@@ -100,7 +99,7 @@ export async function loginViaHttp(
   email: string,
   password: string,
 ): Promise<LoginResult> {
-  const res = await request(ctx.app.getHttpServer() as App)
+  const res = await request(ctx.app.getHttpServer())
     .post('/api/v1/auth/login')
     .send({ email, password });
 

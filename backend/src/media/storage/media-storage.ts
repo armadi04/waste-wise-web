@@ -1,3 +1,4 @@
+import type { UploadedMultipartFile } from '@nestjs/platform-fastify/multipart';
 export type MediaProvider = 'depot' | 's3';
 
 export interface StoredObject {
@@ -9,7 +10,7 @@ export interface StoredObject {
 
 export interface MediaStorage {
   upload(
-    file: Express.Multer.File,
+    file: UploadedMultipartFile,
     object: StoredObject,
     onReserved: (object: StoredObject) => Promise<void>,
   ): Promise<StoredObject>;

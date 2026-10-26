@@ -6,8 +6,11 @@ import {
   HttpStatus,
 } from '@nestjs/common';
 import { GqlContextType } from '@nestjs/graphql';
-import { Logger } from 'nestjs-pino';
-import type { Request, Response } from 'express';
+import type { Logger } from 'nestjs-pino';
+import type {
+  FastifyRequest as Request,
+  FastifyReply as Response,
+} from 'fastify';
 
 /**
  * Catch-all exception filter.
@@ -42,7 +45,20 @@ export class AllExceptionsFilter implements ExceptionFilter {
           ? exceptionResponse
           : { message: exceptionResponse };
       const code = this.codeForStatus(status);
-      response.status(status).json({ ...body, code });
+      const payload = { ...body, code };
+      // Nest 12.1.2's Fastify multipart interceptor spells this differently
+      // from Multer. Keep the existing public validation message.
+      if (
+        request.isMultipart?.() &&
+        'message' in payload &&
+        typeof payload.message === 'string'
+      ) {
+        payload.message = payload.message.replace(
+          /^Unexpected file field(?= - |$)/,
+          'Unexpected field',
+        );
+      }
+      response.status(status).send(payload);
       return;
     }
 
@@ -55,7 +71,7 @@ export class AllExceptionsFilter implements ExceptionFilter {
       'Unhandled exception',
     );
 
-    response.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
+    response.status(HttpStatus.INTERNAL_SERVER_ERROR).send({
       statusCode: HttpStatus.INTERNAL_SERVER_ERROR,
       code: 'INTERNAL_SERVER_ERROR',
       message: 'Internal server error',

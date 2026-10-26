@@ -3,7 +3,7 @@ import { PassportStrategy } from '@nestjs/passport';
 import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { AuthService } from './auth.service';
-import type { Request } from 'express';
+import type { FastifyRequest as Request } from 'fastify';
 import { JwtPayload } from './interfaces/jwt-payload.interface';
 import { OAuthClientService } from '@/oauth/oauth-client.service';
 import { SessionsService } from '@/sessions/sessions.service';

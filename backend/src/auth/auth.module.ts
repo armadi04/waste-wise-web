@@ -1,11 +1,5 @@
-import { API_VERSION } from '@/config/api-routing';
 import { ACCESS_TOKEN_TTL } from '@/sessions/session-policy';
-import {
-  MiddlewareConsumer,
-  Module,
-  NestModule,
-  RequestMethod,
-} from '@nestjs/common';
+import { Module } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { AuthController } from './auth.controller';
 import { UsersModule } from '../users/users.module';
@@ -20,7 +14,6 @@ import { EmailVerificationToken } from './entities/email-verification-token.enti
 import { RevokedSsoSession } from './entities/revoked-sso-session.entity';
 import { TwoFactorRecoveryCode } from './entities/two-factor-recovery-code.entity';
 import { User } from '../users/entities/user.entity';
-import { CsrfMiddleware } from './csrf.middleware';
 
 import { IsUniqueConstraint } from '../common/validators/is-unique.validator';
 import { TurnstileService } from './turnstile.service';
@@ -61,24 +54,4 @@ import { SessionsModule } from '../sessions/sessions.module';
   ],
   exports: [AuthService, TwoFactorService, TurnstileService],
 })
-export class AuthModule implements NestModule {
-  configure(consumer: MiddlewareConsumer) {
-    consumer.apply(CsrfMiddleware).forRoutes(
-      {
-        path: 'auth/refresh',
-        method: RequestMethod.POST,
-        version: API_VERSION,
-      },
-      {
-        path: 'auth/logout',
-        method: RequestMethod.POST,
-        version: API_VERSION,
-      },
-      {
-        path: 'auth/switch-role',
-        method: RequestMethod.POST,
-        version: API_VERSION,
-      },
-    );
-  }
-}
+export class AuthModule {}

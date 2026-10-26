@@ -1,3 +1,4 @@
+import type { UploadedMultipartFile } from '@nestjs/platform-fastify/multipart';
 import {
   BadRequestException,
   Injectable,
@@ -16,8 +17,8 @@ export const DEFAULT_MEDIA_MIME_TYPES =
 export class MediaUploadPipe implements PipeTransform {
   constructor(private readonly config: ConfigService) {}
   async transform(
-    file: Express.Multer.File | undefined,
-  ): Promise<Express.Multer.File> {
+    file: UploadedMultipartFile | undefined,
+  ): Promise<UploadedMultipartFile> {
     if (!file || !Buffer.isBuffer(file.buffer) || !file.buffer.length)
       throw new BadRequestException('A nonempty file is required');
     const max = Number(

@@ -1,4 +1,3 @@
-import { randomUUID } from 'crypto';
 import { Module } from '@nestjs/common';
 import { APP_GUARD } from '@nestjs/core';
 import { ConfigModule, ConfigService } from '@nestjs/config';
@@ -34,7 +33,8 @@ import { GraphqlApiModule } from './graphql/graphql-api.module';
 import { TimeZoneModule } from './time-zone/time-zone.module';
 import { GqlThrottlerGuard } from './common/guards/gql-throttler.guard';
 import env from './config/env';
-import { requestLogSerializers } from './common/utils/request-logging';
+import { requestLoggerOptions } from './config/logging';
+import { SessionCsrfGuard } from './auth/session-csrf.guard';
 
 const initLogger = pino({
   name: 'AppModule',
@@ -43,24 +43,7 @@ const initLogger = pino({
 
 @Module({
   imports: [
-    LoggerModule.forRoot({
-      pinoHttp: {
-        timestamp: pino.stdTimeFunctions.isoTime,
-        autoLogging: true,
-        genReqId: (req) =>
-          (req.headers['x-request-id'] as string) || randomUUID(),
-        customProps: (req) => ({ requestId: req.id }),
-        serializers: requestLogSerializers,
-        transport:
-          process.env.NODE_ENV !== 'production'
-            ? {
-                target: 'pino-pretty',
-                options: { colorize: true, singleLine: true },
-              }
-            : undefined,
-        level: process.env.LOG_LEVEL || 'info',
-      },
-    }),
+    LoggerModule.forRoot({ pinoHttp: requestLoggerOptions }),
     EventEmitterModule.forRoot(),
     ConfigModule.forRoot({
       isGlobal: true,
@@ -188,6 +171,8 @@ const initLogger = pino({
   controllers: [AppController],
   providers: [
     AppService,
+    // Express CSRF middleware rejected invalid session writes before throttling.
+    { provide: APP_GUARD, useClass: SessionCsrfGuard },
     {
       provide: APP_GUARD,
       useClass: GqlThrottlerGuard,
