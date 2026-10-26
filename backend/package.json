@@ -30,7 +30,7 @@
     "migration:run:prod": "bun run node_modules/typeorm/cli.js migration:run -d dist/database/data-source.js",
     "migration:revert": "bun run node_modules/typeorm/cli.js migration:revert -d src/database/data-source.ts",
     "migration:show": "bun run node_modules/typeorm/cli.js migration:show -d src/database/data-source.ts",
-    "spec:generate": "bun run src/scripts/generate-spec.ts",
+    "spec:generate": "bun --no-env-file test/run-unit.ts src/scripts/generate-spec.ts",
     "graphql:types": "bun run src/scripts/generate-graphql-types.ts"
   },
   "dependencies": {
