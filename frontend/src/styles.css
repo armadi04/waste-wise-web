@@ -1,6 +1,6 @@
+@import 'tailwindcss';
 @import './styles/tokens.css';
 @import './styles/controls.css';
-@import 'tailwindcss';
 @plugin './hero.ts';
 
 @source '../node_modules/@heroui/theme/dist/**/*.{js,ts,jsx,tsx}';
