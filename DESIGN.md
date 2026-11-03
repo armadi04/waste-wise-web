@@ -11,9 +11,13 @@ collapsible desktop sidebar and mobile navigation. Backend permissions remain au
 ### Theme contract
 
 Semantic CSS tokens live in `frontend/src/styles/tokens.css`; HeroUI 2.8 configuration
-lives in `frontend/src/hero.ts`. Use the white, slate and blue palette below in both modes.
-The names below are application tokens (`--app-{token}`), not additional native HeroUI
-color keys. Use semantic utilities and shared component variants, never page-specific hex
+lives in `frontend/src/hero.ts`. Both derive from the single palette source in
+`frontend/src/lib/theme/palette.ts`; after changing it run `bun run tokens:generate`.
+Use the white, zinc and teal palette below in both modes,
+with a small amber brand accent (`#F3AA28`) reserved for the wordmark. The primary action
+color uses `#0F766E` rather than the source brand `#0D9488` so white labels meet the 4.5:1
+contrast requirement. The names below are application tokens (`--app-{token}`), not
+additional native HeroUI color keys. Use semantic utilities and shared component variants, never page-specific hex
 colors. Every token must exist in both themes; never inherit a missing dark value from light.
 
 Set exactly one theme class (`light` or `dark`) on the document root. Scope application
@@ -23,50 +27,61 @@ explicit preference is stored. Apply the resolved theme before the first visible
 Portaled modals, popovers and toasts inherit the same root theme. Do not nest opposite
 themes inside operational screens or apply independent theme state to individual components.
 
+The background style is a separate persisted preference stored in
+`frontend/src/lib/stores/background.store.ts` and applied as `data-background` on the
+document root: `gradient` (default light ambient wash), `neutral` (transparent) or `gray`
+(`#F5F5F7`). Dark mode always overrides the background with `#000000`. Apply both the
+resolved theme and background before the first visible render. Keep the background
+preference controls hidden in dark mode, where the styles do not apply.
+
 ### Surfaces, actions and inputs
 
 | Application token | Light | Dark |
 |---|---|---|
-| `background` | #F8FAFC | #0F172A |
-| `surface` | #FFFFFF | #1E293B |
-| `surface-hover` | #F1F5F9 | #334155 |
-| `surface-pressed` | #E2E8F0 | #475569 |
-| `foreground` | #0F172A | #F8FAFC |
-| `muted` | #F1F5F9 | #334155 |
-| `muted-foreground` | #475569 | #CBD5E1 |
-| `border-subtle` | #E2E8F0 | #334155 |
-| `border-control` | #64748B | #94A3B8 |
-| `primary` | #2563EB | #2563EB |
-| `primary-hover` | #1D4ED8 | #1D4ED8 |
-| `primary-pressed` | #1E40AF | #1E40AF |
+| `background` | #FFFFFF | #000000 |
+| `surface` | #FFFFFF | #18181B |
+| `surface-hover` | #E4E4E7 | #3F3F46 |
+| `surface-pressed` | #D4D4D8 | #52525B |
+| `foreground` | #11181C | #ECEDEE |
+| `muted` | #F4F4F5 | #27272A |
+| `muted-foreground` | #52525B | #D4D4D8 |
+| `border-subtle` | #E4E4E7 | #3F3F46 |
+| `border-control` | #71717A | #A1A1AA |
+| `primary` | #0F766E | #0F766E |
+| `primary-hover` | #115E59 | #115E59 |
+| `primary-pressed` | #134E4A | #134E4A |
 | `primary-foreground` | #FFFFFF | #FFFFFF |
-| `link` | #1D4ED8 | #93C5FD |
-| `link-hover` | #1E40AF | #BFDBFE |
-| `selected-background` | #EFF6FF | #172554 |
-| `selected-hover` | #DBEAFE | #1E3A8A |
-| `selected-foreground` | #1D4ED8 | #BFDBFE |
-| `selected-border` | #2563EB | #60A5FA |
-| `focus` | #2563EB | #93C5FD |
-| `focus-offset` | #FFFFFF | #1E293B |
-| `disabled-background` | #F1F5F9 | #334155 |
-| `disabled-foreground` | #64748B | #94A3B8 |
-| `disabled-border` | #CBD5E1 | #475569 |
-| `input-background` | #FFFFFF | #1E293B |
-| `input-foreground` | #0F172A | #F8FAFC |
-| `input-placeholder` | #64748B | #94A3B8 |
-| `input-border` | #64748B | #94A3B8 |
-| `input-border-hover` | #475569 | #CBD5E1 |
-| `input-border-focus` | #2563EB | #60A5FA |
+| `link` | #0F766E | #5EEAD4 |
+| `link-hover` | #115E59 | #99F6E4 |
+| `selected-background` | #F0FDFA | #134E4A |
+| `selected-hover` | #CCFBF1 | #115E59 |
+| `selected-foreground` | #0F766E | #99F6E4 |
+| `selected-border` | #0D9488 | #2DD4BF |
+| `focus` | #0D9488 | #5EEAD4 |
+| `focus-offset` | #FFFFFF | #18181B |
+| `disabled-background` | #F4F4F5 | #27272A |
+| `disabled-foreground` | #71717A | #A1A1AA |
+| `disabled-border` | #D4D4D8 | #52525B |
+| `input-background` | #FFFFFF | #18181B |
+| `input-foreground` | #11181C | #ECEDEE |
+| `input-placeholder` | #71717A | #A1A1AA |
+| `input-border` | #71717A | #A1A1AA |
+| `input-border-hover` | #3F3F46 | #D4D4D8 |
+| `input-border-focus` | #0D9488 | #5EEAD4 |
 | `input-border-error` | #B91C1C | #F87171 |
+| `accent` | #F3AA28 | #F3AA28 |
 
 Surface is the background for cards, tables, forms and the sidebar. `border-subtle` is
 only a decorative separator; interactive controls use `border-control` or `input-border`.
 Neutral interactive rows use `surface-hover` / `surface-pressed` with `foreground`.
 Primary buttons use `primary` / `primary-hover` / `primary-pressed` with
 `primary-foreground` in every state. Links use `link` / `link-hover`; never use the
-solid-button background as a universal text color. Selected rows and navigation use
-`selected-background` / `selected-hover` with `selected-foreground`; show a selected
-indicator using `selected-border`, and expose the corresponding accessible state.
+solid-button background as a universal text color. Selected rows, options and navigation
+use `selected-background` / `selected-hover` with `selected-foreground`; add a non-color
+cue such as weight, an icon or a label, and expose the corresponding accessible state.
+Reserve `selected-border` for choice controls (checkboxes/radios) and tone borders, not
+for navigation, table rows or list options. The `accent` token (`#F3AA28`) is a brand-only
+highlight for the wordmark; never use it for actions, status meaning or body text.
 
 Inputs keep `input-background` and `input-foreground` across normal, hover and focus
 states. Use the placeholder token only for placeholders, never as a replacement for labels.
@@ -116,13 +131,13 @@ label or icon; never communicate status through color alone.
 | `danger-solid-hover` | #991B1B | #991B1B |
 | `danger-solid-pressed` | #7F1D1D | #7F1D1D |
 | `danger-solid-foreground` | #FFFFFF | #FFFFFF |
-| `info` | #2563EB | #93C5FD |
-| `info-background` | #EFF6FF | #172554 |
-| `info-foreground` | #1D4ED8 | #BFDBFE |
-| `info-border` | #2563EB | #60A5FA |
-| `info-solid` | #2563EB | #2563EB |
-| `info-solid-hover` | #1D4ED8 | #1D4ED8 |
-| `info-solid-pressed` | #1E40AF | #1E40AF |
+| `info` | #0F766E | #5EEAD4 |
+| `info-background` | #F0FDFA | #134E4A |
+| `info-foreground` | #0F766E | #99F6E4 |
+| `info-border` | #0D9488 | #2DD4BF |
+| `info-solid` | #0F766E | #0F766E |
+| `info-solid-hover` | #115E59 | #115E59 |
+| `info-solid-pressed` | #134E4A | #134E4A |
 | `info-solid-foreground` | #FFFFFF | #FFFFFF |
 
 ### HeroUI 2.8 mapping
@@ -147,9 +162,12 @@ Use the same exact values as the application tokens; map semantic roles as follo
 | `danger.DEFAULT` / `.foreground` | `danger-solid` / `danger-solid-foreground` |
 | Info variants | Shared app variant using `info-*`; do not invent a native `info` key |
 
-HeroUI semantic colors also have 50–900 scales. Override these scales with blue, slate,
+HeroUI semantic colors also have 50–900 scales. Override these scales with teal, zinc,
 green, amber and red shades respectively rather than inheriting unrelated default hues;
-copy the primary scale into secondary. The explicit pairs above are authoritative for
+copy the primary scale into secondary. The neutral `default` scale is inverted in dark
+mode: high indices resolve to light values so `default-400`, `default-500` and
+`default-800` remain readable on dark surfaces, while `default-100`/`default-200` stay
+dark for hovers and borders. The explicit pairs above are authoritative for
 shared operational components. Do not assume a native `flat`, `bordered`, `light` or
 `ghost` variant automatically uses them: map its rendered slots and interaction states
 through shared wrappers / variants. Native scale-derived variants outside those wrappers
