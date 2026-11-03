@@ -12,6 +12,7 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as ChangelogRouteImport } from './routes/changelog'
 import { Route as ProfileRouteImport } from './routes/profile'
+import { Route as ReportsRouteImport } from './routes/reports'
 import { Route as auditAuditLogsRouteImport } from './routes/(audit)/audit-logs'
 import { Route as authAcceptInviteRouteImport } from './routes/(auth)/accept-invite'
 import { Route as authForgotPasswordRouteImport } from './routes/(auth)/forgot-password'
@@ -23,6 +24,9 @@ import { Route as mediaMediaRouteImport } from './routes/(media)/media'
 import { Route as sessionsSessionsRouteImport } from './routes/(sessions)/sessions'
 import { Route as usersInvitationsRouteImport } from './routes/(users)/invitations'
 import { Route as usersUsersRouteImport } from './routes/(users)/users'
+import { Route as ReportsIndexRouteImport } from './routes/reports.index'
+import { Route as ReportsReportIdRouteImport } from './routes/reports.$reportId'
+import { Route as ReportsNewRouteImport } from './routes/reports.new'
 import { Route as databasesoauthOauthClientsRouteImport } from './routes/(databases)/(oauth)/oauth-clients'
 import { Route as databasespermissionsPermissionsRouteImport } from './routes/(databases)/(permissions)/permissions'
 import { Route as databasesrolesRolesRouteImport } from './routes/(databases)/(roles)/roles'
@@ -40,6 +44,11 @@ const ChangelogRoute = ChangelogRouteImport.update({
 const ProfileRoute = ProfileRouteImport.update({
   id: '/profile',
   path: '/profile',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ReportsRoute = ReportsRouteImport.update({
+  id: '/reports',
+  path: '/reports',
   getParentRoute: () => rootRouteImport,
 } as any)
 const auditAuditLogsRoute = auditAuditLogsRouteImport.update({
@@ -97,6 +106,21 @@ const usersUsersRoute = usersUsersRouteImport.update({
   path: '/users',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ReportsIndexRoute = ReportsIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => ReportsRoute,
+} as any)
+const ReportsReportIdRoute = ReportsReportIdRouteImport.update({
+  id: '/$reportId',
+  path: '/$reportId',
+  getParentRoute: () => ReportsRoute,
+} as any)
+const ReportsNewRoute = ReportsNewRouteImport.update({
+  id: '/new',
+  path: '/new',
+  getParentRoute: () => ReportsRoute,
+} as any)
 const databasesoauthOauthClientsRoute =
   databasesoauthOauthClientsRouteImport.update({
     id: '/(databases)/(oauth)/oauth-clients',
@@ -119,6 +143,7 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/changelog': typeof ChangelogRoute
   '/profile': typeof ProfileRoute
+  '/reports': typeof ReportsRouteWithChildren
   '/audit-logs': typeof auditAuditLogsRoute
   '/accept-invite': typeof authAcceptInviteRoute
   '/forgot-password': typeof authForgotPasswordRoute
@@ -130,6 +155,9 @@ export interface FileRoutesByFullPath {
   '/sessions': typeof sessionsSessionsRoute
   '/invitations': typeof usersInvitationsRoute
   '/users': typeof usersUsersRoute
+  '/reports/$reportId': typeof ReportsReportIdRoute
+  '/reports/new': typeof ReportsNewRoute
+  '/reports/': typeof ReportsIndexRoute
   '/oauth-clients': typeof databasesoauthOauthClientsRoute
   '/permissions': typeof databasespermissionsPermissionsRoute
   '/roles': typeof databasesrolesRolesRoute
@@ -149,6 +177,9 @@ export interface FileRoutesByTo {
   '/sessions': typeof sessionsSessionsRoute
   '/invitations': typeof usersInvitationsRoute
   '/users': typeof usersUsersRoute
+  '/reports/$reportId': typeof ReportsReportIdRoute
+  '/reports/new': typeof ReportsNewRoute
+  '/reports': typeof ReportsIndexRoute
   '/oauth-clients': typeof databasesoauthOauthClientsRoute
   '/permissions': typeof databasespermissionsPermissionsRoute
   '/roles': typeof databasesrolesRolesRoute
@@ -158,6 +189,7 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/changelog': typeof ChangelogRoute
   '/profile': typeof ProfileRoute
+  '/reports': typeof ReportsRouteWithChildren
   '/(audit)/audit-logs': typeof auditAuditLogsRoute
   '/(auth)/accept-invite': typeof authAcceptInviteRoute
   '/(auth)/forgot-password': typeof authForgotPasswordRoute
@@ -169,6 +201,9 @@ export interface FileRoutesById {
   '/(sessions)/sessions': typeof sessionsSessionsRoute
   '/(users)/invitations': typeof usersInvitationsRoute
   '/(users)/users': typeof usersUsersRoute
+  '/reports/$reportId': typeof ReportsReportIdRoute
+  '/reports/new': typeof ReportsNewRoute
+  '/reports/': typeof ReportsIndexRoute
   '/(databases)/(oauth)/oauth-clients': typeof databasesoauthOauthClientsRoute
   '/(databases)/(permissions)/permissions': typeof databasespermissionsPermissionsRoute
   '/(databases)/(roles)/roles': typeof databasesrolesRolesRoute
@@ -179,6 +214,7 @@ export interface FileRouteTypes {
     | '/'
     | '/changelog'
     | '/profile'
+    | '/reports'
     | '/audit-logs'
     | '/accept-invite'
     | '/forgot-password'
@@ -190,6 +226,9 @@ export interface FileRouteTypes {
     | '/sessions'
     | '/invitations'
     | '/users'
+    | '/reports/$reportId'
+    | '/reports/new'
+    | '/reports/'
     | '/oauth-clients'
     | '/permissions'
     | '/roles'
@@ -209,6 +248,9 @@ export interface FileRouteTypes {
     | '/sessions'
     | '/invitations'
     | '/users'
+    | '/reports/$reportId'
+    | '/reports/new'
+    | '/reports'
     | '/oauth-clients'
     | '/permissions'
     | '/roles'
@@ -217,6 +259,7 @@ export interface FileRouteTypes {
     | '/'
     | '/changelog'
     | '/profile'
+    | '/reports'
     | '/(audit)/audit-logs'
     | '/(auth)/accept-invite'
     | '/(auth)/forgot-password'
@@ -228,6 +271,9 @@ export interface FileRouteTypes {
     | '/(sessions)/sessions'
     | '/(users)/invitations'
     | '/(users)/users'
+    | '/reports/$reportId'
+    | '/reports/new'
+    | '/reports/'
     | '/(databases)/(oauth)/oauth-clients'
     | '/(databases)/(permissions)/permissions'
     | '/(databases)/(roles)/roles'
@@ -237,6 +283,7 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   ChangelogRoute: typeof ChangelogRoute
   ProfileRoute: typeof ProfileRoute
+  ReportsRoute: typeof ReportsRouteWithChildren
   auditAuditLogsRoute: typeof auditAuditLogsRoute
   authAcceptInviteRoute: typeof authAcceptInviteRoute
   authForgotPasswordRoute: typeof authForgotPasswordRoute
@@ -274,6 +321,13 @@ declare module '@tanstack/react-router' {
       path: '/profile'
       fullPath: '/profile'
       preLoaderRoute: typeof ProfileRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/reports': {
+      id: '/reports'
+      path: '/reports'
+      fullPath: '/reports'
+      preLoaderRoute: typeof ReportsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/(audit)/audit-logs': {
@@ -353,6 +407,27 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof usersUsersRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/reports/': {
+      id: '/reports/'
+      path: '/'
+      fullPath: '/reports/'
+      preLoaderRoute: typeof ReportsIndexRouteImport
+      parentRoute: typeof ReportsRoute
+    }
+    '/reports/$reportId': {
+      id: '/reports/$reportId'
+      path: '/$reportId'
+      fullPath: '/reports/$reportId'
+      preLoaderRoute: typeof ReportsReportIdRouteImport
+      parentRoute: typeof ReportsRoute
+    }
+    '/reports/new': {
+      id: '/reports/new'
+      path: '/new'
+      fullPath: '/reports/new'
+      preLoaderRoute: typeof ReportsNewRouteImport
+      parentRoute: typeof ReportsRoute
+    }
     '/(databases)/(oauth)/oauth-clients': {
       id: '/(databases)/(oauth)/oauth-clients'
       path: '/oauth-clients'
@@ -377,10 +452,26 @@ declare module '@tanstack/react-router' {
   }
 }
 
+interface ReportsRouteChildren {
+  ReportsReportIdRoute: typeof ReportsReportIdRoute
+  ReportsNewRoute: typeof ReportsNewRoute
+  ReportsIndexRoute: typeof ReportsIndexRoute
+}
+
+const ReportsRouteChildren: ReportsRouteChildren = {
+  ReportsReportIdRoute: ReportsReportIdRoute,
+  ReportsNewRoute: ReportsNewRoute,
+  ReportsIndexRoute: ReportsIndexRoute,
+}
+
+const ReportsRouteWithChildren =
+  ReportsRoute._addFileChildren(ReportsRouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   ChangelogRoute: ChangelogRoute,
   ProfileRoute: ProfileRoute,
+  ReportsRoute: ReportsRouteWithChildren,
   auditAuditLogsRoute: auditAuditLogsRoute,
   authAcceptInviteRoute: authAcceptInviteRoute,
   authForgotPasswordRoute: authForgotPasswordRoute,

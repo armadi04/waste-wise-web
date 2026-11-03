@@ -34,5 +34,6 @@ export type {
 export { useInvitationsUiStore } from '@/lib/stores/invitations-ui.store'
 export { useMediaUiStore } from '@/lib/stores/media-ui.store'
 export { usePermissionsUiStore } from '@/lib/stores/permissions-ui.store'
+export { useReportsUiStore } from '@/lib/stores/reports-ui.store'
 export { useRolesUiStore } from '@/lib/stores/roles-ui.store'
 export { useUsersUiStore } from '@/lib/stores/users-ui.store'

@@ -16,3 +16,12 @@ export async function requireAuth({
   useAuthStore.setState({ isAuthenticated: true, user })
   return { session: user }
 }
+
+export function requirePermission(...permissions: Array<string>) {
+  return async (args: { context: { queryClient: QueryClient } }) => {
+    const { session } = await requireAuth(args)
+    if (!permissions.some((permission) => session.permissions.includes(permission)))
+      throw redirect({ to: '/' })
+    return { session }
+  }
+}

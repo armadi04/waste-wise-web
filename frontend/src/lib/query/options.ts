@@ -1,5 +1,6 @@
 import { keepPreviousData, queryOptions } from '@tanstack/react-query'
 import type { UserSearchParams } from '@/lib/schemas/users'
+import type { ReportSearchParams } from '@/lib/schemas/reports'
 import type { OAuthClient } from '@/lib/services/oauth-client.service'
 import type { Invitation, PaginatedData } from '@/types/api'
 import type { Permission, Role, UserProfile } from '@/types/auth'
@@ -25,6 +26,11 @@ import { getMySessions, getSessions } from '@/lib/services/session.service'
 import { getSignupsTrend, getStatsOverview } from '@/lib/services/stats.service'
 import { getTwoFactorStatus } from '@/lib/services/two-factor.service'
 import { getUsers } from '@/lib/services/user.service'
+import {
+  getReport,
+  getReportStats,
+  getReports,
+} from '@/lib/services/report.service'
 
 export interface TableSearch {
   page?: number
@@ -207,6 +213,70 @@ export function sessionsQueryOptions(params: TableSearch) {
         direction: direction || 'desc',
       }),
     placeholderData: keepPreviousData,
+  })
+}
+
+
+export function reportsQueryOptions(params: ReportSearchParams) {
+  const {
+    page,
+    limit,
+    search,
+    status,
+    category,
+    from,
+    to,
+    reporterId,
+    sort,
+    direction,
+  } = params
+  return queryOptions({
+    queryKey: [
+      'reports',
+      {
+        page,
+        limit,
+        search,
+        status,
+        category,
+        from,
+        to,
+        reporterId,
+        sort,
+        direction,
+      },
+    ],
+    queryFn: () =>
+      getReports({
+        page: page || 1,
+        limit: limit || 20,
+        search: search || '',
+        status,
+        category,
+        from,
+        to,
+        reporterId,
+        sort: sort || 'createdAt',
+        direction: direction || 'desc',
+      }),
+    placeholderData: keepPreviousData,
+  })
+}
+
+export function reportQueryOptions(id: number) {
+  return queryOptions({
+    queryKey: ['reports', 'detail', id],
+    queryFn: () => getReport(id),
+    enabled: Number.isInteger(id) && id > 0,
+  })
+}
+
+export function reportStatsQueryOptions(enabled = true) {
+  return queryOptions({
+    queryKey: ['stats', 'reports'],
+    queryFn: getReportStats,
+    enabled,
+    staleTime: 1000 * 30,
   })
 }
 
