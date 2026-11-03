@@ -15,6 +15,7 @@ import {
 } from '@/components/layout/bottom-nav/lib/bottom-nav-helpers'
 import { useSidebarLogic } from '@/hooks/global'
 import { useUnreadCount } from '@/hooks/notifications'
+import { NAV_ACTIVE_CLASSES, NAV_IDLE_CLASSES } from '@/lib/constants/nav'
 
 import { MobileNavItem } from '@/components/layout/bottom-nav/child/mobile-nav-item'
 
@@ -52,17 +53,15 @@ export const BottomNav = () => {
                 aria-label={MOBILE_LABELS[item.key] ?? item.label}
                 aria-current={isActive ? 'page' : undefined}
                 onPress={() => handleSelect(item.key, item.href)}
-                className={`mobile-bottom-nav__item h-14 min-w-0 rounded-full px-1 text-default-600 transition-colors ${
-                  isActive
-                    ? 'app-selected'
-                    : 'hover:bg-[var(--app-surface-hover)] hover:text-default-900'
+                className={`mobile-bottom-nav__item h-14 min-w-0 rounded-full px-1 transition-colors ${
+                  isActive ? NAV_ACTIVE_CLASSES : NAV_IDLE_CLASSES
                 }`}
               >
                 <span className="flex min-w-0 flex-col items-center justify-center gap-1 leading-none">
                   <span className="mobile-bottom-nav__icon flex h-6 items-center justify-center">
                     {item.icon}
                   </span>
-                  <span className="mobile-bottom-nav__label max-w-full truncate text-[11px] font-medium">
+                  <span className="mobile-bottom-nav__label max-w-full truncate text-[11px]">
                     {MOBILE_LABELS[item.key] ?? item.label}
                   </span>
                 </span>
@@ -81,10 +80,8 @@ export const BottomNav = () => {
             aria-expanded={isOpen}
             onPress={onOpen}
             aria-current={isMoreActive ? 'page' : undefined}
-            className={`mobile-bottom-nav__item h-14 min-w-0 overflow-visible rounded-full px-1 text-default-600 transition-colors ${
-              isMoreActive
-                ? 'app-selected'
-                : 'hover:bg-[var(--app-surface-hover)] hover:text-default-900'
+            className={`mobile-bottom-nav__item h-14 min-w-0 overflow-visible rounded-full px-1 transition-colors ${
+              isMoreActive ? NAV_ACTIVE_CLASSES : NAV_IDLE_CLASSES
             }`}
           >
             <span className="flex min-w-0 flex-col items-center justify-center gap-1 leading-none">
@@ -101,9 +98,7 @@ export const BottomNav = () => {
                   <MoreHorizontal size={22} />
                 </Badge>
               </span>
-              <span className="mobile-bottom-nav__label text-[11px] font-medium">
-                More
-              </span>
+              <span className="mobile-bottom-nav__label text-[11px]">More</span>
             </span>
           </Button>
         </div>

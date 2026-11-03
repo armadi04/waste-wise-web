@@ -1,3 +1,5 @@
+import { NAV_ACTIVE_CLASSES, NAV_IDLE_CLASSES } from '@/lib/constants/nav'
+
 export interface NavSection<TKey extends string> {
   key: TKey
   label: string
@@ -38,10 +40,8 @@ export function SectionNavLayout<TKey extends string>({
               type="button"
               aria-current={isActive ? 'page' : undefined}
               onClick={() => onChange(section.key)}
-              className={`shrink-0 rounded-medium px-4 py-2.5 text-left text-xs font-semibold tracking-widest uppercase transition-colors ${
-                isActive
-                  ? 'app-selected'
-                  : 'text-default-500 hover:bg-default-100'
+              className={`shrink-0 rounded-medium px-4 py-2.5 text-left text-xs font-medium tracking-widest uppercase transition-colors ${
+                isActive ? NAV_ACTIVE_CLASSES : NAV_IDLE_CLASSES
               }`}
             >
               {section.label}

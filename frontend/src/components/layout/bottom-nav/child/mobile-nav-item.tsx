@@ -2,6 +2,7 @@ import { AnimatePresence, motion, useReducedMotion } from 'framer-motion'
 import { ChevronRight } from 'lucide-react'
 import { useState } from 'react'
 import type { NavItem } from '@/lib/constants/sidebar'
+import { NAV_ACTIVE_CLASSES, NAV_IDLE_CLASSES } from '@/lib/constants/nav'
 import { Button } from '@/components/shared/controls'
 
 export const MobileNavItem = ({
@@ -41,16 +42,10 @@ export const MobileNavItem = ({
         aria-expanded={hasChildren ? isExpanded : undefined}
         aria-controls={hasChildren ? submenuId : undefined}
         className={`w-full justify-start gap-4 rounded-large px-4 py-3 text-left transition-all focus-visible:ring-2 focus-visible:ring-focus ${
-          isActive
-            ? 'app-selected font-medium'
-            : 'text-default-600 hover:bg-default-100'
+          isActive ? NAV_ACTIVE_CLASSES : NAV_IDLE_CLASSES
         }`}
       >
-        <span
-          className={`shrink-0 ${isActive ? 'text-[var(--app-selected-foreground)]' : 'text-default-500'}`}
-        >
-          {item.icon}
-        </span>
+        <span className="shrink-0">{item.icon}</span>
         <span className="min-w-0 flex-1 truncate text-base">{item.label}</span>
         {badgeCount > 0 && (
           <span className="shrink-0 rounded-full bg-danger px-2 py-0.5 text-[11px] font-semibold leading-none text-danger-foreground">
@@ -87,8 +82,8 @@ export const MobileNavItem = ({
                 aria-current={activeKey === child.key ? 'page' : undefined}
                 className={`w-full justify-start rounded-large px-4 py-2.5 text-left text-sm transition-all focus-visible:ring-2 focus-visible:ring-focus ${
                   activeKey === child.key
-                    ? 'app-selected font-medium'
-                    : 'text-default-500 hover:bg-default-100 hover:text-default-900'
+                    ? NAV_ACTIVE_CLASSES
+                    : NAV_IDLE_CLASSES
                 }`}
               >
                 {child.label}
