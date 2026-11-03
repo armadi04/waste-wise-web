@@ -6,6 +6,11 @@ export type User = components['schemas']['User']
 export type Role = components['schemas']['Role']
 export type Permission = components['schemas']['Permission']
 export type Media = components['schemas']['Media']
+export type Report = components['schemas']['Report']
+export type ReportStats = components['schemas']['ReportStatsDto']
+export type ReportStatus = Report['status']
+export type WasteCategory = NonNullable<Report['predictedCategory']>
+export type ClassificationStatus = Report['classificationStatus']
 
 export type Notification = components['schemas']['Notification']
 export type NotificationType = components['schemas']['Notification']['type']
