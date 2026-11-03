@@ -219,9 +219,34 @@ describe('AuthService', () => {
         service.validateUser('missing@b.com', 'secret'),
       ).resolves.toBeNull();
     });
+
+    it('should reject a correct password for an inactive account', async () => {
+      const hash = await bcrypt.hash('secret', 10);
+      usersService.findOneByEmail.mockResolvedValue({
+        id: 1,
+        email: 'inactive@b.com',
+        password: hash,
+        isActive: false,
+      });
+
+      await expect(
+        service.validateUser('inactive@b.com', 'secret'),
+      ).rejects.toThrow(ForbiddenException);
+    });
   });
 
   describe('login', () => {
+    it('refuses to mint tokens for an inactive account', async () => {
+      const user = {
+        id: 1,
+        email: 'inactive@b.com',
+        isActive: false,
+      } as User;
+
+      await expect(service.login(user)).rejects.toThrow(ForbiddenException);
+      expect(sessionsService.start).not.toHaveBeenCalled();
+    });
+
     it('keeps same-second login and rotation refresh tokens distinct and usable', async () => {
       const clock = jest.spyOn(Date, 'now').mockReturnValue(1791244800000);
       try {

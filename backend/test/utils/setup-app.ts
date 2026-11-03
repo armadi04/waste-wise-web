@@ -13,11 +13,14 @@ import { MailService } from '@/mail/mail.service';
 import { TurnstileService } from '@/auth/turnstile.service';
 import { MediaStorageService } from '@/media/storage/media-storage.service';
 import { NotificationsListener } from '@/notifications/notifications.listener';
+import { ClassificationService } from '@/reports/classification.service';
 import {
+  makeFakeClassifier,
   makeFakeMail,
   makeFakeStorage,
   fakeTurnstile,
   passThroughGuard,
+  type FakeClassifier,
   type FakeMailService,
 } from './fakes';
 
@@ -26,6 +29,7 @@ export interface TestContext {
   moduleRef: TestingModule;
   dataSource: DataSource;
   mail: FakeMailService;
+  classifier: FakeClassifier;
 }
 
 /**
@@ -38,6 +42,7 @@ export async function setupTestApp(
 ): Promise<TestContext> {
   const mail = makeFakeMail();
   const storage = makeFakeStorage();
+  const classifier = makeFakeClassifier();
 
   const builder = Test.createTestingModule({ imports: [AppModule] })
     .overrideProvider(MailService)
@@ -60,6 +65,8 @@ export async function setupTestApp(
     // notifications endpoints are exercised directly in notifications.e2e.
     .overrideProvider(NotificationsListener)
     .useValue({})
+    .overrideProvider(ClassificationService)
+    .useValue(classifier)
     .overrideGuard(ThrottlerGuard)
     .useValue(passThroughGuard);
   if (dataSourceOverride)
@@ -84,5 +91,5 @@ export async function setupTestApp(
 
   const dataSource = app.get(DataSource);
 
-  return { app, moduleRef, dataSource, mail };
+  return { app, moduleRef, dataSource, mail, classifier };
 }

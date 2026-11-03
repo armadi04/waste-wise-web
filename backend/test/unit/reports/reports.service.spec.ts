@@ -125,6 +125,30 @@ describe('ReportsService', () => {
     expect(result.id).toBe(4);
   });
 
+  it('records a report audit event after creation', async () => {
+    const emit = jest.fn();
+    (service as unknown as { eventEmitter: { emit: jest.Mock } }).eventEmitter =
+      {
+        emit,
+      };
+    repository.findOne.mockResolvedValue(report());
+
+    await service.createForActor(actor(1, ['reports.create']), {
+      description: 'audited report',
+      mediaId: 9,
+    });
+
+    expect(emit).toHaveBeenCalledWith(
+      'audit.record',
+      expect.objectContaining({
+        action: 'report.created',
+        actorId: 1,
+        subjectType: 'report',
+        subjectId: 4,
+      }),
+    );
+  });
+
   it('rejects media owned by another user', async () => {
     mediaService.findOne.mockResolvedValue({ ...media, userId: 2 });
 

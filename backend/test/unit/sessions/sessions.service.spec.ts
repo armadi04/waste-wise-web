@@ -76,6 +76,17 @@ describe('SessionsService', () => {
     await expect(service.revokeById(7)).rejects.toThrow(NotFoundException);
   });
 
+  it('revokes every live session for an account', async () => {
+    repository.update.mockResolvedValue({ affected: 2 });
+
+    const result = await service.revokeAllForUser(7);
+
+    expect(result).toEqual({ revoked: 2 });
+    const [criteria, changes] = repository.update.mock.calls[0];
+    expect(criteria.userId).toBe(7);
+    expect(changes.revokedAt).toBeInstanceOf(Date);
+  });
+
   it('revokes every session except the current one', async () => {
     repository.find.mockResolvedValue([
       { id: 1, sessionId: 'current', revokedAt: null },

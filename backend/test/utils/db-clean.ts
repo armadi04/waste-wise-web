@@ -31,6 +31,7 @@ export async function cleanDatabase(
   )
     throw new Error('Cleanup requires the dedicated nestplate_test database');
   await dataSource.query('UPDATE users SET "avatarId" = NULL');
+  await dataSource.query('DELETE FROM reports');
   await dataSource.query('DELETE FROM media');
   await dataSource.query('DELETE FROM notifications');
   await dataSource.query('DELETE FROM user_sessions');
