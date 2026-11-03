@@ -216,7 +216,6 @@
   .app-pagination [aria-current='page'] {
     background: var(--app-selected-background) !important;
     color: var(--app-selected-foreground) !important;
-    box-shadow: inset 3px 0 var(--app-selected-border);
   }
   .app-dropdownitem[data-selected='true']:is(
       [data-hover='true'],
@@ -315,7 +314,6 @@
   .app-table [data-slot='tr'][data-selected='true'] {
     background: var(--app-selected-background) !important;
     color: var(--app-selected-foreground);
-    box-shadow: inset 3px 0 var(--app-selected-border);
   }
   .app-table [data-slot='tr'][data-selected='true']:hover {
     background: var(--app-selected-hover) !important;
@@ -383,7 +381,6 @@
   .app-option[data-selected='true'] {
     background: var(--app-selected-background) !important;
     color: var(--app-selected-foreground) !important;
-    box-shadow: inset 3px 0 var(--app-selected-border);
   }
   .app-option[data-selected='true']:is(
       [data-hover='true'],
@@ -396,7 +393,6 @@
   }
   .app-tabs [data-slot='cursor'] {
     background: var(--app-selected-background) !important;
-    border: 1px solid var(--app-selected-border);
   }
   .app-tabs [data-selected='true'] [data-slot='tabContent'] {
     color: var(--app-selected-foreground) !important;
