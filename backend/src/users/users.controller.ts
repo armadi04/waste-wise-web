@@ -1,3 +1,4 @@
+import type { UploadedMultipartFile } from '@nestjs/platform-fastify/multipart';
 import {
   Controller,
   Get,
@@ -32,7 +33,10 @@ import { ManageUserPermissionsDto } from './dto/manage-user-permissions.dto';
 import { Permissions } from '../auth/permissions.decorator';
 import { PermissionsGuard } from '../auth/permissions.guard';
 import { OwnerOrPermissionGuard } from '../auth/owner-or-permission.guard';
-import { FileInterceptor, NoFilesInterceptor } from '@nestjs/platform-express';
+import {
+  FileInterceptor,
+  NoFilesInterceptor,
+} from '@nestjs/platform-fastify/multipart';
 import { MediaService } from '../media/media.service';
 import { MediaUploadAdmissionInterceptor } from '../media/media-upload-admission.interceptor';
 import { CacheService } from '../common/cache/cache.service';
@@ -102,7 +106,7 @@ export class UsersController {
     @Param('id') id: string,
     @Body() updateUserDto: UpdateUserDto,
     @Req() req: IAuthRequest,
-    @UploadedFile() file?: Express.Multer.File,
+    @UploadedFile() file?: UploadedMultipartFile,
   ) {
     // Field-level rules (owners can't change their own access or email,
     // access fields need manage_* and may only grant what the caller holds)

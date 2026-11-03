@@ -4,6 +4,7 @@ process.env.TZ = 'UTC';
 import { z } from 'zod';
 import { resolveTurnstileConfig } from '@/auth/turnstile-config';
 import { resolveStorageProfiles } from './media-storage.config';
+import { parseTrustProxy } from '@/common/utils/request-logging';
 
 /**
  * Strict boolean env parser. `z.coerce.boolean()` uses `Boolean(string)`, which
@@ -142,7 +143,7 @@ const baseEnvSchema = z.object({
   // Shown as the issuer in authenticator apps for two-factor codes.
   APP_NAME: z.string().default('Nestplate'),
   ALLOWED_ORIGINS: z.string().default('*'),
-  // Express `trust proxy`: unset/false, a hop count or proxy addresses/subnets.
+  // Unset/false ignores forwarded headers. Otherwise use actual proxy addresses/CIDRs.
   TRUST_PROXY: z.string().optional(),
   LOG_LEVEL: z
     .enum(['trace', 'debug', 'info', 'warn', 'error', 'fatal', 'silent'])
@@ -150,6 +151,15 @@ const baseEnvSchema = z.object({
 });
 
 export const envSchema = baseEnvSchema.superRefine((env, context) => {
+  try {
+    parseTrustProxy(env.TRUST_PROXY);
+  } catch (error) {
+    context.addIssue({
+      code: 'custom',
+      path: ['TRUST_PROXY'],
+      message: (error as Error).message,
+    });
+  }
   try {
     resolveStorageProfiles(env);
   } catch (error) {

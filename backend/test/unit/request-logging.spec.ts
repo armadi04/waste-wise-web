@@ -32,12 +32,14 @@ describe('request logging', () => {
     expect(JSON.stringify(logged)).not.toContain('secret');
   });
 
-  it('parses TRUST_PROXY into an express trust proxy setting', () => {
+  it('parses TRUST_PROXY into a Fastify trust proxy setting', () => {
     expect(parseTrustProxy(undefined)).toBeUndefined();
     expect(parseTrustProxy('false')).toBeUndefined();
-    expect(parseTrustProxy('1')).toBe(1);
-    expect(parseTrustProxy('loopback, 10.0.0.0/8')).toBe(
-      'loopback, 10.0.0.0/8',
-    );
+    expect(() => parseTrustProxy('1')).toThrow('addresses/CIDRs');
+    expect(() => parseTrustProxy('true')).toThrow('addresses/CIDRs');
+    expect(parseTrustProxy('loopback, 10.0.0.0/8')).toEqual([
+      'loopback',
+      '10.0.0.0/8',
+    ]);
   });
 });

@@ -38,7 +38,7 @@ Source of truth: `src/config/env.ts`; template: `.env.example`. Invalid/missing 
 | Database policy | DB_SYNCHRONIZE=false, DB_SEED=true; DB_SKIP_MIGRATIONS only bypasses app boot migrations |
 | Sessions | SESSION_ADMIN_IDLE_MINUTES=120, SESSION_ADMIN_ABSOLUTE_HOURS=8 |
 | Timezone | APP_DEFAULT_TIME_ZONE=Asia/Jakarta; reports also support Makassar/Jayapura |
-| Proxy | TRUST_PROXY: unset, hop count, or proxy addresses/subnets |
+| Proxy | TRUST_PROXY: unset/false, or verified proxy addresses/subnets; true/hop counts are rejected |
 | Depot | DEPOT_BASE_URL (origin), DEPOT_API_KEY (write scope) |
 | Direct S3 | S3_REGION, S3_BUCKET, S3_ACCESS_KEY_ID, S3_SECRET_ACCESS_KEY; optional S3_ENDPOINT, S3_FORCE_PATH_STYLE=false |
 | Redis | REDIS_HOST optional; REDIS_PORT=6379, REDIS_TTL=3600 seconds, REDIS_USERNAME/PASSWORD |
@@ -76,18 +76,26 @@ own run. `migrate:fresh[:seed]` drops schema and is only for explicitly authoriz
 
 - `start:dev`: Bun watch; `build`: Nest + tsc-alias; `start:prod`: Bun compiled output.
 - `lint`: ESLint fixes; `format`: Prettier write. Review resulting diffs.
-- `spec:generate`: regenerate `swagger.json` from an app connected to the intended DB.
+- `spec:generate`: regenerate `swagger.json` from real controller/DTO metadata with mocked dependencies, a sanitized environment and no database; preserve the artifact when semantically unchanged.
 - `graphql:types`: regenerate SDL types. Frontend `api:generate` consumes Swagger.
 - `schema:check`: read-only schema/naming/junction check; use a migrated disposable DB.
 
 ## Tests and isolation
 
 Required checks: `bun run lint`, `bun run test`, `bun run build`.
+For HTTP adapter/auth/upload/GraphQL/realtime changes also run `bun run test:http`.
+This suite uses Fastify `inject()` with mocked services and the actual GraphQL module;
+Socket.IO handshakes use an ephemeral loopback port. It never connects to a database
+and does not run the opt-in database/E2E harness.
 Default scripts target `test/unit/` only. The unit launcher creates an allowlisted child
 environment with `--no-env-file`, dummy provider credentials and an unreachable DB port.
 It never inherits developer DB/provider settings. Unit tests use fakes and do not need providers
 or a live DB. Focused runs use `NESTPLATE_TEST_MODE=unit bun --no-env-file test test/unit/<file>`.
 All tests live under `test/`.
+
+`bun --no-env-file test/performance/http-benchmark.ts fastify` runs the transport
+microbenchmark without providers or a database. See [Operations](OPERATIONS.md#fastify-migration-validation-and-rollback)
+for the recorded Express comparison, limitations and rollback procedure.
 
 E2E and database integration tests are opt-in, run only when explicitly requested.
 Provision a separate disposable PostgreSQL instance/database named `nestplate_test` first.

@@ -1,3 +1,5 @@
+import { RequireSessionCsrf } from './session-csrf.guard';
+import { setSessionCookie } from '@/auth/session-cookies';
 import {
   Controller,
   Post,
@@ -15,7 +17,7 @@ import {
   Res,
 } from '@nestjs/common';
 import crypto from 'crypto';
-import type { Response } from 'express';
+import type { FastifyReply as Response } from 'fastify';
 import {
   ApiTags,
   ApiOperation,
@@ -39,7 +41,7 @@ import { PermissionsGuard } from './permissions.guard';
 import { Permissions } from './permissions.decorator';
 import { Throttle } from '@nestjs/throttler';
 
-import { NoFilesInterceptor } from '@nestjs/platform-express';
+import { NoFilesInterceptor } from '@nestjs/platform-fastify/multipart';
 import { UseInterceptors } from '@nestjs/common';
 import { User } from '../users/entities/user.entity';
 import { SessionsService } from '../sessions/sessions.service';
@@ -74,14 +76,14 @@ export class AuthController {
     accessToken: string,
     maxAge: number,
   ) {
-    res.cookie('accessToken', accessToken, {
+    setSessionCookie(res, 'accessToken', accessToken, {
       httpOnly: true,
       secure: this.isProd,
       sameSite: 'strict',
       path: '/',
       maxAge,
     });
-    res.cookie('authenticated', '1', {
+    setSessionCookie(res, 'authenticated', '1', {
       httpOnly: false,
       secure: this.isProd,
       sameSite: 'strict',
@@ -95,7 +97,7 @@ export class AuthController {
     refreshToken: string,
     maxAge: number,
   ) {
-    res.cookie('refreshToken', refreshToken, {
+    setSessionCookie(res, 'refreshToken', refreshToken, {
       httpOnly: true,
       secure: this.isProd,
       sameSite: 'strict',
@@ -110,7 +112,7 @@ export class AuthController {
       current && /^[a-f0-9]{32}$/.test(current)
         ? current
         : crypto.randomBytes(16).toString('hex');
-    res.cookie('csrfToken', csrfToken, {
+    setSessionCookie(res, 'csrfToken', csrfToken, {
       httpOnly: false,
       secure: this.isProd,
       sameSite: 'lax',
@@ -435,6 +437,7 @@ export class AuthController {
   }
 
   @Post('refresh')
+  @RequireSessionCsrf()
   @ApiOperation({ summary: 'Refresh access token using refresh token cookie' })
   @ApiResponse({
     status: 200,
@@ -465,6 +468,7 @@ export class AuthController {
   }
 
   @ApiBearerAuth()
+  @RequireSessionCsrf()
   @UseGuards(AuthGuard('jwt'))
   @Post('logout')
   @ApiOperation({ summary: 'Logout and clear refresh token cookie' })
@@ -483,7 +487,7 @@ export class AuthController {
     }
     // Also blacklist the refresh token so a captured one can't mint new tokens
     // after logout (it stays valid for its full TTL otherwise).
-    const refreshToken = req.cookies?.refreshToken as string | undefined;
+    const refreshToken = req.cookies?.refreshToken;
     if (refreshToken) {
       await this.authService.blacklistToken(refreshToken);
     }
@@ -576,6 +580,7 @@ export class AuthController {
   }
 
   @ApiBearerAuth()
+  @RequireSessionCsrf()
   @UseGuards(AuthGuard('jwt'))
   @Post('switch-role')
   @ApiOperation({ summary: 'Re-issue tokens scoped to a role the user holds' })

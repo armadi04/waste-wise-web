@@ -1,3 +1,4 @@
+import type { UploadedMultipartFile } from '@nestjs/platform-fastify/multipart';
 import { describe, expect, it } from 'bun:test';
 import { ConfigService } from '@nestjs/config';
 import { Subject, lastValueFrom, of, throwError } from 'rxjs';
@@ -16,7 +17,7 @@ const file = (buffer = pdf) =>
     size: buffer.length,
     originalname: 'document.pdf',
     mimetype: 'text/html',
-  }) as Express.Multer.File;
+  }) as UploadedMultipartFile;
 
 describe('media upload validation', () => {
   it('rejects missing/empty files and oversized buffers before storage', async () => {

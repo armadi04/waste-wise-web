@@ -1,3 +1,4 @@
+import type { UploadedMultipartFile } from '@nestjs/platform-fastify/multipart';
 import { S3Client } from 'bun';
 import type { MediaStorage, StoredObject } from './media-storage';
 
@@ -10,7 +11,7 @@ export class S3StorageProvider implements MediaStorage {
   }
 
   async upload(
-    file: Express.Multer.File,
+    file: UploadedMultipartFile,
     object: StoredObject,
     onReserved: (object: StoredObject) => Promise<void>,
   ): Promise<StoredObject> {
@@ -23,7 +24,7 @@ export class S3StorageProvider implements MediaStorage {
     });
     const response = await fetch(url, {
       method: 'PUT',
-      body: new Uint8Array(file.buffer).buffer,
+      body: new Uint8Array(file.buffer!).buffer,
       headers: { 'Content-Type': file.mimetype },
       signal: AbortSignal.timeout(30_000),
     });

@@ -4,7 +4,7 @@ import { GraphQLModule } from '@nestjs/graphql';
 import { ApolloDriver, ApolloDriverConfig } from '@nestjs/apollo';
 import { DateTimeResolver } from 'graphql-scalars';
 import depthLimit from 'graphql-depth-limit';
-import type { Request, Response } from 'express';
+import { graphqlContext } from './graphql-context';
 // @nestjs/apollo is ESM, so it sees Apollo's ESM type declarations. These files
 // compile as CJS, so the plugin type has to be resolved the same way or the two
 // declarations of ApolloServerPlugin are treated as unrelated.
@@ -77,11 +77,7 @@ import { persistedQueriesOnlyPlugin } from './plugins/persisted-queries-only.plu
           plugins,
           // Expose req/res (for request-scoped guards like rate limiting) plus a
           // fresh set of DataLoaders per request to batch relation lookups.
-          context: ({ req, res }: { req: Request; res: Response }) => ({
-            req,
-            res,
-            loaders: dataloaderService.createLoaders(),
-          }),
+          context: graphqlContext(dataloaderService),
         };
       },
     }),

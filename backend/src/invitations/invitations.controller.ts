@@ -19,7 +19,7 @@ import {
   ApiResponse,
   ApiBearerAuth,
 } from '@nestjs/swagger';
-import { NoFilesInterceptor } from '@nestjs/platform-express';
+import { NoFilesInterceptor } from '@nestjs/platform-fastify/multipart';
 import { Throttle } from '@nestjs/throttler';
 import { InvitationsService } from './invitations.service';
 import { CreateInvitationDto } from './dto/create-invitation.dto';

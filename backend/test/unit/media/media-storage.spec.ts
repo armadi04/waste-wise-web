@@ -1,3 +1,4 @@
+import type { UploadedMultipartFile } from '@nestjs/platform-fastify/multipart';
 import { afterEach, describe, expect, it, mock, spyOn } from 'bun:test';
 import { ConfigService } from '@nestjs/config';
 import { MediaStorageService } from '@/media/storage/media-storage.service';
@@ -126,7 +127,7 @@ describe('storage recovery and bounded requests', () => {
     const file = {
       mimetype: 'application/pdf',
       buffer: Buffer.from('bytes'),
-    } as Express.Multer.File;
+    } as UploadedMultipartFile;
     const object = { path: 'media/7/stable' };
     const reserved = mock(async () => undefined);
     await adapter.upload(file, object, reserved);

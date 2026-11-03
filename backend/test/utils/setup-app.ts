@@ -1,9 +1,10 @@
+import type { NestFastifyApplication } from '@nestjs/platform-fastify';
 import { configureApiRouting } from '@/config/api-routing';
-import { INestApplication, ValidationPipe } from '@nestjs/common';
+import { ValidationPipe } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
 import { ThrottlerGuard } from '@nestjs/throttler';
 import { DataSource } from 'typeorm';
-import cookieParser from 'cookie-parser';
+import { createHttpAdapter, registerHttpPlugins } from '@/config/http';
 import { useContainer } from 'class-validator';
 import { Logger } from 'nestjs-pino';
 import { AppModule } from '@/app.module';
@@ -21,7 +22,7 @@ import {
 } from './fakes';
 
 export interface TestContext {
-  app: INestApplication;
+  app: NestFastifyApplication;
   moduleRef: TestingModule;
   dataSource: DataSource;
   mail: FakeMailService;
@@ -65,15 +66,21 @@ export async function setupTestApp(
     builder.overrideProvider(DataSource).useValue(dataSourceOverride);
   const moduleRef = await builder.compile();
 
-  const app = moduleRef.createNestApplication({ bufferLogs: true });
+  const app = moduleRef.createNestApplication<NestFastifyApplication>(
+    createHttpAdapter(),
+    {
+      bufferLogs: true,
+    },
+  );
   app.useLogger(app.get(Logger));
   app.useGlobalFilters(new AllExceptionsFilter(app.get(Logger)));
   useContainer(app.select(AppModule), { fallbackOnErrors: true });
-  app.use(cookieParser());
+  await registerHttpPlugins(app);
   configureApiRouting(app);
   app.useGlobalPipes(new ValidationPipe({ transform: true, whitelist: true }));
 
   await app.init();
+  await app.getHttpAdapter().getInstance().ready();
 
   const dataSource = app.get(DataSource);
 

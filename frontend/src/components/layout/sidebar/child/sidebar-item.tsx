@@ -32,7 +32,7 @@ export const SidebarItem = ({
   }
 
   const buttonClasses = `
-    relative flex items-center rounded-large cursor-pointer transition-all duration-200
+    relative flex items-center rounded-medium cursor-pointer transition-all duration-200
     ${
       isActive
         ? 'app-selected font-medium'

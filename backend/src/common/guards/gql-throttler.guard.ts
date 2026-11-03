@@ -7,7 +7,7 @@ import { isPerUserThrottled } from './user-throttler.guard';
  * Global rate-limit guard that also works over GraphQL. The default
  * {@link ThrottlerGuard} reads `req`/`res` via `switchToHttp()`, which yields
  * the resolver root object (no `req.ip`) under a GraphQL resolver. This override
- * pulls the Express request/response off the Apollo context instead, so the same
+ * pulls the Fastify request/reply off the Apollo context instead, so the same
  * per-IP throttle applies to `/graphql` as to the REST routes.
  *
  * Routes marked with `@ThrottlePerUser` are left to {@link UserThrottlerGuard},

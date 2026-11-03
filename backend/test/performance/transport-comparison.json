@@ -1,0 +1,101 @@
+{
+  "date": "2026-10-26",
+  "baselineGitCommit": "59fc731acf7bc371dd3cd72673ce7fbb3766fe6b",
+  "openapiSha256Before": "aa1259fcdfd115de8223ff0a8eae636166cc8b832620fa11b831ee1ee7918748",
+  "openapiSha256After": "aa1259fcdfd115de8223ff0a8eae636166cc8b832620fa11b831ee1ee7918748",
+  "workload": {
+    "requestsPerTrial": 10000,
+    "concurrency": 20,
+    "warmupRequests": 1000,
+    "trials": 3,
+    "endpoint": "GET /benchmark (deterministic JSON, 10 items)",
+    "database": false,
+    "metricsScope": "Combined server and fetch client in one Bun process; CPU can exceed 100% across cores; RSS sampled after each trial. Shared host, sequential adapter runs, substantial variance: descriptive only, no production performance claim."
+  },
+  "express": {
+    "nestjs": "12.0.1",
+    "adapter": "express",
+    "bun": "1.3.14",
+    "trials": [
+      {
+        "requests": 10000,
+        "concurrency": 20,
+        "elapsedMs": 2527.497606,
+        "requestsPerSecond": 3956.482481431874,
+        "p50Ms": 3.927791999999954,
+        "p95Ms": 12.215098000000125,
+        "cpuMs": 5150.929,
+        "cpuPercent": 203.795603515994,
+        "rssMiB": 131.234375,
+        "heapUsedMiB": 21.31242847442627
+      },
+      {
+        "requests": 10000,
+        "concurrency": 20,
+        "elapsedMs": 1898.2666669999999,
+        "requestsPerSecond": 5267.963755484308,
+        "p50Ms": 2.7816159999993033,
+        "p95Ms": 9.137600999999904,
+        "cpuMs": 3440.647,
+        "cpuPercent": 181.2520369141582,
+        "rssMiB": 128.37890625,
+        "heapUsedMiB": 35.80794620513916
+      },
+      {
+        "requests": 10000,
+        "concurrency": 20,
+        "elapsedMs": 975.557734,
+        "requestsPerSecond": 10250.54658630793,
+        "p50Ms": 1.7849519999999757,
+        "p95Ms": 3.5459710000004634,
+        "cpuMs": 1470.227,
+        "cpuPercent": 150.7063035594775,
+        "rssMiB": 127.07421875,
+        "heapUsedMiB": 21.135112762451172
+      }
+    ]
+  },
+  "fastify": {
+    "nestjs": "12.1.2",
+    "adapter": "fastify",
+    "bun": "1.3.14",
+    "trials": [
+      {
+        "requests": 10000,
+        "concurrency": 20,
+        "elapsedMs": 1065.766155,
+        "requestsPerSecond": 9382.92134075134,
+        "p50Ms": 1.8715799999999945,
+        "p95Ms": 4.249321000000009,
+        "cpuMs": 2186.432,
+        "cpuPercent": 205.15119472901628,
+        "rssMiB": 127.38671875,
+        "heapUsedMiB": 17.706652641296387
+      },
+      {
+        "requests": 10000,
+        "concurrency": 20,
+        "elapsedMs": 1668.6361860000002,
+        "requestsPerSecond": 5992.918099164367,
+        "p50Ms": 2.2863689999999224,
+        "p95Ms": 9.260159999999814,
+        "cpuMs": 3129.156,
+        "cpuPercent": 187.52775627508774,
+        "rssMiB": 129.47265625,
+        "heapUsedMiB": 24.567646026611328
+      },
+      {
+        "requests": 10000,
+        "concurrency": 20,
+        "elapsedMs": 2302.930846,
+        "requestsPerSecond": 4342.292786328851,
+        "p50Ms": 4.143151000000216,
+        "p95Ms": 9.81471799999963,
+        "cpuMs": 3774.507,
+        "cpuPercent": 163.90014518047755,
+        "rssMiB": 129.234375,
+        "heapUsedMiB": 32.320475578308105
+      }
+    ]
+  }
+}

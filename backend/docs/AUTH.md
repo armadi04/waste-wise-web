@@ -52,7 +52,7 @@ and logs row ids instead of recipient addresses. Starter login uses passwords/Go
 TOTP and optional SSO; the helper is not a public email-OTP login endpoint.
 
 Request logs carry method, path (no query string) and status — never
-headers or cookies. Set `TRUST_PROXY` (hop count or proxy addresses/subnets) when the API sits
+headers or cookies. Set `TRUST_PROXY` to verified proxy addresses/subnets when the API sits
 behind Caddy or another proxy so throttling and sessions see client IPs. Browser identity
 is read through `/api/v1/auth/me`. Mobile/machine clients may use explicit Bearer authorization.
 
@@ -358,9 +358,14 @@ another user's session — the admin routes are the only cross-user path, and th
 ## CSRF
 
 The `refresh`, `logout` and `switch-role` routes are mutating and rely on cookies, so they are protected
-by `CsrfMiddleware` (wired in `AuthModule.configure`). It requires the `csrfToken` cookie to
+by the global `SessionCsrfGuard` before throttling and the route's Passport guard. It requires the `csrfToken` cookie to
 match the `X-CSRF-Token` request header (a double-submit check); a mismatch is a `403`. The
 cookie is set non-httpOnly at login precisely so the SPA can echo it back in the header.
+The check also applies to Bearer requests on these three routes. Cookies are parsed by
+`@fastify/cookie`; no cookie signing secret was used by Express, so existing unsigned
+cookies remain compatible and signing is not newly enabled. JWT signatures are unchanged.
+Cookie lifetimes stay in milliseconds in session policy and convert to seconds only
+when writing Fastify cookies. Names, paths, expiry deadlines and security flags are retained.
 
 ## Realtime & mail
 

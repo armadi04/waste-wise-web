@@ -1,6 +1,6 @@
 import { ConfigService } from '@nestjs/config';
 import { UnauthorizedException } from '@nestjs/common';
-import type { Request } from 'express';
+import type { FastifyRequest as Request } from 'fastify';
 import { describe, beforeEach, it, expect, jest } from 'bun:test';
 import { JwtStrategy } from '../../../src/auth/jwt.strategy';
 import { AuthService } from '../../../src/auth/auth.service';

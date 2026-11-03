@@ -2,7 +2,7 @@
 
 ## Boundaries
 
-NestJS 12 runs on Bun with Express, PostgreSQL/TypeORM, Pino logging, cookie/JWT sessions,
+NestJS 12.1.2 runs on Bun with Fastify 5, PostgreSQL/TypeORM, Pino logging, cookie/JWT sessions,
 RBAC, EventEmitter2, Socket.IO, optional Redis and opt-in schema-first GraphQL.
 Controllers handle transport. Services own logic; generic CRUD extends `BaseService<T>`.
 Guards authorize, DTOs validate, entities define persistence. Business resources are soft-deleted.
@@ -11,7 +11,11 @@ Guards authorize, DTOs validate, entities define persistence. Business resources
 
 `main.ts` validates env before initialization, installs cookie parsing, CORS, global exception
 handling, class-validator DI, the `/api` global prefix, URI versioning with default version `1`, and transforming/whitelisting ValidationPipe.
-Swagger `/api/docs` is non-production. Middleware precedes guards, DTO pipes and services.
+Swagger `/api/docs` is non-production. Fastify cookie hooks precede session CSRF guards,
+authentication, DTO pipes and services. `config/http.ts` shares adapter/parser/CORS setup.
+Media uses native `@nestjs/platform-fastify/multipart` interceptors and memory storage;
+admission runs before buffering. JSON/urlencoded bodies retain the 100 KiB limit and
+urlencoded indexed arrays; media uploads retain their independent configured limits.
 Global throttling defaults to 100 requests/minute; credential/upload routes use tighter limits.
 Health probes skip throttling. Permission metadata needs a matching guard.
 

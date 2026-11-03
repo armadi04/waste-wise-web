@@ -1,3 +1,4 @@
+import { setSessionCookie } from '@/auth/session-cookies';
 import { API_BASE_PATH } from '@/config/api-routing';
 import { sessionCookieMaxAge } from '@/auth/session-cookies';
 import type { SessionTokens } from '@/auth/auth.service';
@@ -15,7 +16,10 @@ import {
 import { ApiExcludeController } from '@nestjs/swagger';
 import { ConfigService } from '@nestjs/config';
 import crypto from 'crypto';
-import type { Request, Response } from 'express';
+import type {
+  FastifyRequest as Request,
+  FastifyReply as Response,
+} from 'fastify';
 import { SsoService } from './sso.service';
 import { AuthService } from '../auth/auth.service';
 
@@ -51,7 +55,7 @@ export class SsoController {
   // SPA's login page with a code it can explain instead.
   private redirectWithError(res: Response, code: SsoErrorCode): void {
     const base = this.env.get<string>('SSO_POST_LOGOUT_URI') ?? '';
-    res.redirect(`${base}/login?ssoError=${code}`);
+    res.redirect(`${base}/login?ssoError=${code}`, 302);
   }
 
   // Silent login: attempt authorization with `prompt=none`. If an IdP session
@@ -60,7 +64,7 @@ export class SsoController {
   // one-shot `ssoSilent` cookie lets the SPA avoid retrying in a loop.
   @Get('silent')
   async silentLogin(@Res() res: Response): Promise<void> {
-    res.cookie('ssoSilent', '1', {
+    setSessionCookie(res, 'ssoSilent', '1', {
       httpOnly: false, // the SPA reads this to gate its one-shot attempt
       secure: isProd(),
       sameSite: 'lax',
@@ -86,7 +90,7 @@ export class SsoController {
     if (currentUrl.searchParams.has('error')) {
       // Keep `ssoSilent` set so the SPA renders the login form, not a loop.
       this.clearPkce(res);
-      res.redirect(this.env.get<string>('SSO_POST_LOGOUT_URI') ?? '/');
+      res.redirect(this.env.get<string>('SSO_POST_LOGOUT_URI') ?? '/', 302);
       return;
     }
 
@@ -125,7 +129,7 @@ export class SsoController {
     });
     this.setAuthCookies(res, tokens, idToken);
 
-    res.redirect(this.env.get<string>('SSO_SUCCESS_REDIRECT') ?? '/');
+    res.redirect(this.env.get<string>('SSO_SUCCESS_REDIRECT') ?? '/', 302);
   }
 
   // Generate PKCE, stash verifier/state in short-lived cookies, redirect to the
@@ -143,9 +147,9 @@ export class SsoController {
       path: SSO_COOKIE_PATH,
       maxAge: 10 * 60 * 1000,
     };
-    res.cookie('ssoVerifier', verifier, transient);
-    res.cookie('ssoState', state, transient);
-    res.redirect(this.sso.buildAuthUrl(challenge, state, prompt).href);
+    setSessionCookie(res, 'ssoVerifier', verifier, transient);
+    setSessionCookie(res, 'ssoState', state, transient);
+    res.redirect(this.sso.buildAuthUrl(challenge, state, prompt).href, 302);
   }
 
   // Drop the per-attempt PKCE cookies.
@@ -168,10 +172,10 @@ export class SsoController {
     res.clearCookie('ssoIdToken', { path: SSO_COOKIE_PATH });
 
     if (this.sso.enabled && idToken) {
-      res.redirect(this.sso.endSessionUrl(idToken).href);
+      res.redirect(this.sso.endSessionUrl(idToken).href, 302);
       return;
     }
-    res.redirect(this.env.get<string>('SSO_POST_LOGOUT_URI') ?? '/');
+    res.redirect(this.env.get<string>('SSO_POST_LOGOUT_URI') ?? '/', 302);
   }
 
   // Back-channel logout: the IdP POSTs a signed logout_token here on single
@@ -202,34 +206,34 @@ export class SsoController {
     idToken: string,
   ): void {
     const maxAge = sessionCookieMaxAge(tokens.sessionExpiresAt);
-    res.cookie('refreshToken', tokens.refreshToken, {
+    setSessionCookie(res, 'refreshToken', tokens.refreshToken, {
       httpOnly: true,
       secure: isProd(),
       sameSite: 'strict',
       maxAge,
     });
-    res.cookie('accessToken', tokens.accessToken, {
+    setSessionCookie(res, 'accessToken', tokens.accessToken, {
       httpOnly: true,
       secure: isProd(),
       sameSite: 'strict',
       path: '/',
       maxAge,
     });
-    res.cookie('authenticated', '1', {
+    setSessionCookie(res, 'authenticated', '1', {
       httpOnly: false,
       secure: isProd(),
       sameSite: 'strict',
       path: '/',
       maxAge,
     });
-    res.cookie('csrfToken', crypto.randomBytes(16).toString('hex'), {
+    setSessionCookie(res, 'csrfToken', crypto.randomBytes(16).toString('hex'), {
       httpOnly: false,
       secure: isProd(),
       sameSite: 'lax',
       path: '/',
       maxAge,
     });
-    res.cookie('ssoIdToken', idToken, {
+    setSessionCookie(res, 'ssoIdToken', idToken, {
       httpOnly: true,
       secure: isProd(),
       sameSite: 'lax',

@@ -1,3 +1,4 @@
+import type { UploadedMultipartFile } from '@nestjs/platform-fastify/multipart';
 import { API_BASE_PATH } from '@/config/api-routing';
 import {
   Injectable,
@@ -40,7 +41,7 @@ export class MediaService extends BaseService<Media> {
   }
 
   async uploadFile(
-    input: Express.Multer.File,
+    input: UploadedMultipartFile,
     userId: number,
     imageOnly = false,
   ): Promise<Media> {

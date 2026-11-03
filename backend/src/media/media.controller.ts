@@ -1,3 +1,4 @@
+import type { UploadedMultipartFile } from '@nestjs/platform-fastify/multipart';
 import {
   Controller,
   Get,
@@ -17,7 +18,7 @@ import {
   ClassSerializerInterceptor,
   NotFoundException,
 } from '@nestjs/common';
-import type { Response } from 'express';
+import type { FastifyReply as Response } from 'fastify';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import {
   ApiTags,
@@ -33,7 +34,7 @@ import { MediaUploadAdmissionInterceptor } from './media-upload-admission.interc
 import { MediaIdPipe } from './dto/media-id.pipe';
 import { Permissions } from '../auth/permissions.decorator';
 import { PermissionsGuard } from '../auth/permissions.guard';
-import { FileInterceptor } from '@nestjs/platform-express';
+import { FileInterceptor } from '@nestjs/platform-fastify/multipart';
 import { CacheService } from '../common/cache/cache.service';
 import { PaginationParamsDto } from '../common/dto/pagination-params.dto';
 import {
@@ -81,7 +82,7 @@ export class MediaController {
   @ApiResponse({ status: 201, type: Media })
   @UseInterceptors(MediaUploadAdmissionInterceptor, FileInterceptor('file'))
   async uploadFile(
-    @UploadedFile() file: Express.Multer.File,
+    @UploadedFile() file: UploadedMultipartFile,
     @Req() req: IAuthRequest,
   ) {
     const result = await this.mediaService.uploadFile(file, req.user.userId);
@@ -157,7 +158,7 @@ export class MediaController {
       );
     }
     const url = await this.mediaService.getSignedUrl(+id);
-    return res.redirect(302, url);
+    return res.redirect(url, 302);
   }
 
   @Get(':id/stream')
@@ -179,7 +180,7 @@ export class MediaController {
     }
 
     const url = await this.mediaService.getSignedUrl(+id);
-    return res.redirect(302, url);
+    return res.redirect(url, 302);
   }
 
   @Post('bulk-delete')

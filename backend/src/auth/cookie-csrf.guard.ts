@@ -4,7 +4,7 @@ import {
   ForbiddenException,
   Injectable,
 } from '@nestjs/common';
-import type { Request } from 'express';
+import type { FastifyRequest as Request } from 'fastify';
 
 // Bearer clients do not rely on ambient browser cookies. Cookie-authenticated writes
 // must prove possession of the readable CSRF cookie, including direct backend calls.

@@ -1,17 +1,14 @@
+import type { NestFastifyApplication } from '@nestjs/platform-fastify';
+import { createHttpAdapter, registerHttpPlugins } from '@/config/http';
 import { afterAll, beforeAll, describe, expect, it, mock } from 'bun:test';
-import {
-  INestApplication,
-  MiddlewareConsumer,
-  Module,
-  NestModule,
-  ValidationPipe,
-} from '@nestjs/common';
+import { Module, ValidationPipe } from '@nestjs/common';
 import { Test } from '@nestjs/testing';
+import { APP_GUARD } from '@nestjs/core';
+import { SessionCsrfGuard } from '@/auth/session-csrf.guard';
 import { ConfigService } from '@nestjs/config';
 import { EventEmitter2 } from '@nestjs/event-emitter';
 import { HealthCheckService, MemoryHealthIndicator } from '@nestjs/terminus';
 import { SwaggerModule } from '@nestjs/swagger';
-import cookieParser from 'cookie-parser';
 import request from 'supertest';
 import { API_VERSION, configureApiRouting } from '@/config/api-routing';
 import {
@@ -22,7 +19,6 @@ import {
 import { AppController } from '@/app.controller';
 import { AppService } from '@/app.service';
 import { AuthController } from '@/auth/auth.controller';
-import { AuthModule } from '@/auth/auth.module';
 import { AuthService } from '@/auth/auth.service';
 import { TurnstileService } from '@/auth/turnstile.service';
 import { TwoFactorService } from '@/auth/two-factor.service';
@@ -65,6 +61,7 @@ const sso = {
 @Module({
   controllers: [AppController, AuthController, HealthController, SsoController],
   providers: [
+    { provide: APP_GUARD, useClass: SessionCsrfGuard },
     AppService,
     { provide: AuthService, useValue: auth },
     { provide: TurnstileService, useValue: { verify: async () => undefined } },
@@ -84,27 +81,24 @@ const sso = {
     },
   ],
 })
-class RoutingTestModule implements NestModule {
-  configure(consumer: MiddlewareConsumer) {
-    // Exercise the production middleware mapping without database/providers.
-    AuthModule.prototype.configure(consumer);
-  }
-}
+class RoutingTestModule {}
 
 describe('REST URI version 1', () => {
-  let app: INestApplication;
+  let app: NestFastifyApplication;
   beforeAll(async () => {
     const module = await Test.createTestingModule({
       imports: [RoutingTestModule],
     }).compile();
-    app = module.createNestApplication();
-    app.use(cookieParser());
+    app =
+      module.createNestApplication<NestFastifyApplication>(createHttpAdapter());
+    await registerHttpPlugins(app);
     configureApiRouting(app);
     app.useGlobalPipes(
       new ValidationPipe({ transform: true, whitelist: true }),
     );
     setupSwagger(app);
     await app.init();
+    await app.getHttpAdapter().getInstance().ready();
   });
   afterAll(async () => {
     await app?.close();

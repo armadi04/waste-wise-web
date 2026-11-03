@@ -1,3 +1,4 @@
+import type { UploadedMultipartFile } from '@nestjs/platform-fastify/multipart';
 import { DepotClient, DepotError, putToS3 } from '@univstekom/depot-sdk';
 import type { MediaStorage, StoredObject } from './media-storage';
 
@@ -17,7 +18,7 @@ export class DepotStorageProvider implements MediaStorage {
   }
 
   async upload(
-    file: Express.Multer.File,
+    file: UploadedMultipartFile,
     object: StoredObject,
     onReserved: (object: StoredObject) => Promise<void>,
   ): Promise<StoredObject> {
@@ -36,7 +37,7 @@ export class DepotStorageProvider implements MediaStorage {
     await onReserved(stored);
     await putToS3(
       reservation.uploadUrl,
-      file.buffer,
+      file.buffer!,
       file.mimetype,
       undefined,
       this.timedFetch,

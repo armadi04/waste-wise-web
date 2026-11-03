@@ -25,7 +25,7 @@ import { CreatePermissionDto } from './dto/create-permission.dto';
 import { UpdatePermissionDto } from './dto/update-permission.dto';
 import { Permissions } from '../auth/permissions.decorator';
 import { PermissionsGuard } from '../auth/permissions.guard';
-import { NoFilesInterceptor } from '@nestjs/platform-express';
+import { NoFilesInterceptor } from '@nestjs/platform-fastify/multipart';
 import { CacheInterceptor } from '@nestjs/cache-manager';
 import { CacheService } from '../common/cache/cache.service';
 import { PaginationParamsDto } from '../common/dto/pagination-params.dto';

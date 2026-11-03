@@ -1,3 +1,4 @@
+import type { UploadedMultipartFile } from '@nestjs/platform-fastify/multipart';
 import { describe, beforeEach, it, expect, mock } from 'bun:test';
 import { ConfigService } from '@nestjs/config';
 import { Repository } from 'typeorm';
@@ -29,7 +30,7 @@ describe('MediaService lifecycle', () => {
     mimetype: 'application/pdf',
     size: 5,
     buffer: Buffer.from('bytes'),
-  } as Express.Multer.File;
+  } as UploadedMultipartFile;
 
   beforeEach(() => {
     row = undefined;
@@ -90,7 +91,7 @@ describe('MediaService lifecycle', () => {
       } as unknown as MediaStorageService,
       { requestDeletion: deletion } as unknown as MediaCleanupService,
       {
-        transform: async (value: Express.Multer.File) => value,
+        transform: async (value: UploadedMultipartFile) => value,
       } as MediaUploadPipe,
     );
   });

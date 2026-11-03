@@ -1,6 +1,6 @@
 # Nestplate backend
 
-NestJS 12 on Bun, PostgreSQL and TypeORM. Owns auth/RBAC, users, invitations, 2FA,
+NestJS 12.1.2 with Fastify 5 on Bun, PostgreSQL and TypeORM. Owns auth/RBAC, users, invitations, 2FA,
 sessions, media (Depot/direct S3), SMTP outbox, notifications, audit, health, generic
 dashboard statistics and optional GraphQL.
 
@@ -44,6 +44,8 @@ Keep `DB_SYNCHRONIZE=false`. Baseline supports new databases only.
 and optional integrations are listed in [Development](docs/DEVELOPMENT.md#environment).
 Run `bun run build` before `start:prod` so imports are rewritten by tsc-alias.
 Default tests are unit-only; requested integration/E2E work uses `nestplate_test`.
+`bun run test:http` tests HTTP/GraphQL with Fastify injection and mocked dependencies,
+plus loopback Socket.IO handshakes, without a database.
 
 ## Documentation
 
