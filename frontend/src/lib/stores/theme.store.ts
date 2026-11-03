@@ -1,5 +1,6 @@
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
+import { syncThemeColor } from '@/lib/theme/appearance'
 
 /**
  * Theme store — single source of truth for dark/light mode.
@@ -39,6 +40,8 @@ export const useThemeStore = create<ThemeStore>()(
     }),
     {
       name: 'theme-store',
+      version: 1,
+      migrate: (persisted) => persisted as ThemeStore,
       merge: (persisted, current) => {
         const saved = persisted as Partial<ThemeStore> | undefined
         return {
@@ -57,9 +60,7 @@ const applyTheme = (isDark: boolean) => {
   document.documentElement.classList.remove('light', 'dark')
   document.documentElement.classList.add(isDark ? 'dark' : 'light')
   document.documentElement.style.colorScheme = isDark ? 'dark' : 'light'
-  document
-    .querySelector('meta[name="theme-color"]')
-    ?.setAttribute('content', isDark ? '#0F172A' : '#F8FAFC')
+  syncThemeColor()
 }
 
 // Apply once at module load, then on every change (fires synchronously inside `set`).
