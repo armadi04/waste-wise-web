@@ -16,4 +16,12 @@ export class CacheInvalidationListener {
   async clearUsers() {
     await this.cacheService.clearKeys('*/users*');
   }
+
+  @OnEvent('user.status_updated')
+  async clearUserStatusCaches() {
+    await Promise.all([
+      this.cacheService.clearKeys('*/users*'),
+      this.cacheService.clearKeys('*/sessions*'),
+    ]);
+  }
 }

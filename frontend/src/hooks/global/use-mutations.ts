@@ -25,13 +25,15 @@ export function useAppMutation<
 
   return useMutation({
     ...rest,
-    onSuccess: (data, variables, context) => {
+    onSuccess: async (data, variables, context) => {
       if (invalidateKeys) {
-        invalidateKeys.forEach((key) => {
-          queryClient.invalidateQueries({
-            queryKey: Array.isArray(key) ? key : [key],
-          })
-        })
+        await Promise.all(
+          invalidateKeys.map((key) =>
+            queryClient.invalidateQueries({
+              queryKey: Array.isArray(key) ? key : [key],
+            }),
+          ),
+        )
       }
 
       if (successMessage) {
@@ -44,7 +46,7 @@ export function useAppMutation<
 
       if (options.onSuccess) {
         // @ts-ignore - Handle TanStack Query signature differences
-        options.onSuccess(data, variables, context)
+        await options.onSuccess(data, variables, context)
       }
     },
     onError: (error: TError, variables, context) => {

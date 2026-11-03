@@ -9,12 +9,14 @@ import { Permission } from '../permissions/entities/permission.entity';
 import { Media } from '../media/entities/media.entity';
 import { MediaModule } from '../media/media.module';
 import { RolesModule } from '../roles/roles.module';
+import { SessionsModule } from '../sessions/sessions.module';
 
 @Module({
   imports: [
     TypeOrmModule.forFeature([User, Role, Permission, Media]),
     MediaModule,
     RolesModule,
+    SessionsModule,
   ],
   controllers: [UsersController],
   providers: [UsersService],

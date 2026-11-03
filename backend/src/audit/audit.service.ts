@@ -3,6 +3,7 @@ import { OnEvent } from '@nestjs/event-emitter';
 import { InjectRepository } from '@nestjs/typeorm';
 import { ILike, Repository } from 'typeorm';
 import { AuditLog } from './entities/audit-log.entity';
+import type { UserStatusUpdatedEvent } from '../users/user-events';
 
 /** What callers emit on `audit.record`. */
 export interface AuditEvent {
@@ -55,6 +56,22 @@ export class AuditService {
       this.logger.error(`Failed to record audit event ${event.action}`, error);
       if (event.eventId) throw error;
     }
+  }
+
+  @OnEvent('user.status_updated')
+  async recordUserStatus(event: UserStatusUpdatedEvent): Promise<void> {
+    await this.record({
+      action: 'user.status_updated',
+      actorId: event.actorId,
+      actorEmail: event.actorEmail,
+      subjectType: 'user',
+      subjectId: event.targetId,
+      summary: event.isActive
+        ? `Activated user #${event.targetId}`
+        : `Deactivated user #${event.targetId}`,
+      metadata: { isActive: event.isActive, targetEmail: event.targetEmail },
+      ipAddress: event.ipAddress,
+    });
   }
 
   /** Read-only listing for the admin page. Newest first; no update or delete. */

@@ -134,6 +134,15 @@ export class SessionsService extends BaseService<UserSession> {
     return Object.assign(session, { lastActiveAt: now, expiresAt });
   }
 
+  /** Revoke every live session for an account, including impersonation sessions. */
+  async revokeAllForUser(userId: number): Promise<{ revoked: number }> {
+    const result = await this.sessionRepository.update(
+      { userId, revokedAt: IsNull() },
+      { revokedAt: new Date() },
+    );
+    return { revoked: result.affected ?? 0 };
+  }
+
   /**
    * The user's own live sessions, most recently active first. Sessions opened by
    * an administrator signing in as them are left out: they aren't the user's

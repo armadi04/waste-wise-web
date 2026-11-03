@@ -19,6 +19,7 @@ import {
 } from '@/hooks/permissions/use-permissions'
 import { useAllRoles } from '@/hooks/roles/use-roles'
 import { useImpersonation } from '@/hooks/users/use-impersonation'
+import { queryKeys } from '@/lib/query/keys'
 import { usersQueryOptions } from '@/lib/query/options'
 import {
   bulkDeleteUsers,
@@ -28,6 +29,7 @@ import {
   syncUserPermissions,
   syncUserRoles,
   updateUser,
+  updateUserStatus,
 } from '@/lib/services/user.service'
 import { useAuthStore } from '@/lib/stores/auth.store'
 import { useUsersUiStore } from '@/lib/stores/users-ui.store'
@@ -47,7 +49,7 @@ export const useUsers = () => {
 
 export const useAllUsers = (enabled = true) => {
   return useQuery({
-    queryKey: ['users', 'all'],
+    queryKey: queryKeys.users.allList,
     queryFn: async () => {
       const response = await getUsers({ paginated: false })
       return Array.isArray(response) ? response : response?.data || []
@@ -96,27 +98,34 @@ export const useUserPage = () => {
   const updateMutation = useAppMutation({
     mutationFn: ({ id, data }: { id: number; data: Partial<CreateUserData> }) =>
       updateUser(id, data),
-    invalidateKeys: ['users'],
+    invalidateKeys: [queryKeys.users.all],
     successMessage: 'User updated successfully',
     onSuccess: () => ui.close('form'),
   })
 
+  const statusMutation = useAppMutation({
+    mutationFn: ({ id, isActive }: { id: number; isActive: boolean }) =>
+      updateUserStatus(id, isActive),
+    invalidateKeys: [queryKeys.users.all, queryKeys.sessions.all],
+    successMessage: 'User status updated',
+  })
+
   const deleteMutation = useAppMutation({
     mutationFn: deleteUser,
-    invalidateKeys: ['users'],
+    invalidateKeys: [queryKeys.users.all],
     successMessage: 'User deleted successfully',
   })
 
   const bulkDeleteMutation = useAppMutation({
     mutationFn: bulkDeleteUsers,
-    invalidateKeys: ['users'],
+    invalidateKeys: [queryKeys.users.all],
     successMessage: 'Users deleted successfully',
   })
 
   const syncRolesMutation = useAppMutation({
     mutationFn: ({ id, roles }: { id: number; roles: Array<number> }) =>
       syncUserRoles(id, roles),
-    invalidateKeys: ['users'],
+    invalidateKeys: [queryKeys.users.all],
     successMessage: 'Roles updated successfully',
     onSuccess: () => ui.close('roles'),
   })
@@ -129,7 +138,7 @@ export const useUserPage = () => {
       id: number
       permissions: Array<number>
     }) => syncUserPermissions(id, permissions),
-    invalidateKeys: ['users'],
+    invalidateKeys: [queryKeys.users.all],
     successMessage: 'Permissions updated successfully',
     onSuccess: () => ui.close('permissions'),
   })
@@ -137,7 +146,7 @@ export const useUserPage = () => {
   const resetPasswordMutation = useAppMutation({
     mutationFn: ({ id, password }: { id: number; password: string }) =>
       resetUserPassword(id, password),
-    invalidateKeys: ['users'],
+    invalidateKeys: [queryKeys.users.all],
     successMessage: 'Password reset successfully',
     onSuccess: () => ui.close('resetPassword'),
   })
@@ -172,6 +181,20 @@ export const useUserPage = () => {
     await impersonation.start(user.id)
   }
 
+  const handleToggleActive = async (user: UserProfile) => {
+    const next = user.isActive === false
+    const isConfirmed = await confirm({
+      title: next ? 'Activate User' : 'Deactivate User',
+      message: next
+        ? `${user.fullname || user.email} will be able to sign in again.`
+        : `${user.fullname || user.email} will be signed out and cannot sign in until reactivated.`,
+      color: next ? 'primary' : 'danger',
+      confirmText: next ? 'Activate user' : 'Deactivate user',
+      cancelText: 'Cancel',
+    })
+    if (isConfirmed) statusMutation.mutate({ id: user.id, isActive: next })
+  }
+
   const handleDelete = async (id: number) => {
     const isConfirmed = await confirm({
       title: 'Delete User',
@@ -200,6 +223,7 @@ export const useUserPage = () => {
     onView: handleView,
     onEdit: handleEdit,
     onDelete: handleDelete,
+    onToggleActive: handleToggleActive,
     onManageRoles: handleManageRoles,
     onManagePermissions: handleManagePermissions,
     onResetPassword: handleResetPassword,
@@ -213,14 +237,22 @@ export const useUserPage = () => {
     sheetName: 'Users',
     columns,
     fetchAll: async () => {
-      const { search, sort, direction, createdIn, registerMethod, timeZone } =
-        searchParams
+      const {
+        search,
+        sort,
+        direction,
+        createdIn,
+        registerMethod,
+        accountStatus,
+        timeZone,
+      } = searchParams
       const filters = {
         search,
         sort,
         direction,
         createdIn,
         registerMethod,
+        accountStatus,
         timeZone,
       }
       const res = await getUsers({ ...filters, paginated: false })
@@ -241,6 +273,11 @@ export const useUserPage = () => {
         : undefined,
       ...tableState,
       initialSearch: tableState.search,
+      pendingRowId: statusMutation.isPending
+        ? statusMutation.variables?.id
+        : deleteMutation.isPending
+          ? deleteMutation.variables
+          : undefined,
       headerActions: createElement(UsersFilters, {
         value: searchParams,
         onChange: (filters) => {

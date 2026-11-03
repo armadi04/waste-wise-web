@@ -100,6 +100,7 @@ export class AuthService {
       return null;
     }
 
+    this.assertActive(user);
     await this.clearFailedLogins(user);
 
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -120,6 +121,11 @@ export class AuthService {
         minutes === 1 ? '' : 's'
       }.`,
     );
+  }
+
+  assertActive(user: Pick<User, 'isActive'>): void {
+    if (user.isActive === false)
+      throw new ForbiddenException('Account is inactive');
   }
 
   /**
@@ -176,12 +182,16 @@ export class AuthService {
           `Your email (${payload.email}) is not registered in this system. Please contact an administrator to get access.`,
         );
       }
+      this.assertActive(user);
 
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
       const { password, ...result } = user;
       return result;
     } catch (error) {
-      if (error instanceof UnauthorizedException) {
+      if (
+        error instanceof UnauthorizedException ||
+        error instanceof ForbiddenException
+      ) {
         throw error;
       }
       throw new UnauthorizedException('Google authentication failed');
@@ -216,12 +226,16 @@ export class AuthService {
           `Your email (${payload.email}) is not registered in this system. Please contact an administrator to get access.`,
         );
       }
+      this.assertActive(user);
 
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
       const { password, ...result } = user;
       return result;
     } catch (error) {
-      if (error instanceof UnauthorizedException) {
+      if (
+        error instanceof UnauthorizedException ||
+        error instanceof ForbiddenException
+      ) {
         throw error;
       }
       throw new UnauthorizedException('Google access token validation failed');
@@ -334,6 +348,7 @@ export class AuthService {
       audience?: SessionAudience;
     } = {},
   ) {
+    this.assertActive(user);
     const session = await this.sessionsService.start(user.id, opts.context, {
       audience: opts.audience ?? 'admin',
       isSso: !!opts.sid,
@@ -361,6 +376,7 @@ export class AuthService {
     if (!user) {
       throw new UnauthorizedException('User no longer exists');
     }
+    this.assertActive(user);
     if (!user.roles?.some((r) => r.name === roleName)) {
       throw new ForbiddenException('You do not have that role');
     }
@@ -583,6 +599,7 @@ export class AuthService {
     if (!user) {
       throw new UnauthorizedException('User no longer exists');
     }
+    this.assertActive(user);
 
     // Carry the chosen role forward (buildTokens drops it if the user no longer
     // holds it).

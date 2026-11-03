@@ -6,6 +6,7 @@ import { useConfirmation } from '@/hooks/global/use-confirmation'
 import { useDataTable } from '@/hooks/global/use-data-table'
 import { useAppMutation } from '@/hooks/global/use-mutations'
 import { useUserPermission } from '@/hooks/permissions/use-permissions'
+import { queryKeys } from '@/lib/query/keys'
 import {
   mySessionsQueryOptions,
   sessionsQueryOptions,
@@ -31,13 +32,13 @@ export const useMySessionsCard = () => {
 
   const revokeMutation = useAppMutation({
     mutationFn: revokeMySession,
-    invalidateKeys: ['my-sessions'],
+    invalidateKeys: [queryKeys.sessions.mine],
     successMessage: 'Session signed out',
   })
 
   const revokeOthersMutation = useAppMutation({
     mutationFn: revokeMyOtherSessions,
-    invalidateKeys: ['my-sessions'],
+    invalidateKeys: [queryKeys.sessions.mine],
     successMessage: 'Signed out of all other devices',
   })
 
@@ -92,7 +93,7 @@ export const useSessionPage = () => {
 
   const revokeMutation = useAppMutation({
     mutationFn: revokeSession,
-    invalidateKeys: ['sessions', 'my-sessions'],
+    invalidateKeys: [queryKeys.sessions.all, queryKeys.sessions.mine],
     successMessage: 'Session revoked',
   })
 

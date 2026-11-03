@@ -26,6 +26,7 @@ import { getMySessions, getSessions } from '@/lib/services/session.service'
 import { getSignupsTrend, getStatsOverview } from '@/lib/services/stats.service'
 import { getTwoFactorStatus } from '@/lib/services/two-factor.service'
 import { getUsers } from '@/lib/services/user.service'
+import { queryKeys } from '@/lib/query/keys'
 import {
   getReport,
   getReportStats,
@@ -41,6 +42,7 @@ export interface TableSearch {
   action?: string
   createdIn?: UserSearchParams['createdIn']
   registerMethod?: UserSearchParams['registerMethod']
+  accountStatus?: UserSearchParams['accountStatus']
 }
 
 export function usersQueryOptions(params: UserSearchParams) {
@@ -52,22 +54,21 @@ export function usersQueryOptions(params: UserSearchParams) {
     direction,
     createdIn,
     registerMethod,
+    accountStatus,
     timeZone,
   } = params
   return queryOptions({
-    queryKey: [
-      'users',
-      {
-        page,
-        limit,
-        search,
-        sort,
-        direction,
-        createdIn,
-        registerMethod,
-        timeZone,
-      },
-    ],
+    queryKey: queryKeys.users.list({
+      page,
+      limit,
+      search,
+      sort,
+      direction,
+      createdIn,
+      registerMethod,
+      accountStatus,
+      timeZone,
+    }),
     queryFn: () =>
       getUsers({
         page: page || 1,
@@ -79,6 +80,7 @@ export function usersQueryOptions(params: UserSearchParams) {
         createdIn,
         timeZone,
         registerMethod,
+        accountStatus,
       }) as Promise<PaginatedData<UserProfile>>,
     placeholderData: keepPreviousData,
   })
@@ -87,7 +89,7 @@ export function usersQueryOptions(params: UserSearchParams) {
 export function rolesQueryOptions(params: TableSearch) {
   const { page, limit, search, sort, direction } = params
   return queryOptions({
-    queryKey: ['roles', { page, limit, search, sort, direction }],
+    queryKey: queryKeys.roles.list({ page, limit, search, sort, direction }),
     queryFn: () =>
       getRoles({
         page: page || 1,
@@ -104,7 +106,7 @@ export function rolesQueryOptions(params: TableSearch) {
 export function permissionsQueryOptions(params: TableSearch) {
   const { page, limit, search, sort, direction } = params
   return queryOptions({
-    queryKey: ['permissions', { page, limit, search, sort, direction }],
+    queryKey: queryKeys.permissions.list({ page, limit, search, sort, direction }),
     queryFn: () =>
       getPermissions({
         page: page || 1,
@@ -121,7 +123,7 @@ export function permissionsQueryOptions(params: TableSearch) {
 export function invitationsQueryOptions(params: TableSearch) {
   const { page, limit, search, sort, direction } = params
   return queryOptions({
-    queryKey: ['invitations', { page, limit, search, sort, direction }],
+    queryKey: queryKeys.invitations.list({ page, limit, search, sort, direction }),
     queryFn: () =>
       getInvitations({
         page: page || 1,
@@ -138,7 +140,7 @@ export function invitationsQueryOptions(params: TableSearch) {
 export function oauthClientsQueryOptions(params: TableSearch) {
   const { page, limit, search, sort, direction } = params
   return queryOptions({
-    queryKey: ['oauth-clients', { page, limit, search, sort, direction }],
+    queryKey: queryKeys.oauthClients.list({ page, limit, search, sort, direction }),
     queryFn: () =>
       getOAuthClients({
         page: page || 1,
@@ -156,7 +158,7 @@ export function mediaQueryOptions(params: TableSearch) {
   const { page, limit, search, sort, direction } = params
   const DEFAULT_LIMIT = 24
   return queryOptions({
-    queryKey: ['media', { page, limit, search, sort, direction }],
+    queryKey: queryKeys.media.list({ page, limit, search, sort, direction }),
     queryFn: async () => {
       const response = await getMediaList({
         page: page || 1,
@@ -173,13 +175,13 @@ export function mediaQueryOptions(params: TableSearch) {
 }
 
 export function auditActionsQueryOptions() {
-  return queryOptions({ queryKey: ['audit-actions'], queryFn: getAuditActions })
+  return queryOptions({ queryKey: queryKeys.audit.actions, queryFn: getAuditActions })
 }
 
 export function auditLogsQueryOptions(params: TableSearch) {
   const { page, limit, search, sort, direction, action } = params
   return queryOptions({
-    queryKey: ['audit-logs', { page, limit, search, sort, direction, action }],
+    queryKey: queryKeys.audit.list({ page, limit, search, sort, direction, action }),
     queryFn: () =>
       getAuditLogs({
         page: page || 1,
@@ -195,7 +197,7 @@ export function auditLogsQueryOptions(params: TableSearch) {
 
 export function mySessionsQueryOptions() {
   return queryOptions({
-    queryKey: ['my-sessions'],
+    queryKey: queryKeys.sessions.mine,
     queryFn: getMySessions,
   })
 }
@@ -203,7 +205,7 @@ export function mySessionsQueryOptions() {
 export function sessionsQueryOptions(params: TableSearch) {
   const { page, limit, search, sort, direction } = params
   return queryOptions({
-    queryKey: ['sessions', { page, limit, search, sort, direction }],
+    queryKey: queryKeys.sessions.list({ page, limit, search, sort, direction }),
     queryFn: () =>
       getSessions({
         page: page || 1,
@@ -231,21 +233,18 @@ export function reportsQueryOptions(params: ReportSearchParams) {
     direction,
   } = params
   return queryOptions({
-    queryKey: [
-      'reports',
-      {
-        page,
-        limit,
-        search,
-        status,
-        category,
-        from,
-        to,
-        reporterId,
-        sort,
-        direction,
-      },
-    ],
+    queryKey: queryKeys.reports.list({
+      page,
+      limit,
+      search,
+      status,
+      category,
+      from,
+      to,
+      reporterId,
+      sort,
+      direction,
+    }),
     queryFn: () =>
       getReports({
         page: page || 1,
@@ -265,7 +264,7 @@ export function reportsQueryOptions(params: ReportSearchParams) {
 
 export function reportQueryOptions(id: number) {
   return queryOptions({
-    queryKey: ['reports', 'detail', id],
+    queryKey: queryKeys.reports.detail(id),
     queryFn: () => getReport(id),
     enabled: Number.isInteger(id) && id > 0,
   })
@@ -273,7 +272,7 @@ export function reportQueryOptions(id: number) {
 
 export function reportStatsQueryOptions(enabled = true) {
   return queryOptions({
-    queryKey: ['stats', 'reports'],
+    queryKey: queryKeys.stats.reports,
     queryFn: getReportStats,
     enabled,
     staleTime: 1000 * 30,
@@ -282,7 +281,7 @@ export function reportStatsQueryOptions(enabled = true) {
 
 export function statsOverviewQueryOptions(enabled = true) {
   return queryOptions({
-    queryKey: ['stats', 'overview'],
+    queryKey: queryKeys.stats.overview,
     queryFn: getStatsOverview,
     enabled,
     staleTime: 1000 * 60,
@@ -295,7 +294,7 @@ export function signupsTrendQueryOptions(
   timeZone = 'Asia/Jakarta',
 ) {
   return queryOptions({
-    queryKey: ['stats', 'signups', days, timeZone],
+    queryKey: queryKeys.stats.signups(days, timeZone),
     queryFn: () => getSignupsTrend(days, timeZone),
     enabled,
     staleTime: 1000 * 60 * 5,
@@ -304,7 +303,7 @@ export function signupsTrendQueryOptions(
 
 export function recentActivityQueryOptions(limit = 8, enabled = true) {
   return queryOptions({
-    queryKey: ['audit-logs', 'recent', limit],
+    queryKey: queryKeys.audit.recent(limit),
     queryFn: () =>
       getAuditLogs({ page: 1, limit, sort: 'createdAt', direction: 'desc' }),
     enabled,
@@ -314,7 +313,7 @@ export function recentActivityQueryOptions(limit = 8, enabled = true) {
 
 export function healthQueryOptions(enabled = true) {
   return queryOptions({
-    queryKey: ['health'],
+    queryKey: queryKeys.health,
     queryFn: () => apiGet<{ status: string }>('/health'),
     enabled,
     staleTime: 1000 * 30,
@@ -324,7 +323,7 @@ export function healthQueryOptions(enabled = true) {
 
 export function profileQueryOptions() {
   return queryOptions({
-    queryKey: ['profile'],
+    queryKey: queryKeys.profile,
     queryFn: getProfile,
 
     staleTime: 1000 * 60 * 5,
@@ -333,7 +332,7 @@ export function profileQueryOptions() {
 
 export function notificationsQueryOptions(page = 1, limit = 10) {
   return queryOptions({
-    queryKey: ['notifications', { page, limit }],
+    queryKey: queryKeys.notifications.list(page, limit),
     queryFn: () => getNotifications({ page, limit }),
     placeholderData: keepPreviousData,
   })
@@ -341,19 +340,19 @@ export function notificationsQueryOptions(page = 1, limit = 10) {
 
 export function unreadCountQueryOptions() {
   return queryOptions({
-    queryKey: ['notifications', 'unread-count'],
+    queryKey: queryKeys.notifications.unreadCount,
     queryFn: getUnreadCount,
     refetchInterval: 60000, // Fallback polling every 1 minute
   })
 }
 
 export function twoFactorQueryOptions() {
-  return queryOptions({ queryKey: ['two-factor'], queryFn: getTwoFactorStatus })
+  return queryOptions({ queryKey: queryKeys.twoFactor, queryFn: getTwoFactorStatus })
 }
 
 export function invitationQueryOptions(token?: string) {
   return queryOptions({
-    queryKey: ['invitation', token],
+    queryKey: queryKeys.invitation(token),
     queryFn: () => getInvitation(token!),
     enabled: !!token,
     retry: false,
@@ -362,7 +361,7 @@ export function invitationQueryOptions(token?: string) {
 
 export function changelogQueryOptions() {
   return queryOptions({
-    queryKey: ['changelog'],
+    queryKey: queryKeys.changelog,
     queryFn: getReleaseNotes,
     // Releases change a few times a month at most; don't refetch on every mount.
     staleTime: 10 * 60 * 1000,
@@ -371,7 +370,7 @@ export function changelogQueryOptions() {
 
 export const sessionQueryOptions = () =>
   queryOptions({
-    queryKey: ['session'],
+    queryKey: queryKeys.session,
     queryFn: getCurrentUser,
     staleTime: 30_000,
     retry: false,

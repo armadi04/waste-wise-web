@@ -6,7 +6,7 @@ import {
   ModalHeader,
 } from '@heroui/react'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { Mail, Phone, User } from 'lucide-react'
+import { Mail, Phone, ShieldCheck, User } from 'lucide-react'
 import { useEffect } from 'react'
 import { useForm } from 'react-hook-form'
 import type { UserFormData } from '@/lib/schemas/users'
@@ -15,6 +15,7 @@ import { Button, Chip, Input, Modal } from '@/components/shared/controls'
 import { updateUserSchema } from '@/lib/schemas/users'
 
 import { DetailRow } from '@/components/features/users/modal/user-form-modal/child/detail-row'
+import { AccountStatusBadge } from '@/components/features/users/components/account-status-badge'
 
 export function UserFormModal({
   isOpen,
@@ -76,6 +77,16 @@ export function UserFormModal({
                       icon={Phone}
                       label="Phone"
                       value={editingUser?.phone || ''}
+                    />
+                    <DetailRow
+                      icon={ShieldCheck}
+                      label="Account Status"
+                      value={
+                        <AccountStatusBadge
+                          status={editingUser?.accountStatus}
+                          emailVerifiedAt={editingUser?.emailVerifiedAt}
+                        />
+                      }
                     />
                   </div>
 

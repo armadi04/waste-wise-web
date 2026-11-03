@@ -113,6 +113,8 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
     if (!user) {
       throw new UnauthorizedException('User not found');
     }
+    if (user.isActive === false)
+      throw new UnauthorizedException('Account is inactive');
 
     // Scope authorization to the chosen role (validated against the freshly
     // loaded user). Mirrors AuthService.buildTokens: a valid activeRole scopes

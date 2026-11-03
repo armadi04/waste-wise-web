@@ -99,6 +99,7 @@ export const getColumns = ({
     uid: 'actions',
     render: (item) => (
       <ActionMenu
+        ariaLabel={`Actions for session ${item.sessionId}`}
         actions={[
           {
             key: 'revoke',

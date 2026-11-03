@@ -7,6 +7,7 @@ import { RegisterMethodEnum } from '@/users/register-method.enum';
 import { User } from '../../users/entities/user.entity';
 import * as bcrypt from 'bcrypt';
 import type { PermissionType } from '@/auth/permissions.type';
+import { resolveDemoUser } from './demo-user';
 
 /**
  * Every permission the app ships with. Exported so the e2e database cleaner can
@@ -53,6 +54,10 @@ export const SEEDED_PERMISSIONS: Array<{
   {
     name: 'users.manage_permissions',
     description: 'Manage user permissions (sync, attach, detach)',
+  },
+  {
+    name: 'users.manage_status',
+    description: 'Activate or deactivate user accounts',
   },
 
   // Role permissions
@@ -250,17 +255,16 @@ export class SeederService implements OnApplicationBootstrap {
       this.logger.log(`Created default superadmin user: ${adminEmail}`);
     }
 
-    const demoEmail = process.env.DEMO_USER_EMAIL;
-    const demoPassword = process.env.DEMO_USER_PASSWORD;
-    if (demoEmail && demoPassword) {
+    const demo = resolveDemoUser(process.env);
+    if (demo) {
       const existingDemo = await this.userRepository.findOneBy({
-        email: demoEmail,
+        email: demo.email,
       });
       if (!existingDemo) {
         const userRole = await this.roleRepository.findOneBy({ name: 'user' });
-        const hashedPassword = await bcrypt.hash(demoPassword, 10);
+        const hashedPassword = await bcrypt.hash(demo.password, 10);
         const demoUser = this.userRepository.create({
-          email: demoEmail,
+          email: demo.email,
           password: hashedPassword,
           fullname: 'Demo User',
           registerMethod: RegisterMethodEnum.SEEDER,
@@ -268,7 +272,7 @@ export class SeederService implements OnApplicationBootstrap {
           emailVerifiedAt: new Date(),
         });
         await this.userRepository.save(demoUser);
-        this.logger.log(`Created demo user: ${demoEmail}`);
+        this.logger.log(`Created demo user: ${demo.email}`);
       }
     }
   }

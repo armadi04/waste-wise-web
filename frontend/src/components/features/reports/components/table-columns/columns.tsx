@@ -103,6 +103,7 @@ export function getColumns({
       uid: 'actions',
       render: (report) => (
         <ActionMenu
+          ariaLabel={`Actions for report #${report.id}`}
           actions={[
             {
               key: 'view',

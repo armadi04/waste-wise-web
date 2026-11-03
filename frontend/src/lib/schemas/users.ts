@@ -1,5 +1,6 @@
 import { z } from 'zod'
 import { REGISTER_METHODS } from '@/lib/constants/register-method'
+import { ACCOUNT_STATUS_VALUES } from '@/lib/constants/account-status'
 
 const baseUserSchema = z.object({
   email: z.string().email('Invalid email address'),
@@ -44,6 +45,7 @@ export const userSearchSchema = z.object({
     .optional(),
   createdIn: z.enum(['today', '7d', '1m', '3m']).optional(),
   registerMethod: z.enum(REGISTER_METHODS).optional(),
+  accountStatus: z.enum(ACCOUNT_STATUS_VALUES).optional(),
 })
 
 export type UserSearchParams = z.infer<typeof userSearchSchema>

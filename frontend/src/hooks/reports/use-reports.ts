@@ -17,6 +17,7 @@ import { useAppMutation } from '@/hooks/global/use-mutations'
 import { useAuth } from '@/hooks/auth/use-auth'
 import { useUserPermission } from '@/hooks/permissions/use-permissions'
 import { useAllUsers } from '@/hooks/users/use-users'
+import { queryKeys } from '@/lib/query/keys'
 import {
   reportQueryOptions,
   reportStatsQueryOptions,
@@ -83,7 +84,7 @@ export const useCreateReportMutation = () =>
       notifyClassification(report)
       return report
     },
-    invalidateKeys: [['reports'], ['stats', 'reports'], ['media']],
+    invalidateKeys: [queryKeys.reports.all, queryKeys.stats.reports, queryKeys.media.all],
     successMessage: 'Report created',
   })
 
@@ -108,14 +109,14 @@ export const useUpdateReportMutation = () =>
       notifyClassification(report)
       return report
     },
-    invalidateKeys: [['reports'], ['stats', 'reports'], ['media']],
+    invalidateKeys: [queryKeys.reports.all, queryKeys.stats.reports, queryKeys.media.all],
     successMessage: 'Report updated',
   })
 
 export const useDeleteReportMutation = () =>
   useAppMutation({
     mutationFn: deleteReport,
-    invalidateKeys: [['reports'], ['stats', 'reports']],
+    invalidateKeys: [queryKeys.reports.all, queryKeys.stats.reports],
     successMessage: 'Report deleted',
   })
 
@@ -192,7 +193,7 @@ export const useReportDetail = (id: number) => {
   const navigate = routeApi.useNavigate()
   const statusMutation = useAppMutation({
     mutationFn: (status: ReportStatus) => updateReportStatus(id, status),
-    invalidateKeys: [['reports'], ['stats', 'reports']],
+    invalidateKeys: [queryKeys.reports.all, queryKeys.stats.reports],
     successMessage: 'Report status updated',
   })
   const deleteMutation = useDeleteReportMutation()

@@ -72,6 +72,7 @@ export const getColumns = ({
         const isPending = status === 'pending'
         return (
           <ActionMenu
+            ariaLabel={`Actions for invitation ${item.email}`}
             actions={[
               {
                 key: 'copy',

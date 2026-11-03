@@ -53,6 +53,7 @@ export const getColumns = ({
     uid: 'actions',
     render: (item) => (
       <ActionMenu
+        ariaLabel={`Actions for role ${item.name}`}
         actions={[
           {
             key: 'view',

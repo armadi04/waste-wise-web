@@ -1,10 +1,16 @@
 import { IsEnum, IsIn, IsOptional } from 'class-validator';
+import { ACCOUNT_STATUS_VALUES } from '../account-status';
+import type { AccountStatus } from '../account-status';
 import { ApiPropertyOptional } from '@nestjs/swagger';
 import { PaginationParamsDto } from '@/common/dto/pagination-params.dto';
 import { RegisterMethodEnum } from '../register-method.enum';
 import type { CreatedInPreset } from '@/common/helpers/created-in-range';
 
 export class UsersQueryDto extends PaginationParamsDto {
+  @ApiPropertyOptional({ enum: ACCOUNT_STATUS_VALUES })
+  @IsOptional()
+  @IsIn([...ACCOUNT_STATUS_VALUES])
+  accountStatus?: AccountStatus;
   @ApiPropertyOptional({
     enum: ['Asia/Jakarta', 'Asia/Makassar', 'Asia/Jayapura'],
   })

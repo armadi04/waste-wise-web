@@ -68,6 +68,7 @@ export const getColumns = ({
     uid: 'actions',
     render: (item) => (
       <ActionMenu
+        ariaLabel={`Actions for OAuth client ${item.name}`}
         actions={[
           {
             key: 'view',

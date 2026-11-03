@@ -10,6 +10,7 @@ export type PermissionType =
   | 'users.delete'
   | 'users.manage_roles'
   | 'users.manage_permissions'
+  | 'users.manage_status'
   | 'users.impersonate'
   | 'menu.dashboard'
   | 'menu.users'

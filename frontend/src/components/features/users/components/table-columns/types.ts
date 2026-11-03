@@ -4,6 +4,7 @@ export interface GetColumnsParams {
   onView: (user: UserProfile) => void
   onEdit: (user: UserProfile) => void
   onDelete: (id: number) => void
+  onToggleActive: (user: UserProfile) => void
   onManageRoles: (user: UserProfile) => void
   onManagePermissions: (user: UserProfile) => void
   onResetPassword: (user: UserProfile) => void

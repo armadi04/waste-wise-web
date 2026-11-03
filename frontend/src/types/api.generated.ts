@@ -1211,6 +1211,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/users/{id}/status": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /** Activate or deactivate a user account */
+        patch: operations["UsersController_updateStatus_v1"];
+        trace?: never;
+    };
     "/api/v1/users/{id}/roles/sync": {
         parameters: {
             query?: never;
@@ -1431,6 +1448,7 @@ export interface components {
             fullname: string | null;
             phone: string | null;
             notificationsEnabled: boolean;
+            isActive: boolean;
             avatar: components["schemas"]["Media"] | null;
             media: components["schemas"]["Media"][];
             roles: components["schemas"]["Role"][];
@@ -1441,6 +1459,11 @@ export interface components {
             twoFactorEnabledAt: string | null;
             /** @enum {string} */
             registerMethod: "EMAIL_OTP" | "GOOGLE" | "INVITATION" | "SSO" | "SEEDER" | "UNKNOWN";
+            /**
+             * @description Derived account state; populated by the API presenter.
+             * @enum {string}
+             */
+            accountStatus?: "INACTIVE" | "ACTIVE" | "UNVERIFIED" | "LOCKED";
             /** Format: date-time */
             createdAt: string;
             /** Format: date-time */
@@ -1686,6 +1709,9 @@ export interface components {
             data: components["schemas"]["User"][];
         };
         UpdateUserDto: Record<string, never>;
+        UpdateUserStatusDto: {
+            isActive: boolean;
+        };
         ManageRolesDto: Record<string, never>;
         ManageUserPermissionsDto: Record<string, never>;
     };
@@ -3715,6 +3741,7 @@ export interface operations {
                 sort?: string;
                 direction?: "ASC" | "DESC";
                 paginated?: boolean;
+                accountStatus?: "INACTIVE" | "ACTIVE" | "UNVERIFIED" | "LOCKED";
                 timeZone?: "Asia/Jakarta" | "Asia/Makassar" | "Asia/Jayapura";
                 /** @description Creation window in the selected report timezone, default Asia/Jakarta; 1m and 3m use 30 and 90 days. */
                 createdIn?: "today" | "7d" | "1m" | "3m";
@@ -3820,6 +3847,31 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content?: never;
+            };
+        };
+    };
+    UsersController_updateStatus_v1: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["UpdateUserStatusDto"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["User"];
+                };
             };
         };
     };

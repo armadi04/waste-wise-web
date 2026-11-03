@@ -3647,6 +3647,20 @@
             }
           },
           {
+            "name": "accountStatus",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "INACTIVE",
+                "ACTIVE",
+                "UNVERIFIED",
+                "LOCKED"
+              ]
+            }
+          },
+          {
             "name": "timeZone",
             "required": false,
             "in": "query",
@@ -3847,6 +3861,52 @@
           }
         ],
         "summary": "Delete multiple users",
+        "tags": [
+          "Users"
+        ]
+      }
+    },
+    "/api/v1/users/{id}/status": {
+      "patch": {
+        "operationId": "UsersController_updateStatus_v1",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateUserStatusDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/User"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Activate or deactivate a user account",
         "tags": [
           "Users"
         ]
@@ -4543,6 +4603,9 @@
           "notificationsEnabled": {
             "type": "boolean"
           },
+          "isActive": {
+            "type": "boolean"
+          },
           "avatar": {
             "nullable": true,
             "type": "object",
@@ -4591,6 +4654,16 @@
               "UNKNOWN"
             ]
           },
+          "accountStatus": {
+            "type": "string",
+            "enum": [
+              "INACTIVE",
+              "ACTIVE",
+              "UNVERIFIED",
+              "LOCKED"
+            ],
+            "description": "Derived account state; populated by the API presenter."
+          },
           "createdAt": {
             "format": "date-time",
             "type": "string"
@@ -4608,6 +4681,7 @@
           "fullname",
           "phone",
           "notificationsEnabled",
+          "isActive",
           "avatar",
           "media",
           "roles",
@@ -5497,6 +5571,17 @@
       "UpdateUserDto": {
         "type": "object",
         "properties": {}
+      },
+      "UpdateUserStatusDto": {
+        "type": "object",
+        "properties": {
+          "isActive": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "isActive"
+        ]
       },
       "ManageRolesDto": {
         "type": "object",
