@@ -14,6 +14,7 @@ import { SsoModule } from './sso/sso.module';
 import { RolesModule } from './roles/roles.module';
 import { PermissionsModule } from './permissions/permissions.module';
 import { MediaModule } from './media/media.module';
+import { ReportsModule } from './reports/reports.module';
 import { SeederModule } from './database/seeder/seeder.module';
 import { CacheModule as AppCacheModule } from './common/cache/cache.module';
 import { CacheModule, CacheModuleOptions } from '@nestjs/cache-manager';
@@ -152,6 +153,7 @@ const initLogger = pino({
     RolesModule,
     PermissionsModule,
     MediaModule,
+    ReportsModule,
     SeederModule,
     AppCacheModule,
     NotificationsModule,
