@@ -149,13 +149,7 @@ export const Header = () => {
                 onOpenChange={setIsUserMenuOpen}
               >
                 <DropdownTrigger>
-                  <div
-                    className={`flex items-center gap-3 cursor-pointer transition-opacity ${
-                      isUserMenuOpen
-                        ? 'bg-[var(--app-selected-background)]'
-                        : 'hover:bg-[var(--app-surface-hover)]'
-                    }`}
-                  >
+                  <div className="flex cursor-pointer items-center gap-3 transition-opacity hover:opacity-80">
                     <div className="hidden sm:flex flex-col items-end gap-1">
                       <p className="text-sm font-semibold leading-none">
                         {profile?.fullname}
