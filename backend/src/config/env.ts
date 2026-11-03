@@ -52,6 +52,8 @@ const baseEnvSchema = z.object({
   // Admin seed
   ADMIN_EMAIL: z.string().email(),
   ADMIN_PASSWORD: z.string().min(8),
+  DEMO_USER_EMAIL: z.string().email().optional(),
+  DEMO_USER_PASSWORD: z.string().min(8).optional(),
 
   // Only the selected storage provider requires credentials at startup.
   MEDIA_PROVIDER: z.enum(['depot', 's3']).default('depot'),
@@ -137,6 +139,15 @@ const baseEnvSchema = z.object({
   GRAPHQL_MAX_COMPLEXITY: z.coerce.number().default(1000),
   GRAPHQL_MAX_DEPTH: z.coerce.number().default(10),
   GRAPHQL_PERSISTED_ONLY: boolFromEnv(false),
+
+  // ML service (optional; reports still save when unavailable)
+  ML_SERVICE_URL: z.string().url().optional(),
+  ML_SERVICE_TIMEOUT_MS: z.coerce
+    .number()
+    .int()
+    .min(1000)
+    .max(60000)
+    .default(15000),
 
   // App
   APP_URL: z.string().url().default('http://localhost:3001'),
