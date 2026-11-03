@@ -1,4 +1,4 @@
-# Nestplate Starter agent entry point
+# WasteWise agent entry point
 
 Read [shared working rules](CLAUDE.md), then the relevant project guide:
 

@@ -22,7 +22,7 @@ export function testEnvironment(
     TURNSTILE_ENABLED: 'false',
     LOG_LEVEL: 'silent',
     THROTTLE_LIMIT: '100000',
-    APP_NAME: 'Nestplate',
+    APP_NAME: 'WasteWise',
     APP_URL: 'http://localhost:3001',
     TZ: 'UTC',
   };

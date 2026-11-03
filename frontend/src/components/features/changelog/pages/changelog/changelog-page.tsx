@@ -4,6 +4,7 @@ import { Chip } from '@/components/shared/controls'
 import { ReleaseCard } from '@/components/features/changelog/components/release-card'
 import { PageHeader } from '@/components/layout/page-header'
 import { useChangelog } from '@/hooks/changelog'
+import { BRAND_NAME } from '@/lib/constants/brand'
 
 export function ChangelogPage() {
   const { releases, version, isLoading } = useChangelog()
@@ -22,7 +23,7 @@ export function ChangelogPage() {
         <div className="flex flex-wrap items-center gap-3 rounded-large border border-default-200 bg-content1 px-6 py-5">
           <div className="flex min-w-0 flex-1 flex-col gap-1">
             <p className="text-base font-semibold text-default-700">
-              What's new in Nestplate
+              What's new in {BRAND_NAME}
             </p>
             <p className="max-w-2xl text-sm leading-relaxed text-default-500">
               Every update is recorded here — new features, fixes, and changes

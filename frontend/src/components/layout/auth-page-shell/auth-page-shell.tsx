@@ -3,6 +3,7 @@ import { motion, useReducedMotion } from 'framer-motion'
 import loginDayBg from '@/assets/images/login-day.webp'
 import loginNightBg from '@/assets/images/login-night.webp'
 import { useTheme } from '@/hooks/global'
+import { BRAND_NAME } from '@/lib/constants/brand'
 import { useTimeZone } from '@/lib/stores/time-zone'
 import { formatBusinessDate } from '@/lib/utils/format'
 
@@ -58,7 +59,9 @@ export function AuthPageShell({ children, morph = true }: AuthPageShellProps) {
       </main>
 
       <footer className="relative z-10 flex items-center justify-between px-6 pb-6 pt-4 text-xs text-white drop-shadow-[0_1px_2px_rgba(0,0,0,0.9)]">
-        <p>© {formatBusinessDate(new Date(), 'yyyy')} Nestplate Starter.</p>
+        <p>
+          © {formatBusinessDate(new Date(), 'yyyy')} {BRAND_NAME}.
+        </p>
         <a
           href="https://armadii.my.id"
           target="_blank"

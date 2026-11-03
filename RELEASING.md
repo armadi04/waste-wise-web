@@ -1,6 +1,6 @@
 # Releasing
 
-Nestplate Starter (backend + frontend) is released **automatically** by
+WasteWise (backend + frontend) is released **automatically** by
 `semantic-release` from your Conventional Commit messages — you never tag it by
 hand.
 

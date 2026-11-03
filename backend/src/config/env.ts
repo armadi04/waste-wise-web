@@ -152,7 +152,7 @@ const baseEnvSchema = z.object({
   // App
   APP_URL: z.string().url().default('http://localhost:3001'),
   // Shown as the issuer in authenticator apps for two-factor codes.
-  APP_NAME: z.string().default('Nestplate'),
+  APP_NAME: z.string().default('WasteWise'),
   ALLOWED_ORIGINS: z.string().default('*'),
   // Unset/false ignores forwarded headers. Otherwise use actual proxy addresses/CIDRs.
   TRUST_PROXY: z.string().optional(),

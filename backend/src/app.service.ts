@@ -4,7 +4,7 @@ import { API_VERSION } from './config/api-routing';
 import { SWAGGER_UI_PATH } from './config/swagger.config';
 
 export class ApiInfo {
-  @ApiProperty({ example: 'Nestplate API' })
+  @ApiProperty({ example: 'WasteWise API' })
   name: string;
 
   @ApiProperty({ example: API_VERSION })
@@ -18,7 +18,7 @@ export class ApiInfo {
 export class AppService {
   getApiInfo(): ApiInfo {
     return {
-      name: 'Nestplate API',
+      name: 'WasteWise API',
       apiVersion: API_VERSION,
       docs: SWAGGER_UI_PATH,
     };

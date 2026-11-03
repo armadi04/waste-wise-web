@@ -66,7 +66,7 @@ describe('MailService', () => {
       { subject: string; html: string; text: string },
     ];
     expect(message.subject).toBe(
-      `Kode masuk ${process.env.APP_NAME || 'Nestplate'}`,
+      `Kode masuk ${process.env.APP_NAME || 'WasteWise'}`,
     );
     expect(message.html).toContain('123456');
     expect(message.html).toContain('10 menit');

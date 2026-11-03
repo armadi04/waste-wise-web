@@ -50,7 +50,7 @@ function escapeHtml(value: string): string {
 export class MailService {
   constructor(private readonly outbox: MailOutboxService) {}
   private get appName(): string {
-    return process.env.APP_NAME || 'Nestplate';
+    return process.env.APP_NAME || 'WasteWise';
   }
 
   async sendVerificationEmail(email: string, verifyUrl: string): Promise<void> {

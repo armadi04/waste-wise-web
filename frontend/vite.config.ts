@@ -7,6 +7,7 @@ import { VitePWA } from 'vite-plugin-pwa'
 import { tanstackRouter } from '@tanstack/router-plugin/vite'
 import { normalizeApiOrigin } from './src/lib/config/api-url.ts'
 import { validateTurnstileSiteKey } from './src/lib/config/turnstile.ts'
+import { BRAND_DESCRIPTION, BRAND_NAME } from './src/lib/constants/brand.ts'
 
 // https://vitejs.dev/config/
 export default defineConfig(({ mode, command }) => {
@@ -28,37 +29,35 @@ export default defineConfig(({ mode, command }) => {
       VitePWA({
         registerType: 'autoUpdate',
         injectRegister: 'auto',
+        // The manifest icons are already matched by workbox.globPatterns below.
+        // Disable this to avoid duplicate precache entries.
+        includeManifestIcons: false,
         manifest: {
-          name: 'Nestplate Starter',
-          short_name: 'Nestplate',
-          description: 'Nestplate Starter dashboard',
+          name: BRAND_NAME,
+          short_name: BRAND_NAME,
+          description: BRAND_DESCRIPTION,
           start_url: '/',
           display: 'standalone',
           theme_color: '#ffffff',
           background_color: '#ffffff',
           icons: [
             {
-              src: 'favicon.ico',
-              sizes: '48x48 32x32 16x16',
+              src: '/favicon_io/favicon.ico',
+              sizes: '16x16 32x32 48x48',
               type: 'image/x-icon',
             },
             {
-              src: 'favicon.svg',
-              sizes: 'any',
-              type: 'image/svg+xml',
-            },
-            {
-              src: 'pwa-192.png',
+              src: '/favicon_io/android-chrome-192x192.png',
               sizes: '192x192',
               type: 'image/png',
             },
             {
-              src: 'pwa-512.png',
+              src: '/favicon_io/android-chrome-512x512.png',
               sizes: '512x512',
               type: 'image/png',
             },
             {
-              src: 'maskable-icon-512.png',
+              src: '/favicon_io/maskable-icon-512.png',
               sizes: '512x512',
               type: 'image/png',
               purpose: 'maskable',
@@ -78,6 +77,9 @@ export default defineConfig(({ mode, command }) => {
             /^\/graphql(?:\/|$)/,
           ],
           globPatterns: ['**/*.{js,css,html,ico,svg,png}'],
+          // The root favicon is a legacy copy of the brand icon. The app links
+          // and notifications use favicon_io/, so avoid caching both copies.
+          globIgnores: ['favicon.ico'],
           maximumFileSizeToCacheInBytes: 4 * 1024 * 1024, // 4 MiB
         },
         devOptions: {

@@ -1,0 +1,5 @@
+export const BRAND_NAME = 'WasteWise'
+export const BRAND_NAME_LEADING = 'Waste'
+export const BRAND_NAME_TRAILING = 'Wise'
+export const BRAND_DESCRIPTION = 'Smart Waste Management Platform'
+export const BRAND_LOGO_SRC = '/favicon_io/logo-96.png'

@@ -1,6 +1,6 @@
-# Nestplate Starter
+# WasteWise
 
-A full-stack starter built on **NestJS 12 + Bun** and **React 19 + Vite**.
+Smart Waste Management Platform built on **NestJS 12 + Bun** and **React 19 + Vite**.
 Authentication, RBAC, media management, real-time notifications, responsive navigation,
 waste reports with ML-assisted classification, and a role-aware dashboard are included.
 

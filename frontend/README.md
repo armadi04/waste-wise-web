@@ -1,4 +1,4 @@
-# Nestplate frontend
+# WasteWise frontend
 
 React 19 SPA with Vite, TanStack Router/Query, HeroUI, Tailwind, Zustand and PWA support.
 Backend remains the authority for identity, permissions and persistence. The same shell serves

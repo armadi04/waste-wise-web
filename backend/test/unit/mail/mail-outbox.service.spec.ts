@@ -43,7 +43,7 @@ describe('MailOutboxService', () => {
               if (key === 'SMTP_USER') return 'user@test.com';
               if (key === 'SMTP_PASS') return 'test-pass';
               if (key === 'MAIL_FROM') return 'no-reply@test.com';
-              if (key === 'MAIL_FROM_NAME') return 'Nestplate';
+              if (key === 'MAIL_FROM_NAME') return 'WasteWise';
               return undefined;
             }),
           },
@@ -81,7 +81,7 @@ describe('MailOutboxService', () => {
 
     expect(sendMail).toHaveBeenCalledTimes(1);
     expect(sendMail.mock.calls[0][0]).toMatchObject({
-      from: '"Nestplate" <no-reply@test.com>',
+      from: '"WasteWise" <no-reply@test.com>',
       to: message.to,
     });
     const [, update] = repository.update.mock.calls[0] as [

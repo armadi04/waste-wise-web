@@ -1335,7 +1335,7 @@ export type webhooks = Record<string, never>;
 export interface components {
     schemas: {
         ApiInfo: {
-            /** @example Nestplate API */
+            /** @example WasteWise API */
             name: string;
             /** @example 1 */
             apiVersion: string;

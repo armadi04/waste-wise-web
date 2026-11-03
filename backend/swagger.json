@@ -4190,8 +4190,8 @@
     }
   },
   "info": {
-    "title": "Nestplate API",
-    "description": "Nestplate Starter API. REST URI version: v1; application releases are versioned independently.",
+    "title": "WasteWise API",
+    "description": "Smart Waste Management Platform API. REST URI version: v1; application releases are versioned independently.",
     "version": "1.0",
     "contact": {}
   },
@@ -4211,7 +4211,7 @@
         "properties": {
           "name": {
             "type": "string",
-            "example": "Nestplate API"
+            "example": "WasteWise API"
           },
           "apiVersion": {
             "type": "string",

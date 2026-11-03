@@ -7,9 +7,9 @@ export const SWAGGER_UI_PATH = '/api/docs';
 /** Shared metadata. Operation paths include the REST prefix and URI version. */
 export function buildSwaggerConfig() {
   return new DocumentBuilder()
-    .setTitle('Nestplate API')
+    .setTitle('WasteWise API')
     .setDescription(
-      'Nestplate Starter API. REST URI version: v1; application releases are versioned independently.',
+      'Smart Waste Management Platform API. REST URI version: v1; application releases are versioned independently.',
     )
     .setVersion('1.0')
     .addBearerAuth()

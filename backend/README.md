@@ -1,4 +1,4 @@
-# Nestplate backend
+# WasteWise backend
 
 NestJS 12.1.2 with Fastify 5 on Bun, PostgreSQL and TypeORM. Owns auth/RBAC, users, invitations, 2FA,
 sessions, media (Depot/direct S3), waste reports with ML-assisted classification,
@@ -21,7 +21,7 @@ GitHub Packages authentication is required for the SDK dependencies. API:
 `GET /api/v1` is public and returns only API identity:
 
 ```json
-{ "name": "Nestplate API", "apiVersion": "1", "docs": "/api/docs" }
+{ "name": "WasteWise API", "apiVersion": "1", "docs": "/api/docs" }
 ```
 
 `apiVersion` follows the shared REST URI version configuration, independently of the

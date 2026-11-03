@@ -106,7 +106,7 @@ describe('REST URI version 1', () => {
 
   it('serves root metadata, login and health under version 1', async () => {
     await request(app.getHttpServer()).get('/api/v1').expect(200, {
-      name: 'Nestplate API',
+      name: 'WasteWise API',
       apiVersion: API_VERSION,
       docs: SWAGGER_UI_PATH,
     });
@@ -263,7 +263,7 @@ describe('REST URI version 1', () => {
     expect(document.components?.schemas?.ApiInfo).toMatchObject({
       required: ['name', 'apiVersion', 'docs'],
       properties: {
-        name: { example: 'Nestplate API' },
+        name: { example: 'WasteWise API' },
         apiVersion: { example: API_VERSION },
         docs: { example: SWAGGER_UI_PATH },
       },

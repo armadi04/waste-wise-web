@@ -36,7 +36,7 @@ Source of truth: `src/config/env.ts`; template: `.env.example`. Invalid/missing 
 | Storage | MEDIA_PROVIDER=depot; selected provider credentials required (see below) |
 | Storage profiles | MEDIA_STORAGE_PROFILE optional; MEDIA_STORAGE_PROFILES JSON map of named locations/credentials |
 | Upload limits | MEDIA_MAX_FILE_SIZE=20971520 bytes (max 100 MiB); MEDIA_MAX_CONCURRENT_UPLOADS=4 (1–16); MEDIA_ALLOWED_MIME_TYPES signature allowlist |
-| Server | NODE_ENV=development, PORT=3000, APP_NAME=Nestplate, APP_URL; ALLOWED_ORIGINS, LOG_LEVEL=info |
+| Server | NODE_ENV=development, PORT=3000, APP_NAME=WasteWise, APP_URL; ALLOWED_ORIGINS, LOG_LEVEL=info |
 | Database policy | DB_SYNCHRONIZE=false, DB_SEED=true; DB_SKIP_MIGRATIONS only bypasses app boot migrations |
 | Sessions | SESSION_ADMIN_IDLE_MINUTES=120, SESSION_ADMIN_ABSOLUTE_HOURS=8 |
 | Timezone | APP_DEFAULT_TIME_ZONE=Asia/Jakarta; reports also support Makassar/Jayapura |

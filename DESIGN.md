@@ -1,4 +1,4 @@
-# Nestplate UI conventions
+# WasteWise UI conventions
 
 ## Foundation
 

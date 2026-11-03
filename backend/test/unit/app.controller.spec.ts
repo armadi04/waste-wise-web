@@ -29,7 +29,7 @@ describe('AppController', () => {
     it('returns exactly the API identity fields from shared configuration', () => {
       const info = appController.getApiInfo();
       expect(info).toEqual({
-        name: 'Nestplate API',
+        name: 'WasteWise API',
         apiVersion: API_VERSION,
         docs: SWAGGER_UI_PATH,
       });

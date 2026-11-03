@@ -21,6 +21,7 @@ import { useState } from 'react'
 import { Dropdown, DropdownItem } from '@/components/shared/controls'
 import { useAuthStore } from '@/lib/stores/auth.store'
 import { useFullscreen, useSidebarLogic, useTheme } from '@/hooks/global'
+import { SidebarBrand } from '@/components/layout/sidebar/child/sidebar-brand'
 import { SidebarItem } from '@/components/layout/sidebar/child/sidebar-item'
 
 export {
@@ -61,35 +62,7 @@ export const Sidebar = () => {
       <div
         className={`flex items-center ${isCollapsed ? 'justify-center' : 'px-4'} h-[80px] shrink-0`}
       >
-        <AnimatePresence mode="wait">
-          {isCollapsed ? (
-            <motion.div
-              key="collapsed-logo"
-              initial={{ opacity: 0, scale: 0.8 }}
-              animate={{ opacity: 1, scale: 1 }}
-              exit={{ opacity: 0, scale: 0.8 }}
-              transition={{ duration: 0.2 }}
-              className="whitespace-nowrap text-[24px] font-semibold tracking-tight italic"
-            >
-              <span className="text-[var(--app-link)]">K</span>
-              <span className="text-foreground">M</span>
-            </motion.div>
-          ) : (
-            <motion.div
-              key="expanded-logo"
-              initial={{ opacity: 0, x: -10 }}
-              animate={{ opacity: 1, x: 0 }}
-              exit={{ opacity: 0, x: -10 }}
-              transition={{ duration: 0.2 }}
-              className="flex items-center gap-0"
-            >
-              <div className="font-semibold text-2xl tracking-tight italic">
-                <span className="text-[var(--app-link)]">Nest</span>
-                <span className="text-foreground">plate</span>
-              </div>
-            </motion.div>
-          )}
-        </AnimatePresence>
+        <SidebarBrand isCollapsed={isCollapsed} />
       </div>
 
       {/* Navigation Items */}
