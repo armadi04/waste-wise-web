@@ -9,6 +9,7 @@
     "test": "vitest run",
     "lint": "eslint",
     "format": "prettier",
+    "tokens:generate": "bun scripts/generate-tokens.ts",
     "check": "prettier --write . && eslint --fix",
     "test:e2e": "playwright test",
     "api:generate": "openapi-typescript ../backend/swagger.json -o src/types/api.generated.ts"
