@@ -7,7 +7,10 @@ Admin and User; navigation and actions follow backend permissions.
 Reports live at `/reports`, `/reports/new`, and `/reports/:reportId`. The dashboard is `/`
 and shows report counts/charts scoped by the backend (all reports for Admin, own for User).
 Table filters, pagination, and sorting are URL state; report photos upload through the Media
-Module before the report is created.
+Module before the report is created. The Users table shows derived account status
+(Active/Inactive/Unverified/Locked) and role names. Admins with `users.manage_status` can
+deactivate or reactivate other accounts; inactive users are signed out and cannot sign in. Report lifecycle changes appear in the audit trail
+and the Admin dashboard activity feed.
 
 ## Quick start
 

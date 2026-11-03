@@ -25,7 +25,8 @@ there is no root package-manager workspace.
 | Configuration | Zod startup validation; Redis optional with in-memory fallback |
 | API identity | `GET /api/v1`: name, URI API version, documentation URL |
 | Health | `GET /api/v1/health`: PostgreSQL ping and heap memory check |
-| Reports | Role-scoped report CRUD, URL-driven filters, status transitions, media photos and ML classification results |
+| Reports | Role-scoped report CRUD, URL-driven filters, status transitions, media photos, ML classification results and audit trail |
+| Users | Existing user management plus activate/deactivate, session revocation, account status and role names |
 | Dashboard and tables | Role-aware report statistics, Recharts distributions, sortable/searchable/paginated DataTable, Excel export |
 | PWA | Installable frontend, production service worker and update handling |
 | GraphQL | Optional schema-first API, DataLoaders and OAuth client credentials |

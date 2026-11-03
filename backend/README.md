@@ -45,6 +45,14 @@ the internal ML service at `ML_SERVICE_URL` (`POST /api/v1/predict`) and still s
 `classificationStatus=FAILED` when it is unavailable. Required env and optional integrations
 are listed in [Development](docs/DEVELOPMENT.md#environment).
 
+Development/test seeding creates a verified User demo account
+(`user@smart-waste.local` / `DemoUser123!` by default). Report mutations write `report.created`,
+`report.updated`, `report.status_updated`, and `report.deleted` into the audit trail.
+
+User accounts can be deactivated with `PATCH /api/v1/users/:id/status` (`users.manage_status`).
+Inactive users cannot sign in, refresh, switch roles or use existing access tokens; all sessions
+are revoked. Self-deactivation is rejected and superadmin accounts remain superadmin-only.
+
 Report resources:
 
 ```text
