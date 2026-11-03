@@ -2,7 +2,7 @@
 
 A full-stack starter built on **NestJS 12 + Bun** and **React 19 + Vite**.
 Authentication, RBAC, media management, real-time notifications, responsive navigation,
-and a generic dashboard are included — ready to clone and extend.
+waste reports with ML-assisted classification, and a role-aware dashboard are included.
 
 This README is a summary. Start with each package's `docs/ARCHITECTURE.md`, then read
 the task-oriented guide linked below. Backend and frontend are independent Bun packages;
@@ -25,7 +25,8 @@ there is no root package-manager workspace.
 | Configuration | Zod startup validation; Redis optional with in-memory fallback |
 | API identity | `GET /api/v1`: name, URI API version, documentation URL |
 | Health | `GET /api/v1/health`: PostgreSQL ping and heap memory check |
-| Dashboard and tables | Generic Recharts statistics, sortable/searchable/paginated DataTable, Excel export |
+| Reports | Role-scoped report CRUD, URL-driven filters, status transitions, media photos and ML classification results |
+| Dashboard and tables | Role-aware report statistics, Recharts distributions, sortable/searchable/paginated DataTable, Excel export |
 | PWA | Installable frontend, production service worker and update handling |
 | GraphQL | Optional schema-first API, DataLoaders and OAuth client credentials |
 | Email | SMTP outbox with retries; no mail-provider API dependency |
@@ -78,7 +79,8 @@ cp .env.example .env
 bun run dev
 ```
 
-Backend: **localhost:3000**, REST base `/api/v1`. Frontend: **localhost:3001**; Vite proxies
+The optional ML service runs separately from its own repository; set `ML_SERVICE_URL` on the
+backend (default service API: `POST /api/v1/predict`). Backend: **localhost:3000**, REST base `/api/v1`. Frontend: **localhost:3001**; Vite proxies
 `/api` and `/socket.io` to the backend. Leave `VITE_API_URL` empty for same-origin requests.
 Swagger UI is `/api/docs` outside production; OpenAPI documents are `/api/docs/openapi.json` and `/api/docs/openapi.yaml`.
 Sign in with the admin email/password configured in the backend env.

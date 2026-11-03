@@ -31,6 +31,8 @@ Source of truth: `src/config/env.ts`; template: `.env.example`. Invalid/missing 
 |---|---|
 | Database (required) | DB_HOST, DB_USERNAME, DB_PASSWORD, DB_NAME; DB_PORT=5432 |
 | Identity (required) | JWT_SECRET (min 16 chars), ADMIN_EMAIL, ADMIN_PASSWORD (min 8 chars) |
+| Demo user (optional) | DEMO_USER_EMAIL, DEMO_USER_PASSWORD (min 8 chars) create one verified `user` account when seeding |
+| Reports / ML | ML_SERVICE_URL (optional), ML_SERVICE_TIMEOUT_MS=15000; without the URL reports still save with classification FAILED |
 | Storage | MEDIA_PROVIDER=depot; selected provider credentials required (see below) |
 | Storage profiles | MEDIA_STORAGE_PROFILE optional; MEDIA_STORAGE_PROFILES JSON map of named locations/credentials |
 | Upload limits | MEDIA_MAX_FILE_SIZE=20971520 bytes (max 100 MiB); MEDIA_MAX_CONCURRENT_UPLOADS=4 (1–16); MEDIA_ALLOWED_MIME_TYPES signature allowlist |
@@ -68,8 +70,8 @@ bun run schema:check
 ```
 
 Review generated SQL. Keep `DB_SYNCHRONIZE=false`. Seeder is idempotent, non-production and
-creates permissions, `superadmin`/`user` roles and the env-configured verified admin, without
-business/demo data. Automatic boot seeding is gated by `DB_SEED`; explicit `seed` controls its
+creates permissions, `superadmin`/`user` roles and the env-configured verified admin. It also
+creates an optional verified demo user when `DEMO_USER_EMAIL` and `DEMO_USER_PASSWORD` are set. Automatic boot seeding is gated by `DB_SEED`; explicit `seed` controls its
 own run. `migrate:fresh[:seed]` drops schema and is only for explicitly authorized disposable DBs.
 
 ## Commands and generated output

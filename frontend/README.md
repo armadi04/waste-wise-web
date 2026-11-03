@@ -1,7 +1,13 @@
 # Nestplate frontend
 
 React 19 SPA with Vite, TanStack Router/Query, HeroUI, Tailwind, Zustand and PWA support.
-Backend remains the authority for identity, permissions and persistence.
+Backend remains the authority for identity, permissions and persistence. The same shell serves
+Admin and User; navigation and actions follow backend permissions.
+
+Reports live at `/reports`, `/reports/new`, and `/reports/:reportId`. The dashboard is `/`
+and shows report counts/charts scoped by the backend (all reports for Admin, own for User).
+Table filters, pagination, and sorting are URL state; report photos upload through the Media
+Module before the report is created.
 
 ## Quick start
 

@@ -1,8 +1,8 @@
 # Nestplate backend
 
 NestJS 12.1.2 with Fastify 5 on Bun, PostgreSQL and TypeORM. Owns auth/RBAC, users, invitations, 2FA,
-sessions, media (Depot/direct S3), SMTP outbox, notifications, audit, health, generic
-dashboard statistics and optional GraphQL.
+sessions, media (Depot/direct S3), waste reports with ML-assisted classification,
+SMTP outbox, notifications, audit, health, dashboard statistics and optional GraphQL.
 
 ## Quick start
 
@@ -40,8 +40,26 @@ curl http://localhost:3000/api/v1/health
 
 Keep `DB_SYNCHRONIZE=false`. Baseline supports new databases only.
 
-`MEDIA_PROVIDER=depot` is default; use `s3` for direct S3-compatible storage. Required env
-and optional integrations are listed in [Development](docs/DEVELOPMENT.md#environment).
+`MEDIA_PROVIDER=depot` is default; use `s3` for direct S3-compatible storage. Reports call
+the internal ML service at `ML_SERVICE_URL` (`POST /api/v1/predict`) and still save with
+`classificationStatus=FAILED` when it is unavailable. Required env and optional integrations
+are listed in [Development](docs/DEVELOPMENT.md#environment).
+
+Report resources:
+
+```text
+GET    /api/v1/reports                 list (own or all by permission)
+GET    /api/v1/reports/:id             detail
+POST   /api/v1/reports                 create (mediaId from Media Module upload)
+PATCH  /api/v1/reports/:id             update; new mediaId re-runs classification
+PATCH  /api/v1/reports/:id/status      admin status transition
+DELETE /api/v1/reports/:id             soft delete
+GET    /api/v1/stats/reports           role-scoped dashboard aggregation
+```
+
+Photo flow: upload through `POST /api/v1/media/upload`, then pass `mediaId` to Reports.
+The backend fetches the stored image from media storage and forwards it to the ML service;
+the browser never calls the ML service directly.
 Run `bun run build` before `start:prod` so imports are rewritten by tsc-alias.
 Default tests are unit-only; requested integration/E2E work uses `nestplate_test`.
 `bun run test:http` tests HTTP/GraphQL with Fastify injection and mocked dependencies,
