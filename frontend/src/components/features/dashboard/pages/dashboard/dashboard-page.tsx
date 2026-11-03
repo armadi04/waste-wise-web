@@ -111,9 +111,9 @@ export function Dashboard() {
   return (
     <div className="mx-auto flex min-h-full w-full flex-col pb-10">
       <PageHeader
-        title={`Welcome back, ${displayName}`}
-        description="Report activity and waste handling at a glance."
-        breadcrumbs={[{ label: 'Overview', isCurrent: true }]}
+        title="Dashboard"
+        description={`Welcome back, ${displayName}. Report activity and waste handling at a glance.`}
+        breadcrumbs={[{ label: 'Dashboard', isCurrent: true }]}
       />
 
       {canViewReports && (
