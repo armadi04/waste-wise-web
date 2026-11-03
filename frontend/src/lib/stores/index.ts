@@ -12,6 +12,8 @@
 
 // Global stores
 export { useAuthStore } from '@/lib/stores/auth.store'
+export { useBackgroundStore } from '@/lib/stores/background.store'
+export type { BackgroundStyle } from '@/lib/stores/background.store'
 export { useCommandPaletteStore } from '@/lib/stores/command-palette.store'
 export { useConfirmationStore } from '@/lib/stores/confirmation.store'
 export type { ConfirmationOptions } from '@/lib/stores/confirmation.store'

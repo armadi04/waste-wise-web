@@ -34,8 +34,8 @@ export default defineConfig(({ mode, command }) => {
           description: 'Nestplate Starter dashboard',
           start_url: '/',
           display: 'standalone',
-          theme_color: '#f8fafc',
-          background_color: '#f8fafc',
+          theme_color: '#ffffff',
+          background_color: '#ffffff',
           icons: [
             {
               src: 'favicon.ico',

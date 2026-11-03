@@ -1,3 +1,5 @@
+export { useBackground } from './use-background'
+export type { BackgroundStyle } from './use-background'
 export { useClearCache } from './use-clear-cache'
 export { useClientReady } from './use-client-ready'
 export {

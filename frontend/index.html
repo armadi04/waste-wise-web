@@ -7,7 +7,7 @@
     <!-- Primary -->
     <title>Nestplate Starter</title>
     <meta name="description" content="Nestplate Starter dashboard" />
-    <meta name="theme-color" content="#F8FAFC" />
+    <meta name="theme-color" content="#FFFFFF" />
     <meta name="color-scheme" content="light dark" />
     <meta name="referrer" content="strict-origin-when-cross-origin" />
 
@@ -34,9 +34,25 @@
         document.documentElement.classList.remove('light', 'dark')
         document.documentElement.classList.add(dark ? 'dark' : 'light')
         document.documentElement.style.colorScheme = dark ? 'dark' : 'light'
+        let background = 'gradient'
+        try {
+          const savedBackground = JSON.parse(
+            localStorage.getItem('background-store') || 'null',
+          )
+          const legacyBackground = localStorage.getItem('background')
+          const style =
+            savedBackground?.state?.style ?? legacyBackground ?? 'gradient'
+          if (['gradient', 'neutral', 'gray'].includes(style))
+            background = style
+        } catch {
+          /* Unavailable or malformed storage: use the default gradient. */
+        }
+        document.documentElement.dataset.background = background
         document.querySelector('meta[name="theme-color"]').content = dark
-          ? '#0F172A'
-          : '#F8FAFC'
+          ? '#000000'
+          : background === 'gray'
+            ? '#f5f5f7'
+            : '#ffffff'
       })()
     </script>
 
