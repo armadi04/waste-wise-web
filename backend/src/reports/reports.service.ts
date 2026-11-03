@@ -88,6 +88,7 @@ export class ReportsService extends BaseService<Report> {
   async createForActor(
     actor: AuthenticatedUser,
     dto: CreateReportDto,
+    ipAddress?: string | null,
   ): Promise<Report> {
     const media = await this.assertUsableMedia(actor, dto.mediaId);
     const classification = await this.classification.classify(media);
@@ -104,13 +105,27 @@ export class ReportsService extends BaseService<Report> {
       classificationStatus: classification.status,
       classificationError: classification.errorCode,
     });
-    return this.findOneForActor(actor, report.id);
+    const view = await this.findOneForActor(actor, report.id);
+    this.recordAudit(
+      actor,
+      'report.created',
+      view.id,
+      `Created report #${view.id}`,
+      {
+        mediaId: view.mediaId,
+        classificationStatus: view.classificationStatus,
+        predictedCategory: view.predictedCategory,
+      },
+      ipAddress,
+    );
+    return view;
   }
 
   async updateForActor(
     actor: AuthenticatedUser,
     id: number,
     dto: UpdateReportDto,
+    ipAddress?: string | null,
   ): Promise<Report> {
     const report = await this.findOneForActor(actor, id);
     this.assertCanUpdate(actor, report);
@@ -127,6 +142,7 @@ export class ReportsService extends BaseService<Report> {
     if (dto.latitude !== undefined) changes.latitude = dto.latitude;
     if (dto.longitude !== undefined) changes.longitude = dto.longitude;
 
+    let reclassified = false;
     if (dto.mediaId !== undefined && dto.mediaId !== report.mediaId) {
       const media = await this.assertUsableMedia(actor, dto.mediaId);
       const classification = await this.classification.classify(media);
@@ -136,27 +152,64 @@ export class ReportsService extends BaseService<Report> {
       changes.modelVersion = classification.modelVersion;
       changes.classificationStatus = classification.status;
       changes.classificationError = classification.errorCode;
+      reclassified = true;
     }
 
     await super.update(id, changes);
-    return this.findOneForActor(actor, id);
+    const view = await this.findOneForActor(actor, id);
+    this.recordAudit(
+      actor,
+      'report.updated',
+      id,
+      `Updated report #${id}`,
+      {
+        mediaId: view.mediaId,
+        reclassified,
+        classificationStatus: view.classificationStatus,
+      },
+      ipAddress,
+    );
+    return view;
   }
 
-  async removeForActor(actor: AuthenticatedUser, id: number): Promise<void> {
+  async removeForActor(
+    actor: AuthenticatedUser,
+    id: number,
+    ipAddress?: string | null,
+  ): Promise<void> {
     const report = await this.findOneForActor(actor, id);
     this.assertCanDelete(actor, report);
     await super.remove(id);
+    this.recordAudit(
+      actor,
+      'report.deleted',
+      id,
+      `Deleted report #${id}`,
+      { status: report.status, mediaId: report.mediaId },
+      ipAddress,
+    );
   }
 
   async updateStatusForActor(
     actor: AuthenticatedUser,
     id: number,
     status: ReportStatus,
+    ipAddress?: string | null,
   ): Promise<Report> {
     const report = await this.findOneForActor(actor, id);
-    assertStatusTransition(report.status, status);
+    const from = report.status;
+    assertStatusTransition(from, status);
     await super.update(id, { status });
-    return this.findOneForActor(actor, id);
+    const view = await this.findOneForActor(actor, id);
+    this.recordAudit(
+      actor,
+      'report.status_updated',
+      id,
+      `Changed report #${id} status from ${from} to ${status}`,
+      { from, to: status },
+      ipAddress,
+    );
+    return view;
   }
 
   async statsForActor(actor: AuthenticatedUser): Promise<ReportStatsDto> {
@@ -317,6 +370,26 @@ export class ReportsService extends BaseService<Report> {
     if (media.size !== null && media.size > REPORT_IMAGE_MAX_BYTES)
       throw new BadRequestException('Report photo must be 5 MB or smaller');
     return media;
+  }
+
+  private recordAudit(
+    actor: AuthenticatedUser,
+    action: string,
+    reportId: number,
+    summary: string,
+    metadata: Record<string, unknown>,
+    ipAddress?: string | null,
+  ): void {
+    this.eventEmitter?.emit('audit.record', {
+      action,
+      actorId: actor.userId,
+      actorEmail: actor.email,
+      subjectType: 'report',
+      subjectId: reportId,
+      summary,
+      metadata,
+      ipAddress: ipAddress ?? null,
+    });
   }
 
   private canReadAll(actor: AuthenticatedUser): boolean {

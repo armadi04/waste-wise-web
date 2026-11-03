@@ -68,7 +68,7 @@ export class ReportsController {
   @ApiResponse({ status: 201, type: Report })
   @UseInterceptors(NoFilesInterceptor())
   create(@Req() req: IAuthRequest, @Body() dto: CreateReportDto) {
-    return this.reportsService.createForActor(req.user, dto);
+    return this.reportsService.createForActor(req.user, dto, req.ip ?? null);
   }
 
   @Patch(':id')
@@ -81,7 +81,12 @@ export class ReportsController {
     @Param('id', ParseIntPipe) id: number,
     @Body() dto: UpdateReportDto,
   ) {
-    return this.reportsService.updateForActor(req.user, id, dto);
+    return this.reportsService.updateForActor(
+      req.user,
+      id,
+      dto,
+      req.ip ?? null,
+    );
   }
 
   @Patch(':id/status')
@@ -94,7 +99,12 @@ export class ReportsController {
     @Param('id', ParseIntPipe) id: number,
     @Body() dto: UpdateReportStatusDto,
   ) {
-    return this.reportsService.updateStatusForActor(req.user, id, dto.status);
+    return this.reportsService.updateStatusForActor(
+      req.user,
+      id,
+      dto.status,
+      req.ip ?? null,
+    );
   }
 
   @Delete(':id')
@@ -105,7 +115,7 @@ export class ReportsController {
     @Req() req: IAuthRequest,
     @Param('id', ParseIntPipe) id: number,
   ) {
-    await this.reportsService.removeForActor(req.user, id);
+    await this.reportsService.removeForActor(req.user, id, req.ip ?? null);
     return { deleted: true };
   }
 }
