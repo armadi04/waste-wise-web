@@ -1,4 +1,8 @@
-import { ArgumentsHost, NotFoundException } from '@nestjs/common';
+import {
+  ArgumentsHost,
+  NotFoundException,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { Logger } from 'nestjs-pino';
 import { describe, beforeEach, it, expect, jest } from 'bun:test';
 import { AllExceptionsFilter } from '../../../../src/common/filters/all-exceptions.filter';
@@ -32,6 +36,20 @@ describe('AllExceptionsFilter', () => {
       expect.objectContaining({ message: 'nope', code: 'NOT_FOUND' }),
     );
     expect(logger.error).not.toHaveBeenCalled();
+  });
+
+  it('preserves an explicit error code from the exception body', () => {
+    filter.catch(
+      new UnauthorizedException({
+        message: 'That code is not valid',
+        code: 'TWO_FACTOR_INVALID_CODE',
+      }),
+      host,
+    );
+
+    expect(send).toHaveBeenCalledWith(
+      expect.objectContaining({ code: 'TWO_FACTOR_INVALID_CODE' }),
+    );
   });
 
   it('should log and mask unknown errors as a generic 500', () => {

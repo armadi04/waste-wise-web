@@ -3,6 +3,7 @@ import {
   ForbiddenException,
   Injectable,
   NotFoundException,
+  ServiceUnavailableException,
   UnauthorizedException,
 } from '@nestjs/common';
 import { EventEmitter2, OnEvent } from '@nestjs/event-emitter';
@@ -116,16 +117,20 @@ export class AuthService {
       1,
       Math.ceil((user.lockedUntil.getTime() - Date.now()) / 60_000),
     );
-    throw new ForbiddenException(
-      `Too many failed sign-in attempts. Try again in ${minutes} minute${
+    throw new ForbiddenException({
+      message: `Too many failed sign-in attempts. Try again in ${minutes} minute${
         minutes === 1 ? '' : 's'
       }.`,
-    );
+      code: 'ACCOUNT_LOCKED',
+    });
   }
 
   assertActive(user: Pick<User, 'isActive'>): void {
     if (user.isActive === false)
-      throw new ForbiddenException('Account is inactive');
+      throw new ForbiddenException({
+        message: 'Account is inactive',
+        code: 'ACCOUNT_INACTIVE',
+      });
   }
 
   /**
@@ -176,26 +181,48 @@ export class AuthService {
         throw new UnauthorizedException('Invalid Google token');
       }
 
-      const user = await this.usersService.findOneByEmail(payload.email);
-      if (!user) {
-        throw new UnauthorizedException(
-          `Your email (${payload.email}) is not registered in this system. Please contact an administrator to get access.`,
-        );
-      }
-      this.assertActive(user);
-
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
-      const { password, ...result } = user;
-      return result;
+      return await this.resolveGoogleUser({
+        email: payload.email,
+        fullname: payload.name,
+        emailVerified: payload.email_verified,
+      });
     } catch (error) {
       if (
         error instanceof UnauthorizedException ||
-        error instanceof ForbiddenException
+        error instanceof ForbiddenException ||
+        error instanceof ServiceUnavailableException
       ) {
         throw error;
       }
       throw new UnauthorizedException('Google authentication failed');
     }
+  }
+
+  /**
+   * Existing Google accounts sign in; unknown ones are auto-registered by the
+   * users service with the default `user` role. The backend remains the source
+   * of truth for identity, account status, roles and permissions.
+   */
+  private async resolveGoogleUser(payload: {
+    email?: string | null;
+    fullname?: string | null;
+    emailVerified?: boolean;
+  }): Promise<Omit<User, 'password'>> {
+    if (!payload.email) {
+      throw new UnauthorizedException('Invalid Google identity');
+    }
+    if (payload.emailVerified === false) {
+      throw new UnauthorizedException('Google email is not verified');
+    }
+    const user = await this.usersService.findOrCreateGoogleUser({
+      email: payload.email,
+      fullname: payload.fullname,
+    });
+    this.assertActive(user);
+
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const { password, ...result } = user;
+    return result;
   }
 
   async validateGoogleAccessToken(
@@ -215,26 +242,25 @@ export class AuthService {
         throw new UnauthorizedException('Invalid Google access token');
       }
 
-      const payload = (await response.json()) as { email: string };
+      const payload = (await response.json()) as {
+        email?: string;
+        name?: string;
+        email_verified?: boolean;
+      };
       if (!payload || !payload.email) {
         throw new UnauthorizedException('Invalid Google user information');
       }
 
-      const user = await this.usersService.findOneByEmail(payload.email);
-      if (!user) {
-        throw new UnauthorizedException(
-          `Your email (${payload.email}) is not registered in this system. Please contact an administrator to get access.`,
-        );
-      }
-      this.assertActive(user);
-
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
-      const { password, ...result } = user;
-      return result;
+      return await this.resolveGoogleUser({
+        email: payload.email,
+        fullname: payload.name,
+        emailVerified: payload.email_verified,
+      });
     } catch (error) {
       if (
         error instanceof UnauthorizedException ||
-        error instanceof ForbiddenException
+        error instanceof ForbiddenException ||
+        error instanceof ServiceUnavailableException
       ) {
         throw error;
       }
@@ -325,12 +351,16 @@ export class AuthService {
     try {
       payload = this.jwtService.verify<JwtPayload>(token);
     } catch {
-      throw new UnauthorizedException(
-        'Your sign-in attempt expired — start again',
-      );
+      throw new UnauthorizedException({
+        message: 'Your sign-in attempt expired — start again',
+        code: 'TWO_FACTOR_CHALLENGE_EXPIRED',
+      });
     }
     if (payload.tokenType !== '2fa') {
-      throw new UnauthorizedException('Invalid verification token');
+      throw new UnauthorizedException({
+        message: 'Invalid verification token',
+        code: 'TWO_FACTOR_CHALLENGE_INVALID',
+      });
     }
     return payload.sub;
   }

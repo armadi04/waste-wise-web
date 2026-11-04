@@ -26,6 +26,7 @@ describe('AuthService', () => {
   let service: AuthService;
   let usersService: {
     findOneByEmail: jest.Mock;
+    findOrCreateGoogleUser: jest.Mock;
     findOne: jest.Mock;
     update: jest.Mock;
     markEmailVerified: jest.Mock;
@@ -73,6 +74,7 @@ describe('AuthService', () => {
   beforeEach(async () => {
     usersService = {
       findOneByEmail: jest.fn(),
+      findOrCreateGoogleUser: jest.fn(),
       findOne: jest.fn(),
       update: jest.fn(),
       markEmailVerified: jest.fn(),
@@ -680,17 +682,39 @@ describe('AuthService', () => {
       );
     });
 
-    it('should throw when the email is not registered', async () => {
+    it('should reject an unverified Google email', async () => {
       (service as unknown as { googleClient: unknown }).googleClient = {
-        verifyIdToken: jest
-          .fn()
-          .mockResolvedValue({ getPayload: () => ({ email: 'x@b.com' }) }),
+        verifyIdToken: jest.fn().mockResolvedValue({
+          getPayload: () => ({ email: 'x@b.com', email_verified: false }),
+        }),
       };
-      usersService.findOneByEmail.mockResolvedValue(null);
 
       await expect(service.validateGoogleUser('tok')).rejects.toThrow(
-        UnauthorizedException,
+        'Google email is not verified',
       );
+      expect(usersService.findOrCreateGoogleUser).not.toHaveBeenCalled();
+    });
+
+    it('should auto-register an unknown Google account', async () => {
+      (service as unknown as { googleClient: unknown }).googleClient = {
+        verifyIdToken: jest.fn().mockResolvedValue({
+          getPayload: () => ({ email: 'x@b.com', name: 'Google User' }),
+        }),
+      };
+      usersService.findOrCreateGoogleUser.mockResolvedValue({
+        id: 1,
+        email: 'x@b.com',
+        password: 'secret-hash',
+        isActive: true,
+      });
+
+      const result = await service.validateGoogleUser('tok');
+
+      expect(usersService.findOrCreateGoogleUser).toHaveBeenCalledWith({
+        email: 'x@b.com',
+        fullname: 'Google User',
+      });
+      expect((result as Record<string, unknown>).password).toBeUndefined();
     });
 
     it('should return the user without password when registered', async () => {
@@ -699,10 +723,11 @@ describe('AuthService', () => {
           .fn()
           .mockResolvedValue({ getPayload: () => ({ email: 'x@b.com' }) }),
       };
-      usersService.findOneByEmail.mockResolvedValue({
+      usersService.findOrCreateGoogleUser.mockResolvedValue({
         id: 1,
         email: 'x@b.com',
         password: 'secret-hash',
+        isActive: true,
       });
 
       const result = await service.validateGoogleUser('tok');
@@ -727,12 +752,13 @@ describe('AuthService', () => {
     it('should return the registered user for a valid access token', async () => {
       globalThis.fetch = jest.fn().mockResolvedValue({
         ok: true,
-        json: async () => ({ email: 'x@b.com' }),
+        json: async () => ({ email: 'x@b.com', name: 'Google User' }),
       }) as never;
-      usersService.findOneByEmail.mockResolvedValue({
+      usersService.findOrCreateGoogleUser.mockResolvedValue({
         id: 1,
         email: 'x@b.com',
         password: 'secret-hash',
+        isActive: true,
       });
 
       const result = await service.validateGoogleAccessToken('ya29.x');

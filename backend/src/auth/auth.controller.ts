@@ -7,6 +7,8 @@ import {
   UseGuards,
   Request,
   Get,
+  Header,
+  HttpCode,
   Headers,
   Ip,
   Param,
@@ -23,6 +25,8 @@ import {
   ApiOperation,
   ApiResponse,
   ApiBearerAuth,
+  ApiExtraModels,
+  getSchemaPath,
 } from '@nestjs/swagger';
 import { EventEmitter2 } from '@nestjs/event-emitter';
 import { AuthService, type SessionTokens } from './auth.service';
@@ -31,6 +35,9 @@ import { TurnstileService } from './turnstile.service';
 import { LoginDto } from './dto/login.dto';
 import { SwitchRoleDto } from './dto/switch-role.dto';
 import { GoogleLoginDto } from './dto/google-login.dto';
+import { MobileAuthSessionDto } from './dto/mobile-auth-session.dto';
+import { MobileRefreshTokenDto } from './dto/mobile-refresh.dto';
+import { MobileTwoFactorChallengeDto } from './dto/mobile-two-factor-challenge.dto';
 import { ForgotPasswordDto } from './dto/forgot-password.dto';
 import { ResetPasswordDto } from './dto/reset-password.dto';
 import { ResendVerificationDto } from './dto/resend-verification.dto';
@@ -50,6 +57,7 @@ import { TwoFactorCodeDto } from './dto/two-factor-code.dto';
 import { TwoFactorVerifyDto } from './dto/two-factor-verify.dto';
 
 @ApiTags('Auth')
+@ApiExtraModels(MobileAuthSessionDto, MobileTwoFactorChallengeDto)
 @Controller('auth')
 export class AuthController {
   constructor(
@@ -157,6 +165,60 @@ export class AuthController {
     return { accessToken: tokens.accessToken };
   }
 
+  /**
+   * Native clients cannot use the browser's CSRF-cookie flow. They receive the
+   * refresh token directly over HTTPS and spend it at the mobile refresh
+   * endpoint, which also lets logout revoke the device session without cookies.
+   */
+  private async completeMobileLogin(
+    user: Omit<User, 'password'>,
+    context: { ipAddress: string; userAgent: string },
+  ) {
+    const tokens = await this.authService.login(user, { context });
+    this.eventEmitter.emit('audit.record', {
+      action: 'auth.login',
+      actorId: user.id,
+      actorEmail: user.email,
+      subjectType: 'user',
+      subjectId: user.id,
+      summary: 'Signed in from mobile',
+      ipAddress: context.ipAddress,
+    });
+    return {
+      accessToken: tokens.accessToken,
+      refreshToken: tokens.refreshToken,
+      sessionExpiresAt: tokens.sessionExpiresAt,
+    };
+  }
+
+  /**
+   * Spend a two-factor challenge and return the verified user. Browser and
+   * mobile routes share this; only the final token delivery differs.
+   */
+  private async verifyTwoFactorChallenge(
+    dto: TwoFactorVerifyDto,
+  ): Promise<Omit<User, 'password'>> {
+    const userId = this.authService.consumeTwoFactorChallenge(
+      dto.challengeToken,
+    );
+
+    const user = await this.authService.getProfile(userId);
+    if (!user) throw new UnauthorizedException('User no longer exists');
+
+    // A wrong code is a guess at the same account as a wrong password, so it
+    // counts towards the same lockout.
+    this.authService.assertNotLocked(user);
+    if (!(await this.twoFactorService.verify(userId, dto.code))) {
+      await this.authService.registerFailedLogin(user);
+      throw new UnauthorizedException({
+        message: 'That code is not valid',
+        code: 'TWO_FACTOR_INVALID_CODE',
+      });
+    }
+    await this.authService.clearFailedLogins(user);
+    return user;
+  }
+
   @Post('login')
   @ApiResponse({ status: 400, description: 'Invalid security challenge' })
   @ApiResponse({
@@ -236,6 +298,127 @@ export class AuthController {
     return this.completeLogin(user, res, { ipAddress: ip, userAgent });
   }
 
+  @Post('mobile/google')
+  @HttpCode(200)
+  @Header('Cache-Control', 'no-store')
+  @Throttle({ default: { limit: 10, ttl: 60_000 } })
+  @ApiOperation({ summary: 'Login with Google for a native mobile client' })
+  @ApiResponse({
+    status: 200,
+    schema: {
+      oneOf: [
+        { $ref: getSchemaPath(MobileAuthSessionDto) },
+        { $ref: getSchemaPath(MobileTwoFactorChallengeDto) },
+      ],
+    },
+  })
+  @UseInterceptors(NoFilesInterceptor())
+  async mobileGoogleLogin(
+    @Body() googleLoginDto: GoogleLoginDto,
+    @Ip() ip: string,
+    @Headers('user-agent') userAgent: string,
+  ) {
+    const user = googleLoginDto.token.startsWith('ya29.')
+      ? await this.authService.validateGoogleAccessToken(googleLoginDto.token)
+      : await this.authService.validateGoogleUser(googleLoginDto.token);
+
+    if (this.twoFactorService.isEnabled(user)) {
+      return {
+        twoFactorRequired: true,
+        challengeToken: this.authService.issueTwoFactorChallenge(user),
+      };
+    }
+
+    return this.completeMobileLogin(user, {
+      ipAddress: ip,
+      userAgent: userAgent || 'WasteWise-Mobile',
+    });
+  }
+
+  @Post('mobile/2fa/verify')
+  @HttpCode(200)
+  @Header('Cache-Control', 'no-store')
+  @Throttle({ default: { limit: 5, ttl: 60_000 } })
+  @ApiOperation({
+    summary: 'Finish a mobile login with two-factor verification',
+  })
+  @ApiResponse({
+    status: 200,
+    type: MobileAuthSessionDto,
+  })
+  @UseInterceptors(NoFilesInterceptor())
+  async mobileVerifyTwoFactor(
+    @Body() dto: TwoFactorVerifyDto,
+    @Ip() ip: string,
+    @Headers('user-agent') userAgent: string,
+  ) {
+    const user = await this.verifyTwoFactorChallenge(dto);
+    return this.completeMobileLogin(user, {
+      ipAddress: ip,
+      userAgent: userAgent || 'WasteWise-Mobile',
+    });
+  }
+
+  @Post('mobile/refresh')
+  @HttpCode(200)
+  @Header('Cache-Control', 'no-store')
+  @Throttle({ default: { limit: 20, ttl: 60_000 } })
+  @ApiOperation({ summary: 'Rotate a mobile refresh token' })
+  @ApiResponse({
+    status: 200,
+    type: MobileAuthSessionDto,
+  })
+  @UseInterceptors(NoFilesInterceptor())
+  async mobileRefresh(
+    @Body() dto: MobileRefreshTokenDto,
+    @Ip() ip: string,
+    @Headers('user-agent') userAgent: string,
+  ) {
+    const tokens = await this.authService.refresh(dto.refreshToken, {
+      ipAddress: ip,
+      userAgent: userAgent || 'WasteWise-Mobile',
+    });
+    return {
+      accessToken: tokens.accessToken,
+      refreshToken: tokens.refreshToken,
+      sessionExpiresAt: tokens.sessionExpiresAt,
+    };
+  }
+
+  @Post('mobile/logout')
+  @HttpCode(200)
+  @Header('Cache-Control', 'no-store')
+  @Throttle({ default: { limit: 20, ttl: 60_000 } })
+  @ApiOperation({ summary: 'Revoke a mobile refresh token and device session' })
+  @ApiResponse({
+    status: 200,
+    schema: { properties: { message: { type: 'string' } } },
+  })
+  @UseInterceptors(NoFilesInterceptor())
+  async mobileLogout(
+    @Body() dto: MobileRefreshTokenDto,
+    @Headers('authorization') authorization?: string,
+  ) {
+    const accessToken = authorization?.match(/^Bearer\s+(\S+)$/i)?.[1];
+    if (accessToken) {
+      await this.authService.blacklistToken(accessToken);
+    }
+
+    const session = this.authService.sessionFromTokens([dto.refreshToken]);
+    await this.authService.blacklistToken(dto.refreshToken);
+    if (session?.sessionId) {
+      await this.sessionsService.revokeBySessionId(session.sessionId);
+    }
+
+    this.eventEmitter.emit('audit.record', {
+      action: 'auth.logout',
+      actorId: session?.userId,
+      actorEmail: session?.email,
+      summary: 'Signed out from mobile',
+    });
+    return { message: 'Logout successful' };
+  }
+
   @Post('2fa/verify')
   @Throttle({ default: { limit: 5, ttl: 60_000 } })
   @ApiOperation({ summary: 'Finish a login by verifying the second factor' })
@@ -250,22 +433,7 @@ export class AuthController {
     @Headers('user-agent') userAgent: string,
     @Res({ passthrough: true }) res: Response,
   ) {
-    const userId = this.authService.consumeTwoFactorChallenge(
-      dto.challengeToken,
-    );
-
-    const user = await this.authService.getProfile(userId);
-    if (!user) throw new UnauthorizedException('User no longer exists');
-
-    // A wrong code is a guess at the same account as a wrong password, so it
-    // counts towards the same lockout.
-    this.authService.assertNotLocked(user);
-    if (!(await this.twoFactorService.verify(userId, dto.code))) {
-      await this.authService.registerFailedLogin(user);
-      throw new UnauthorizedException('That code is not valid');
-    }
-    await this.authService.clearFailedLogins(user);
-
+    const user = await this.verifyTwoFactorChallenge(dto);
     return this.completeLogin(user, res, { ipAddress: ip, userAgent });
   }
 

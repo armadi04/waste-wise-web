@@ -44,7 +44,11 @@ export class AllExceptionsFilter implements ExceptionFilter {
         typeof exceptionResponse === 'object' && exceptionResponse !== null
           ? exceptionResponse
           : { message: exceptionResponse };
-      const code = this.codeForStatus(status);
+      const explicitCode = (body as { code?: unknown }).code;
+      const code =
+        typeof explicitCode === 'string'
+          ? explicitCode
+          : this.codeForStatus(status);
       const payload = { ...body, code };
       // Nest 12.1.2's Fastify multipart interceptor spells this differently
       // from Multer. Keep the existing public validation message.

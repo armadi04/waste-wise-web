@@ -3,7 +3,9 @@ import {
   NotFoundException,
   ConflictException,
   ForbiddenException,
+  ServiceUnavailableException,
 } from '@nestjs/common';
+import crypto from 'node:crypto';
 import { InjectRepository } from '@nestjs/typeorm';
 import {
   Repository,
@@ -120,6 +122,46 @@ export class UsersService extends BaseService<User> {
       return saved;
     } catch (error) {
       this.handleDbError(error);
+    }
+  }
+
+  /**
+   * Resolve a verified Google identity to a local account. Unknown Google
+   * accounts become active, verified `user` accounts so mobile sign-in does not
+   * depend on a separate registration screen. A unique-email conflict means a
+   * concurrent sign-in won the race, so re-read and return that account.
+   */
+  async findOrCreateGoogleUser(input: {
+    email: string;
+    fullname?: string | null;
+  }): Promise<User> {
+    const existing = await this.findOneByEmail(input.email);
+    if (existing) return existing;
+
+    const userRole = await this.rolesRepository.findOneBy({ name: 'user' });
+    if (!userRole) {
+      throw new ServiceUnavailableException(
+        'The default user role is not configured',
+      );
+    }
+
+    try {
+      const created = await this.create(
+        {
+          email: input.email,
+          password: crypto.randomBytes(32).toString('hex'),
+          fullname: input.fullname?.trim() || undefined,
+          roleIds: [userRole.id],
+        },
+        { autoVerify: true, registerMethod: RegisterMethodEnum.GOOGLE },
+      );
+      return await this.findOne(created.id);
+    } catch (error) {
+      if (error instanceof ConflictException) {
+        const raced = await this.findOneByEmail(input.email);
+        if (raced) return raced;
+      }
+      throw error;
     }
   }
 

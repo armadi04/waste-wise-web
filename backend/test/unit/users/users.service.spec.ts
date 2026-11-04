@@ -53,6 +53,7 @@ describe('UsersService', () => {
           useValue: {
             findBy: jest.fn().mockResolvedValue([]),
             find: jest.fn().mockResolvedValue([]),
+            findOneBy: jest.fn(),
           },
         },
         {
@@ -102,6 +103,54 @@ describe('UsersService', () => {
       );
       expect(emailFilter.objectLiteralParameters).toEqual({ email: 'A@B.COM' });
       expect(result).toBe(user);
+    });
+  });
+
+  describe('findOrCreateGoogleUser', () => {
+    it('creates a verified Google user with the default role', async () => {
+      (rolesRepository.findOneBy as jest.Mock).mockResolvedValue({
+        id: 2,
+        name: 'user',
+      });
+      (rolesRepository.findBy as jest.Mock).mockResolvedValue([
+        { id: 2, name: 'user' },
+      ]);
+      const created = {
+        id: 9,
+        email: 'google@b.com',
+        isActive: true,
+        emailVerifiedAt: new Date(),
+      } as User;
+      (usersRepository.findOne as jest.Mock)
+        .mockResolvedValueOnce(null)
+        .mockResolvedValueOnce(created);
+
+      const result = await service.findOrCreateGoogleUser({
+        email: 'google@b.com',
+        fullname: 'Google User',
+      });
+
+      expect(usersRepository.save).toHaveBeenCalledWith(
+        expect.objectContaining({
+          email: 'google@b.com',
+          fullname: 'Google User',
+          roles: [{ id: 2, name: 'user' }],
+          registerMethod: RegisterMethodEnum.GOOGLE,
+        }),
+      );
+      expect(result).toMatchObject(created);
+    });
+
+    it('returns the existing account instead of registering again', async () => {
+      const existing = { id: 4, email: 'existing@b.com' } as User;
+      (usersRepository.findOne as jest.Mock).mockResolvedValue(existing);
+
+      const result = await service.findOrCreateGoogleUser({
+        email: 'existing@b.com',
+      });
+
+      expect(result).toBe(existing);
+      expect(usersRepository.save).not.toHaveBeenCalled();
     });
   });
 

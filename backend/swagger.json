@@ -275,6 +275,181 @@
         ]
       }
     },
+    "/api/v1/auth/mobile/google": {
+      "post": {
+        "operationId": "AuthController_mobileGoogleLogin_v1",
+        "parameters": [
+          {
+            "name": "user-agent",
+            "required": true,
+            "in": "header",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/GoogleLoginDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/MobileAuthSessionDto"
+                    },
+                    {
+                      "$ref": "#/components/schemas/MobileTwoFactorChallengeDto"
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        },
+        "summary": "Login with Google for a native mobile client",
+        "tags": [
+          "Auth"
+        ]
+      }
+    },
+    "/api/v1/auth/mobile/2fa/verify": {
+      "post": {
+        "operationId": "AuthController_mobileVerifyTwoFactor_v1",
+        "parameters": [
+          {
+            "name": "user-agent",
+            "required": true,
+            "in": "header",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TwoFactorVerifyDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MobileAuthSessionDto"
+                }
+              }
+            }
+          }
+        },
+        "summary": "Finish a mobile login with two-factor verification",
+        "tags": [
+          "Auth"
+        ]
+      }
+    },
+    "/api/v1/auth/mobile/refresh": {
+      "post": {
+        "operationId": "AuthController_mobileRefresh_v1",
+        "parameters": [
+          {
+            "name": "user-agent",
+            "required": true,
+            "in": "header",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/MobileRefreshTokenDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MobileAuthSessionDto"
+                }
+              }
+            }
+          }
+        },
+        "summary": "Rotate a mobile refresh token",
+        "tags": [
+          "Auth"
+        ]
+      }
+    },
+    "/api/v1/auth/mobile/logout": {
+      "post": {
+        "operationId": "AuthController_mobileLogout_v1",
+        "parameters": [
+          {
+            "name": "authorization",
+            "required": true,
+            "in": "header",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/MobileRefreshTokenDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "summary": "Revoke a mobile refresh token and device session",
+        "tags": [
+          "Auth"
+        ]
+      }
+    },
     "/api/v1/auth/2fa/verify": {
       "post": {
         "operationId": "AuthController_verifyTwoFactor_v1",
@@ -4320,6 +4495,42 @@
           "data"
         ]
       },
+      "MobileAuthSessionDto": {
+        "type": "object",
+        "properties": {
+          "accessToken": {
+            "type": "string"
+          },
+          "refreshToken": {
+            "type": "string"
+          },
+          "sessionExpiresAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        },
+        "required": [
+          "accessToken",
+          "refreshToken",
+          "sessionExpiresAt"
+        ]
+      },
+      "MobileTwoFactorChallengeDto": {
+        "type": "object",
+        "properties": {
+          "twoFactorRequired": {
+            "type": "boolean",
+            "example": true
+          },
+          "challengeToken": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "twoFactorRequired",
+          "challengeToken"
+        ]
+      },
       "LoginDto": {
         "type": "object",
         "properties": {
@@ -4368,6 +4579,18 @@
         "required": [
           "challengeToken",
           "code"
+        ]
+      },
+      "MobileRefreshTokenDto": {
+        "type": "object",
+        "properties": {
+          "refreshToken": {
+            "type": "string",
+            "description": "WasteWise refresh token issued to a mobile client"
+          }
+        },
+        "required": [
+          "refreshToken"
         ]
       },
       "TwoFactorCodeDto": {
