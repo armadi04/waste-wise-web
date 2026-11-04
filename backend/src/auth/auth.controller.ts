@@ -53,6 +53,12 @@ import { UseInterceptors } from '@nestjs/common';
 import { User } from '../users/entities/user.entity';
 import { SessionsService } from '../sessions/sessions.service';
 import { TwoFactorService } from './two-factor.service';
+import {
+  MessageResponseDto,
+  RecoveryCodesDto,
+  TwoFactorEnrollmentDto,
+  TwoFactorStatusDto,
+} from './dto/two-factor-management.dto';
 import { TwoFactorCodeDto } from './dto/two-factor-code.dto';
 import { TwoFactorVerifyDto } from './dto/two-factor-verify.dto';
 
@@ -441,15 +447,7 @@ export class AuthController {
   @UseGuards(AuthGuard('jwt'))
   @Get('2fa')
   @ApiOperation({ summary: 'Two-factor status for the current user' })
-  @ApiResponse({
-    status: 200,
-    schema: {
-      properties: {
-        enabled: { type: 'boolean' },
-        recoveryCodesRemaining: { type: 'number' },
-      },
-    },
-  })
+  @ApiResponse({ status: 200, type: TwoFactorStatusDto })
   async twoFactorStatus(@Request() req: IAuthRequest) {
     const user = await this.authService.getProfile(req.user.userId);
     return {
@@ -464,16 +462,7 @@ export class AuthController {
   @Post('2fa/setup')
   @Throttle({ default: { limit: 5, ttl: 60_000 } })
   @ApiOperation({ summary: 'Start two-factor enrollment (QR + secret)' })
-  @ApiResponse({
-    status: 201,
-    schema: {
-      properties: {
-        secret: { type: 'string' },
-        otpauthUrl: { type: 'string' },
-        qrDataUrl: { type: 'string' },
-      },
-    },
-  })
+  @ApiResponse({ status: 201, type: TwoFactorEnrollmentDto })
   startTwoFactorSetup(@Request() req: IAuthRequest) {
     return this.twoFactorService.startEnrollment(req.user.userId);
   }
@@ -483,14 +472,7 @@ export class AuthController {
   @Post('2fa/enable')
   @Throttle({ default: { limit: 5, ttl: 60_000 } })
   @ApiOperation({ summary: 'Confirm enrollment; returns the recovery codes' })
-  @ApiResponse({
-    status: 201,
-    schema: {
-      properties: {
-        recoveryCodes: { type: 'array', items: { type: 'string' } },
-      },
-    },
-  })
+  @ApiResponse({ status: 201, type: RecoveryCodesDto })
   @UseInterceptors(NoFilesInterceptor())
   async enableTwoFactor(
     @Request() req: IAuthRequest,
@@ -509,10 +491,7 @@ export class AuthController {
   @Post('2fa/disable')
   @Throttle({ default: { limit: 5, ttl: 60_000 } })
   @ApiOperation({ summary: 'Turn the second factor off (needs a valid code)' })
-  @ApiResponse({
-    status: 201,
-    schema: { properties: { message: { type: 'string' } } },
-  })
+  @ApiResponse({ status: 201, type: MessageResponseDto })
   @UseInterceptors(NoFilesInterceptor())
   async disableTwoFactor(
     @Request() req: IAuthRequest,
@@ -527,14 +506,7 @@ export class AuthController {
   @Post('2fa/recovery-codes')
   @Throttle({ default: { limit: 5, ttl: 60_000 } })
   @ApiOperation({ summary: 'Replace the recovery codes (needs a valid code)' })
-  @ApiResponse({
-    status: 201,
-    schema: {
-      properties: {
-        recoveryCodes: { type: 'array', items: { type: 'string' } },
-      },
-    },
-  })
+  @ApiResponse({ status: 201, type: RecoveryCodesDto })
   @UseInterceptors(NoFilesInterceptor())
   async regenerateRecoveryCodes(
     @Request() req: IAuthRequest,

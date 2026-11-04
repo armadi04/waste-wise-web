@@ -505,14 +505,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "properties": {
-                    "enabled": {
-                      "type": "boolean"
-                    },
-                    "recoveryCodesRemaining": {
-                      "type": "number"
-                    }
-                  }
+                  "$ref": "#/components/schemas/TwoFactorStatusDto"
                 }
               }
             }
@@ -539,17 +532,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "properties": {
-                    "secret": {
-                      "type": "string"
-                    },
-                    "otpauthUrl": {
-                      "type": "string"
-                    },
-                    "qrDataUrl": {
-                      "type": "string"
-                    }
-                  }
+                  "$ref": "#/components/schemas/TwoFactorEnrollmentDto"
                 }
               }
             }
@@ -586,14 +569,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "properties": {
-                    "recoveryCodes": {
-                      "type": "array",
-                      "items": {
-                        "type": "string"
-                      }
-                    }
-                  }
+                  "$ref": "#/components/schemas/RecoveryCodesDto"
                 }
               }
             }
@@ -630,11 +606,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "properties": {
-                    "message": {
-                      "type": "string"
-                    }
-                  }
+                  "$ref": "#/components/schemas/MessageResponseDto"
                 }
               }
             }
@@ -671,14 +643,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "properties": {
-                    "recoveryCodes": {
-                      "type": "array",
-                      "items": {
-                        "type": "string"
-                      }
-                    }
-                  }
+                  "$ref": "#/components/schemas/RecoveryCodesDto"
                 }
               }
             }
@@ -1118,7 +1083,17 @@
         "parameters": [],
         "responses": {
           "200": {
-            "description": ""
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ReleaseNotesDto"
+                  }
+                }
+              }
+            }
           }
         },
         "security": [
@@ -2011,10 +1986,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/Notification"
-                  }
+                  "$ref": "#/components/schemas/PaginatedNotificationResponse"
                 }
               }
             }
@@ -4593,6 +4565,44 @@
           "refreshToken"
         ]
       },
+      "TwoFactorStatusDto": {
+        "type": "object",
+        "properties": {
+          "enabled": {
+            "type": "boolean"
+          },
+          "recoveryCodesRemaining": {
+            "type": "number",
+            "description": "Unused recovery codes left"
+          }
+        },
+        "required": [
+          "enabled",
+          "recoveryCodesRemaining"
+        ]
+      },
+      "TwoFactorEnrollmentDto": {
+        "type": "object",
+        "properties": {
+          "secret": {
+            "type": "string",
+            "description": "Base32 TOTP secret for manual entry"
+          },
+          "otpauthUrl": {
+            "type": "string",
+            "description": "otpauth:// URI for authenticator apps"
+          },
+          "qrDataUrl": {
+            "type": "string",
+            "description": "PNG data URL of the otpauth QR code"
+          }
+        },
+        "required": [
+          "secret",
+          "otpauthUrl",
+          "qrDataUrl"
+        ]
+      },
       "TwoFactorCodeDto": {
         "type": "object",
         "properties": {
@@ -4603,6 +4613,32 @@
         },
         "required": [
           "code"
+        ]
+      },
+      "RecoveryCodesDto": {
+        "type": "object",
+        "properties": {
+          "recoveryCodes": {
+            "description": "One-time recovery codes; shown only once",
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        },
+        "required": [
+          "recoveryCodes"
+        ]
+      },
+      "MessageResponseDto": {
+        "type": "object",
+        "properties": {
+          "message": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "message"
         ]
       },
       "ForgotPasswordDto": {
@@ -4929,6 +4965,34 @@
           "role"
         ]
       },
+      "ReleaseNotesDto": {
+        "type": "object",
+        "properties": {
+          "version": {
+            "type": "string",
+            "example": "1.4.0"
+          },
+          "notes": {
+            "type": "string",
+            "description": "Release body in Markdown"
+          },
+          "publishedAt": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "url": {
+            "type": "string",
+            "description": "Release page URL"
+          }
+        },
+        "required": [
+          "version",
+          "notes",
+          "publishedAt",
+          "url"
+        ]
+      },
       "CreateInvitationDto": {
         "type": "object",
         "properties": {
@@ -5182,6 +5246,24 @@
           "isRead",
           "link",
           "createdAt"
+        ]
+      },
+      "PaginatedNotificationResponse": {
+        "type": "object",
+        "properties": {
+          "meta": {
+            "$ref": "#/components/schemas/PaginationMetaDto"
+          },
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Notification"
+            }
+          }
+        },
+        "required": [
+          "meta",
+          "data"
         ]
       },
       "TokenRequestDto": {
