@@ -47,7 +47,8 @@ are listed in [Development](docs/DEVELOPMENT.md#environment).
 
 Development/test seeding creates a verified User demo account
 (`user@smart-waste.local` / `DemoUser123!` by default). Report mutations write `report.created`,
-`report.updated`, `report.status_updated`, and `report.deleted` into the audit trail.
+`report.updated`, `report.status_updated`, and `report.deleted` into the audit trail. Status
+changes by staff also send the reporter an in-app notification linking to the report.
 
 User accounts can be deactivated with `PATCH /api/v1/users/:id/status` (`users.manage_status`).
 Inactive users cannot sign in, refresh, switch roles or use existing access tokens; all sessions

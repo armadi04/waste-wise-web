@@ -240,4 +240,51 @@ describe('ReportsService', () => {
       byCategory: { plastic: 2, unclassified: 1 },
     });
   });
+
+  it('emits a status change event for the reporter after an update', async () => {
+    const emit = jest.fn();
+    (service as unknown as { eventEmitter: { emit: jest.Mock } }).eventEmitter =
+      { emit };
+    repository.findOne
+      .mockResolvedValueOnce(report({ status: ReportStatus.PENDING }))
+      .mockResolvedValueOnce(report({ status: ReportStatus.IN_PROGRESS }));
+    repository.preload.mockResolvedValue(
+      report({ status: ReportStatus.IN_PROGRESS }),
+    );
+
+    await service.updateStatusForActor(
+      actor(2, ['reports.status.update', 'reports.read.all']),
+      4,
+      ReportStatus.IN_PROGRESS,
+    );
+
+    expect(emit).toHaveBeenCalledWith('report.status_changed', {
+      reportId: 4,
+      reporterId: 1,
+      actorId: 2,
+      from: ReportStatus.PENDING,
+      to: ReportStatus.IN_PROGRESS,
+    });
+  });
+
+  it('does not emit a status change for an invalid transition', async () => {
+    const emit = jest.fn();
+    (service as unknown as { eventEmitter: { emit: jest.Mock } }).eventEmitter =
+      { emit };
+    repository.findOne.mockResolvedValue(
+      report({ status: ReportStatus.COMPLETED }),
+    );
+
+    await expect(
+      service.updateStatusForActor(
+        actor(2, ['reports.status.update', 'reports.read.all']),
+        4,
+        ReportStatus.REJECTED,
+      ),
+    ).rejects.toBeInstanceOf(BadRequestException);
+    expect(emit).not.toHaveBeenCalledWith(
+      'report.status_changed',
+      expect.anything(),
+    );
+  });
 });

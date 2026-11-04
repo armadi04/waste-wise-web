@@ -61,8 +61,11 @@ account/device-specific. Generic report zones currently support Jakarta, Makassa
 ## Events and integrations
 
 Services emit domain events; listeners persist notifications and push them through the gateway.
-`system.create/update/delete`, `user.created/invited/deleted/roles_updated`, `user.notification`
-and `audit.record` are existing contracts. Feature services do not call the gateway directly.
+`system.create/update/delete`, `user.created/invited/deleted/roles_updated`, `user.notification`,
+`report.status_changed` and `audit.record` are existing contracts. Feature services do not call
+the gateway directly. `report.status_changed` (`src/reports/report-events.ts`) notifies the
+reporter, unless they changed it themselves, with a `/reports/:id` link and the idempotent event
+id `report:<id>:status:<status>`; a failed notification never fails the status update.
 Socket.IO namespace `notifications` accepts cookie or explicit token auth and emits
 `new_notification` and `app_refresh`. HTTP polling supplies a notification fallback.
 

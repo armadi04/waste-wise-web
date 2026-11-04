@@ -26,6 +26,10 @@ import {
   ReportStatus,
   WasteCategory,
 } from './entities/report.entity';
+import {
+  REPORT_STATUS_CHANGED,
+  type ReportStatusChangedEvent,
+} from './report-events';
 import { assertStatusTransition } from './report-status';
 
 const REPORT_IMAGE_MAX_BYTES = 5 * 1024 * 1024;
@@ -209,6 +213,14 @@ export class ReportsService extends BaseService<Report> {
       { from, to: status },
       ipAddress,
     );
+    const event: ReportStatusChangedEvent = {
+      reportId: id,
+      reporterId: report.reporterId,
+      actorId: actor.userId,
+      from,
+      to: status,
+    };
+    this.eventEmitter?.emit(REPORT_STATUS_CHANGED, event);
     return view;
   }
 
