@@ -5250,7 +5250,8 @@
           "audience": {
             "type": "string",
             "enum": [
-              "admin"
+              "admin",
+              "mobile"
             ]
           },
           "lastActiveAt": {
@@ -5327,7 +5328,8 @@
           "audience": {
             "type": "string",
             "enum": [
-              "admin"
+              "admin",
+              "mobile"
             ]
           },
           "lastActiveAt": {

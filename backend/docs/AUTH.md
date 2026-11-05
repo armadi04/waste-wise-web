@@ -19,6 +19,11 @@ Session lifetimes follow OWASP idle + absolute timeouts, per session `audience`
 | Audience | Opened by | Access JWT | Idle (max gap between refreshes) | Absolute (since login) |
 |---|---|---|---|---|
 | `admin` | dashboard password/Google/2FA, impersonation | 15 min | 2 h (`SESSION_ADMIN_IDLE_MINUTES`) | 8 h (`SESSION_ADMIN_ABSOLUTE_HOURS`) |
+| `mobile` | native app `/auth/mobile/*` sign-in | 15 min | same as `admin` | same as `admin` |
+
+The admin UI labels `admin` sessions as "Browser" and `mobile` sessions as "Mobile". The
+mobile app sends `User-Agent: WasteWise-Mobile/<version> (Android <release>; <brand> <model>)`.
+Sessions opened before the `mobile` audience existed stay `admin` until they expire.
 
 The `user_sessions` row is authoritative: `expiresAt` is the idle deadline, slid by each
 refresh but never past `absoluteExpiresAt`; refresh and every request are refused once either

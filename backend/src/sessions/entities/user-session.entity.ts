@@ -12,7 +12,7 @@ import {
 } from 'typeorm';
 import { ApiProperty } from '@nestjs/swagger';
 import { User } from '../../users/entities/user.entity';
-import type { SessionAudience } from '../session-policy';
+import { SESSION_AUDIENCES, type SessionAudience } from '../session-policy';
 
 /**
  * A signed-in device/browser session. The `sessionId` is minted at login and
@@ -66,7 +66,7 @@ export class UserSession {
   impersonatedBy: User | null;
 
   /** Starter dashboard session policy. */
-  @ApiProperty({ enum: ['admin'] })
+  @ApiProperty({ enum: SESSION_AUDIENCES })
   @Column({ name: 'audience', type: 'varchar', length: 16, default: 'admin' })
   audience: SessionAudience;
 
