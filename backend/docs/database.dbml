@@ -1,0 +1,358 @@
+// WasteWise database schema (PostgreSQL).
+// Source of truth: TypeORM migrations in backend/src/database/migrations.
+// Generated from the live schema after all 8 migrations (latest AddSchemaHardeningConstraints).
+// Paste this file into https://dbdiagram.io/d to render and export the diagram.
+
+Project wastewise {
+  database_type: 'PostgreSQL'
+  Note: 'WasteWise smart waste management: users, RBAC, reports with AI classification, media, sessions.'
+}
+
+Enum notifications_type_enum {
+  info
+  success
+  warning
+  error
+}
+
+Enum reports_classification_status_enum {
+  COMPLETED
+  FAILED
+}
+
+Enum reports_predicted_category_enum {
+  ORGANIC_WASTE
+  PLASTIC_WASTE
+  PAPER_WASTE
+}
+
+Enum reports_status_enum {
+  PENDING
+  IN_PROGRESS
+  COMPLETED
+  REJECTED
+}
+
+Enum users_register_method_enum {
+  EMAIL_OTP
+  GOOGLE
+  INVITATION
+  SEEDER
+  UNKNOWN
+}
+
+Table audit_logs {
+  "eventId" varchar
+  id int [pk, increment]
+  action varchar [not null]
+  "actorId" int
+  "actorEmail" varchar
+  "subjectType" varchar
+  "subjectId" varchar
+  summary varchar
+  metadata jsonb
+  "ipAddress" varchar
+  "createdAt" timestamptz [not null, default: `now()`]
+
+  indexes {
+    "actorId" [name: 'IDX_2dc33f7f3c22e2e7badafca1d1']
+    "createdAt" [name: 'IDX_c69efb19bf127c97e6740ad530']
+    action [name: 'IDX_cee5459245f652b75eb2759b4c']
+    "eventId" [unique, name: 'IDX_f953f2cb581d00109a05741e13']
+  }
+}
+
+Table blacklisted_tokens {
+  id int [pk, increment]
+  token varchar [not null, unique]
+  reason varchar(16) [not null, default: 'logout']
+  "invalidatedAt" timestamptz [not null, default: `now()`]
+}
+
+Table email_verification_tokens {
+  id int [pk, increment]
+  token varchar [not null, unique]
+  "userId" int [not null]
+  "expiresAt" timestamptz [not null]
+  "usedAt" timestamptz
+  "createdAt" timestamptz [not null, default: `now()`]
+
+  indexes {
+    token [name: 'IDX_3d1613f95c6a564a3b588d161a']
+  }
+}
+
+Table invitations {
+  id int [pk, increment]
+  token varchar [not null, unique]
+  email varchar [not null]
+  "roleIds" text
+  "invitedBy" int
+  "expiresAt" timestamptz [not null]
+  "acceptedAt" timestamptz
+  "createdAt" timestamptz [not null, default: `now()`]
+  "deletedAt" timestamptz
+
+  indexes {
+    email [name: 'IDX_97ab59cb592c7cec109741b592']
+    token [name: 'IDX_e577dcf9bb6d084373ed399850']
+  }
+}
+
+Table media {
+  id int [pk, increment]
+  provider varchar [not null, default: 's3']
+  filename varchar [not null]
+  "originalName" varchar
+  mimetype varchar [not null]
+  size bigint
+  path varchar
+  url varchar
+  "driveId" varchar
+  "webviewLink" varchar
+  "userId" int
+  "isPrivate" boolean [not null, default: false]
+  "createdAt" timestamptz [not null, default: `now()`]
+  "updatedAt" timestamptz [not null, default: `now()`]
+  "deletedAt" timestamptz
+  "storageProfile" varchar(64) [not null]
+  "storageFingerprint" varchar(64)
+  state varchar [not null, default: 'ready']
+  "remoteName" varchar
+  "cleanupAt" timestamptz
+  "cleanupLeaseUntil" timestamptz
+  "cleanupLeaseToken" uuid
+  "cleanupAttempts" int [not null, default: 0]
+  "cleanupErrorCode" varchar
+
+  indexes {
+    (state, "cleanupAt", "cleanupLeaseUntil") [name: 'IDX_media_cleanup']
+  }
+
+  Note: 'CHK_media_provider: CHECK (((provider) = s3)); CHK_media_ready_object: CHECK ((((state) <> ready) OR (path IS NOT NULL))); CHK_media_size: CHECK (((size IS NULL) OR ((size >= 0) AND (size <= 9007199254740991)))); CHK_media_state: CHECK (((state) = ANY ((ARRAY[pending, ready, deleting])[])))'
+}
+
+Table notifications {
+  "eventId" varchar
+  id int [pk, increment]
+  "userId" int
+  "targetRole" varchar
+  "actorId" int
+  title varchar [not null]
+  message text [not null]
+  type notifications_type_enum [not null, default: 'info']
+  "isRead" boolean [not null, default: false]
+  link varchar
+  "createdAt" timestamptz [not null, default: `now()`]
+  "updatedAt" timestamptz [not null, default: `now()`]
+
+  indexes {
+    "eventId" [unique, name: 'IDX_3337493bfdc5d0fccd4bd5f51e']
+    "actorId" [name: 'IDX_44412a2d6f162ff4dc1697d0db']
+    "targetRole" [name: 'IDX_626e2ada494617867c40748eb9']
+    "userId" [name: 'IDX_692a909ee0fa9383e7859f9b40']
+  }
+}
+
+Table outbound_emails {
+  id int [pk, increment]
+  to varchar [not null]
+  subject varchar [not null]
+  html text [not null]
+  text text [not null]
+  status varchar [not null, default: 'pending']
+  attempts int [not null, default: 0]
+  "nextAttemptAt" timestamptz [not null]
+  "lastError" text
+  "sentAt" timestamptz
+  "redactAfterSend" boolean [not null, default: false]
+  "expiresAt" timestamptz
+  "createdAt" timestamptz [not null, default: `now()`]
+
+  indexes {
+    status [name: 'IDX_5b49d1a088beb13cdb51a93dbd']
+    "nextAttemptAt" [name: 'IDX_6a5a4a43f6951d0f1fcec9106a']
+  }
+}
+
+Table password_reset_tokens {
+  id int [pk, increment]
+  token varchar [not null, unique]
+  "userId" int [not null]
+  "expiresAt" timestamptz [not null]
+  "usedAt" timestamptz
+  "createdAt" timestamptz [not null, default: `now()`]
+
+  indexes {
+    token [name: 'IDX_ab673f0e63eac966762155508e']
+  }
+}
+
+Table permissions {
+  id int [pk, increment]
+  name varchar [not null, unique]
+  description varchar
+  "createdAt" timestamptz [not null, default: `now()`]
+  "updatedAt" timestamptz [not null, default: `now()`]
+  "deletedAt" timestamptz
+
+  indexes {
+    name [name: 'IDX_48ce552495d14eae9b187bb671']
+  }
+}
+
+Table reports {
+  id int [pk, increment]
+  "reporterId" int [not null]
+  "mediaId" int [not null]
+  description text [not null]
+  latitude numeric(9,6)
+  longitude numeric(9,6)
+  "predictedCategory" reports_predicted_category_enum
+  confidence numeric(5,4)
+  "modelVersion" varchar
+  "classificationStatus" reports_classification_status_enum [not null, default: 'COMPLETED']
+  "classificationError" varchar
+  status reports_status_enum [not null, default: 'PENDING']
+  "createdAt" timestamptz [not null, default: `now()`]
+  "updatedAt" timestamptz [not null, default: `now()`]
+  "deletedAt" timestamptz
+
+  indexes {
+    "createdAt" [name: 'IDX_reports_createdAt']
+    "predictedCategory" [name: 'IDX_reports_predictedCategory']
+    "reporterId" [name: 'IDX_reports_reporterId']
+    status [name: 'IDX_reports_status']
+  }
+
+  Note: 'CHK_reports_confidence: CHECK (((confidence IS NULL) OR ((confidence >= (0)) AND (confidence <= (1))))); CHK_reports_geo: CHECK ((((latitude >= (-90)) AND (latitude <= (90))) AND ((longitude >= (-180)) AND (longitude <= (180)))))'
+}
+
+Table role_permissions {
+  "roleId" int [not null]
+  "permissionId" int [not null]
+
+  indexes {
+    ("roleId", "permissionId") [pk]
+    "permissionId" [name: 'IDX_06792d0c62ce6b0203c03643cd']
+    "roleId" [name: 'IDX_b4599f8b8f548d35850afa2d12']
+  }
+}
+
+Table roles {
+  id int [pk, increment]
+  name varchar [not null]
+  description varchar
+  "createdAt" timestamptz [not null, default: `now()`]
+  "updatedAt" timestamptz [not null, default: `now()`]
+  "deletedAt" timestamptz
+
+  indexes {
+    name [name: 'IDX_648e3f5447f725579d7d4ffdfb']
+    name [unique, name: 'UQ_roles_name_active', note: '("deletedAt" IS NULL)']
+  }
+}
+
+Table two_factor_recovery_codes {
+  id int [pk, increment]
+  "userId" int [not null]
+  "codeHash" varchar [not null]
+  "usedAt" timestamptz
+  "createdAt" timestamptz [not null, default: `now()`]
+
+  indexes {
+    "userId" [name: 'IDX_b8bb7fb08d5097dc938cef1e4a']
+  }
+}
+
+Table user_permissions {
+  "userId" int [not null]
+  "permissionId" int [not null]
+
+  indexes {
+    ("userId", "permissionId") [pk]
+    "permissionId" [name: 'IDX_cf38f85e52ee274ba9a01901ed']
+    "userId" [name: 'IDX_f05ccc7935f14874d7f89ba030']
+  }
+}
+
+Table user_roles {
+  "userId" int [not null]
+  "roleId" int [not null]
+
+  indexes {
+    ("userId", "roleId") [pk]
+    "userId" [name: 'IDX_472b25323af01488f1f66a06b6']
+    "roleId" [name: 'IDX_86033897c009fcca8b6505d6be']
+  }
+}
+
+Table user_sessions {
+  id int [pk, increment]
+  "sessionId" varchar [not null, unique]
+  "userId" int [not null]
+  "ipAddress" varchar
+  "userAgent" text
+  "impersonatedById" int
+  audience varchar(16) [not null, default: 'admin']
+  "lastActiveAt" timestamptz [not null]
+  "expiresAt" timestamptz [not null]
+  "absoluteExpiresAt" timestamptz [not null]
+  "revokedAt" timestamptz
+  "createdAt" timestamptz [not null, default: `now()`]
+  "updatedAt" timestamptz [not null, default: `now()`]
+  "deletedAt" timestamptz
+
+  indexes {
+    "userId" [name: 'IDX_55fa4db8406ed66bc704432842']
+    "sessionId" [name: 'IDX_f1d56cb09724333a500af7fe91']
+  }
+
+  Note: 'CHK_user_sessions_deadlines: CHECK (("expiresAt" <= "absoluteExpiresAt"))'
+}
+
+Table users {
+  "timeZone" varchar(100)
+  "lastDetectedTimeZone" varchar(100)
+  id int [pk, increment]
+  email varchar [not null]
+  password varchar [not null]
+  fullname varchar
+  phone varchar
+  "notificationsEnabled" boolean [not null, default: true]
+  "emailVerifiedAt" timestamptz
+  "failedLoginAttempts" int [not null, default: 0]
+  "lockedUntil" timestamptz
+  "twoFactorSecret" text
+  "twoFactorEnabledAt" timestamptz
+  "twoFactorLastStep" bigint
+  "registerMethod" users_register_method_enum [not null, default: 'UNKNOWN']
+  "createdAt" timestamptz [not null, default: `now()`]
+  "updatedAt" timestamptz [not null, default: `now()`]
+  "deletedAt" timestamptz
+  "avatarId" int [unique]
+  "isActive" boolean [not null, default: true]
+
+  indexes {
+    email [name: 'IDX_97672ac88f789774dd47f7c8be']
+    "registerMethod" [name: 'IDX_users_registerMethod']
+    `lower((email)::text)` [unique, name: 'UQ_users_email_active', note: '("deletedAt" IS NULL)']
+  }
+}
+
+Ref FK_2dc33f7f3c22e2e7badafca1d12: audit_logs."actorId" > users.id [delete: set null]
+Ref FK_invitations_invitedBy: invitations."invitedBy" > users.id [delete: set null]
+Ref FK_0db866835bf356d896e1892635d: media."userId" > users.id
+Ref FK_notifications_actorId: notifications."actorId" > users.id [delete: set null]
+Ref FK_692a909ee0fa9383e7859f9b406: notifications."userId" > users.id [delete: cascade]
+Ref FK_reports_mediaId: reports."mediaId" > media.id [delete: restrict]
+Ref FK_reports_reporterId: reports."reporterId" > users.id [delete: restrict]
+Ref FK_06792d0c62ce6b0203c03643cdd: role_permissions."permissionId" > permissions.id [delete: cascade, update: cascade]
+Ref FK_b4599f8b8f548d35850afa2d12c: role_permissions."roleId" > roles.id [delete: cascade, update: cascade]
+Ref FK_cf38f85e52ee274ba9a01901ed2: user_permissions."permissionId" > permissions.id [delete: cascade, update: cascade]
+Ref FK_f05ccc7935f14874d7f89ba030f: user_permissions."userId" > users.id [delete: cascade, update: cascade]
+Ref FK_86033897c009fcca8b6505d6be2: user_roles."roleId" > roles.id [delete: cascade, update: cascade]
+Ref FK_472b25323af01488f1f66a06b67: user_roles."userId" > users.id [delete: cascade, update: cascade]
+Ref FK_user_sessions_impersonatedById: user_sessions."impersonatedById" > users.id [delete: set null]
+Ref FK_55fa4db8406ed66bc7044328427: user_sessions."userId" > users.id [delete: cascade]
+Ref FK_3e1f52ec904aed992472f2be147: users."avatarId" > media.id

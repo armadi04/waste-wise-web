@@ -112,6 +112,7 @@ E2E suites are opt-in; default test scripts run unit tests.
 | [Auth](backend/docs/AUTH.md) | Change sessions, providers, 2FA, verification or RBAC |
 | [Adding features](backend/docs/ADDING_FEATURES.md) | Implement a CRUD resource end-to-end |
 | [Operations](backend/docs/OPERATIONS.md) | Configure media providers, SMTP and deployment |
+| [Database and ERD](backend/docs/DATABASE.md) | See the schema diagram, tables, relations and the DBML for dbdiagram.io |
 | [GraphQL](backend/docs/GRAPHQL.md) | Enable the optional API |
 | [Naming](backend/docs/NAMING_CONVENTIONS.md) | Choose filenames, identifiers and schema names |
 | [Agent guide](backend/docs/AI_AGENT_GUIDE.md) | Follow implementation and verification conventions |
