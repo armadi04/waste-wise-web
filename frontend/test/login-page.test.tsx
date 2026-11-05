@@ -77,6 +77,13 @@ beforeEach(() => {
 afterEach(cleanup)
 
 describe('login page forms', () => {
+  it('shows the WasteWise brand in the heading', () => {
+    render(<LoginPage />)
+    expect(
+      screen.getByRole('heading', { name: /Welcome back to WasteWise/ }),
+    ).toBeTruthy()
+  })
+
   it('connects the email form to the login submission handler', () => {
     render(<LoginPage />)
     const form = screen.getByLabelText('Email').closest('form')!

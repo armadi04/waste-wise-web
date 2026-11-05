@@ -16,6 +16,12 @@ import {
 import { TurnstileWidget } from '@/components/ui/turnstile-widget'
 import { useAuthGuard, useLogin, useSilentSso } from '@/hooks/auth'
 import { turnstileErrorMessages } from '@/lib/config/turnstile'
+import {
+  BRAND_DESCRIPTION,
+  BRAND_LOGO_SRC,
+  BRAND_NAME_LEADING,
+  BRAND_NAME_TRAILING,
+} from '@/lib/constants/brand'
 
 export function LoginPage() {
   useAuthGuard({ isAuthPage: true })
@@ -76,12 +82,26 @@ export function LoginPage() {
       }
     >
       {/* Header */}
-      <div className="space-y-3 text-center">
+      <div className="flex flex-col items-center gap-3 text-center">
+        <img
+          src={BRAND_LOGO_SRC}
+          alt=""
+          aria-hidden="true"
+          width={56}
+          height={56}
+          draggable={false}
+          decoding="async"
+          className="h-14 w-14 object-contain"
+        />
+        <p className="text-[11px] font-medium uppercase tracking-[0.18em] text-default-500">
+          {BRAND_DESCRIPTION}
+        </p>
         <h1 className="text-2xl font-semibold tracking-tight text-foreground sm:text-[28px]">
           Welcome back to{' '}
-          <span className="text-[var(--app-link)] italic">Nest</span>
-          <span className="text-foreground italic">plate </span>
-          <span className="text-[var(--app-link)] italic">Admin</span>
+          <span className="whitespace-nowrap italic">
+            <span className="text-[var(--app-link)]">{BRAND_NAME_LEADING}</span>
+            <span className="text-foreground">{BRAND_NAME_TRAILING}</span>
+          </span>
         </h1>
         <p className="text-sm text-default-500">
           Sign in to continue to your dashboard.
