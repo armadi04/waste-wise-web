@@ -15,6 +15,7 @@ describe('describeUserAgent', () => {
   it('recognises older app builds', () => {
     expect(describeUserAgent('WasteWise-Mobile')).toBe('WasteWise app')
     expect(describeUserAgent('okhttp/4.12.0')).toBe('WasteWise app')
+    expect(describeUserAgent('WasteWise/1.0.0')).toBe('WasteWise app')
     expect(
       describeUserAgent('Dalvik/2.1.0 (Linux; U; Android 14; 23078RKD5C)'),
     ).toBe('WasteWise app on Android')

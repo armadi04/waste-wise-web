@@ -37,7 +37,11 @@ function describeMobileApp(userAgent: string): string | null {
       : 'WasteWise app'
   }
   // Older app builds sent the HTTP library's default agent.
-  if (/^(okhttp|Dalvik)\//.test(userAgent)) {
+  // React Native's default is `<App label>/<version>`, e.g. `WasteWise/1.0.0`.
+  if (
+    /^(okhttp|Dalvik)\//.test(userAgent) ||
+    /^WasteWise\/[\w.-]+$/.test(userAgent)
+  ) {
     return /Android/.test(userAgent)
       ? 'WasteWise app on Android'
       : 'WasteWise app'
