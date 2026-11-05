@@ -17,7 +17,6 @@ import { MailService } from '../../../src/mail/mail.service';
 import { BlacklistedToken } from '../../../src/auth/entities/blacklisted-token.entity';
 import { PasswordResetToken } from '../../../src/auth/entities/password-reset-token.entity';
 import { EmailVerificationToken } from '../../../src/auth/entities/email-verification-token.entity';
-import { RevokedSsoSession } from '../../../src/auth/entities/revoked-sso-session.entity';
 import { User } from '../../../src/users/entities/user.entity';
 import { SessionsService } from '../../../src/sessions/sessions.service';
 import type { AuthenticatedUser } from '../../../src/auth/interfaces/auth-request.interface';
@@ -56,11 +55,6 @@ describe('AuthService', () => {
     createQueryBuilder: jest.Mock;
   };
   let blacklistInsert: Record<string, jest.Mock>;
-  let revokedSsoSessionRepository: {
-    create: jest.Mock;
-    save: jest.Mock;
-    findOneBy: jest.Mock;
-  };
   let userRepository: { update: jest.Mock };
   const sessionDeadline = new Date('2030-01-01T08:00:00Z');
   let sessionsService: {
@@ -109,11 +103,6 @@ describe('AuthService', () => {
       findOneBy: jest.fn(),
       createQueryBuilder: jest.fn(() => blacklistInsert),
     };
-    revokedSsoSessionRepository = {
-      create: jest.fn((dto) => dto),
-      save: jest.fn((e) => Promise.resolve(e)),
-      findOneBy: jest.fn(),
-    };
     userRepository = { update: jest.fn(() => Promise.resolve({})) };
     sessionsService = {
       start: jest.fn(
@@ -155,10 +144,6 @@ describe('AuthService', () => {
         {
           provide: getRepositoryToken(EmailVerificationToken),
           useValue: verificationTokenRepository,
-        },
-        {
-          provide: getRepositoryToken(RevokedSsoSession),
-          useValue: revokedSsoSessionRepository,
         },
         {
           provide: ConfigService,
@@ -452,7 +437,6 @@ describe('AuthService', () => {
         await service.login(user as unknown as User, { audience: 'admin' });
         expect(sessionsService.start).toHaveBeenLastCalledWith(1, undefined, {
           audience: 'admin',
-          isSso: false,
           impersonatedById: undefined,
         });
         expect(refreshExpiresIn()).toBe(2 * 60 * 60);
@@ -504,7 +488,6 @@ describe('AuthService', () => {
         await service.refresh('legacy');
         expect(sessionsService.start).toHaveBeenCalledWith(1, undefined, {
           audience: 'admin',
-          isSso: false,
         });
       });
     });
@@ -844,7 +827,6 @@ describe('AuthService', () => {
 
       expect(sessionsService.start).toHaveBeenCalledWith(2, undefined, {
         audience: 'admin',
-        isSso: false,
         impersonatedById: 1,
       });
       const payload = (jwtService.sign as jest.Mock).mock.calls[0][0] as {

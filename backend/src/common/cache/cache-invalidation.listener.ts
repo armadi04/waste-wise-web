@@ -4,7 +4,7 @@ import { CacheService } from './cache.service';
 
 /**
  * Cache invalidation for writes that don't go through a controller that clears
- * its own keys: accounts are also created by Google sign-in, SSO
+ * its own keys: accounts are also created by Google sign-in
  * provisioning and invitation acceptance.
  */
 @Injectable()

@@ -737,7 +737,6 @@ export class AuthController {
     const tokens = await this.authService.switchRole(
       req.user.userId,
       dto.role,
-      req.user.sid,
       req.user.sessionId,
       req.user.impersonatorId,
     );

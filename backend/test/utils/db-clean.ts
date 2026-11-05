@@ -38,7 +38,6 @@ export async function cleanDatabase(
   await dataSource.query('DELETE FROM audit_logs');
   await dataSource.query('DELETE FROM outbound_emails');
   await dataSource.query('DELETE FROM two_factor_recovery_codes');
-  await dataSource.query('DELETE FROM revoked_sso_sessions');
   await dataSource.query('DELETE FROM invitations');
   await dataSource.query('DELETE FROM blacklisted_tokens');
   await dataSource.query('DELETE FROM password_reset_tokens');

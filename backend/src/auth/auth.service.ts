@@ -19,7 +19,6 @@ import {
 } from './entities/blacklisted-token.entity';
 import { PasswordResetToken } from './entities/password-reset-token.entity';
 import { EmailVerificationToken } from './entities/email-verification-token.entity';
-import { RevokedSsoSession } from './entities/revoked-sso-session.entity';
 import { ConfigService } from '@nestjs/config';
 import { OAuth2Client } from 'google-auth-library';
 import { MailService } from '../mail/mail.service';
@@ -71,8 +70,6 @@ export class AuthService {
     private resetTokenRepository: Repository<PasswordResetToken>,
     @InjectRepository(EmailVerificationToken)
     private verificationTokenRepository: Repository<EmailVerificationToken>,
-    @InjectRepository(RevokedSsoSession)
-    private revokedSsoSessionRepository: Repository<RevokedSsoSession>,
     @InjectRepository(User)
     private userRepository: Repository<User>,
     private configService: ConfigService,
@@ -282,7 +279,6 @@ export class AuthService {
   private buildTokens(
     user: Omit<User, 'password'>,
     opts: {
-      sid?: string;
       activeRole?: string;
       sessionId?: string;
       impersonatorId?: number;
@@ -306,7 +302,6 @@ export class AuthService {
       roles: activeRole ? [activeRole] : [],
       emailVerified: !!user.emailVerifiedAt,
       ...(activeRole ? { activeRole } : {}),
-      ...(opts.sid ? { sid: opts.sid } : {}),
       ...(opts.sessionId ? { sessionId: opts.sessionId } : {}),
       ...(opts.impersonatorId ? { impersonatorId: opts.impersonatorId } : {}),
     };
@@ -365,13 +360,11 @@ export class AuthService {
     return payload.sub;
   }
 
-  // `sid` is the OIDC session id, passed only for SSO logins so the session can
-  // be revoked on back-channel logout. `context` (IP + user agent) is recorded
+  // `context` (IP + user agent) is recorded
   // on the device session so the user can recognise it in the session list.
   async login(
     user: Omit<User, 'password'>,
     opts: {
-      sid?: string;
       context?: SessionContext;
       impersonatorId?: number;
       /** Session lifetime policy. */
@@ -381,11 +374,9 @@ export class AuthService {
     this.assertActive(user);
     const session = await this.sessionsService.start(user.id, opts.context, {
       audience: opts.audience ?? 'admin',
-      isSso: !!opts.sid,
       impersonatedById: opts.impersonatorId,
     });
     return this.buildTokens(user, {
-      sid: opts.sid,
       sessionId: session.sessionId,
       impersonatorId: opts.impersonatorId,
       audience: session.audience,
@@ -398,7 +389,6 @@ export class AuthService {
   async switchRole(
     userId: number,
     roleName: string,
-    sid?: string,
     sessionId?: string,
     impersonatorId?: number,
   ) {
@@ -416,7 +406,6 @@ export class AuthService {
       : null;
     return this.buildTokens(user, {
       activeRole: roleName,
-      sid,
       sessionId,
       impersonatorId,
       audience: session?.audience,
@@ -519,19 +508,6 @@ export class AuthService {
     return this.login(impersonator, { context });
   }
 
-  async revokeSession(sid: string, sub?: string | null): Promise<void> {
-    const existing = await this.revokedSsoSessionRepository.findOneBy({ sid });
-    if (existing) return;
-    await this.revokedSsoSessionRepository.save(
-      this.revokedSsoSessionRepository.create({ sid, sub: sub ?? null }),
-    );
-  }
-
-  async isSessionRevoked(sid: string): Promise<boolean> {
-    const found = await this.revokedSsoSessionRepository.findOneBy({ sid });
-    return !!found;
-  }
-
   async blacklistToken(token: string, reason: BlacklistReason = 'logout') {
     // Idempotent: a token can already be listed (rotated, then logged out).
     await this.blacklistedTokenRepository
@@ -611,11 +587,6 @@ export class AuthService {
       throw new UnauthorizedException('Invalid or expired refresh token');
     }
 
-    // An SSO session that has been revoked (back-channel logout) can't be refreshed.
-    if (payload.sid && (await this.isSessionRevoked(payload.sid))) {
-      throw new UnauthorizedException('Session has been revoked');
-    }
-
     // A device session the user (or an admin) signed out can't be refreshed
     // either — otherwise revoking it would only last until the access token expired.
     if (
@@ -648,12 +619,10 @@ export class AuthService {
     } else {
       session = await this.sessionsService.start(user.id, context, {
         audience: 'admin',
-        isSso: !!payload.sid,
       });
     }
 
     const tokens = this.buildTokens(user, {
-      sid: payload.sid,
       activeRole: payload.activeRole,
       sessionId: session.sessionId,
       impersonatorId: payload.impersonatorId,

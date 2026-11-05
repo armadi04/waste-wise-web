@@ -23,8 +23,6 @@ import { AuthService } from '@/auth/auth.service';
 import { TurnstileService } from '@/auth/turnstile.service';
 import { TwoFactorService } from '@/auth/two-factor.service';
 import { SessionsService } from '@/sessions/sessions.service';
-import { SsoController } from '@/sso/sso.controller';
-import { SsoService } from '@/sso/sso.service';
 import { DatabaseHealthService } from '@/health/database-health.service';
 import { HealthController } from '@/health/health.controller';
 
@@ -37,29 +35,11 @@ const auth = {
   validateUser: mock(async () => ({ id: 1, email: 'user@example.test' })),
   login: mock(async () => tokens),
   refresh: mock(async () => tokens),
-  revokeSession: mock(async () => undefined),
 };
 const health = { check: mock(async () => ({ status: 'ok' })) };
-const sso = {
-  enabled: true,
-  newPkce: mock(async () => ({
-    verifier: 'test-verifier',
-    challenge: 'test-challenge',
-    state: 'test-state',
-  })),
-  buildAuthUrl: () => new URL('https://idp.example.test/authorize'),
-  verifyLogoutToken: mock(async () => ({ sid: 'test-sid', sub: 'test-sub' })),
-  exchange: mock(async () => ({
-    claims: { sub: 'test-sub', email: 'user@example.test' },
-    idToken: 'test-id-token',
-    sid: 'test-sid',
-  })),
-  provisionUser: mock(async () => ({ id: 1, email: 'user@example.test' })),
-  endSessionUrl: () => new URL('https://idp.example.test/logout'),
-};
 
 @Module({
-  controllers: [AppController, AuthController, HealthController, SsoController],
+  controllers: [AppController, AuthController, HealthController],
   providers: [
     { provide: APP_GUARD, useClass: SessionCsrfGuard },
     AppService,
@@ -71,13 +51,9 @@ const sso = {
     { provide: HealthCheckService, useValue: health },
     { provide: DatabaseHealthService, useValue: {} },
     { provide: MemoryHealthIndicator, useValue: {} },
-    { provide: SsoService, useValue: sso },
     {
       provide: ConfigService,
-      useValue: new ConfigService({
-        SSO_REDIRECT_URI: 'http://localhost:3001/api/v1/auth/sso/callback',
-        SSO_POST_LOGOUT_URI: 'http://localhost:3001',
-      }),
+      useValue: new ConfigService({}),
     },
   ],
 })
@@ -123,7 +99,6 @@ describe('REST URI version 1', () => {
   it('rejects old and unsupported versions without reaching handlers', async () => {
     const loginCalls = auth.login.mock.calls.length;
     const healthCalls = health.check.mock.calls.length;
-    const ssoCalls = sso.newPkce.mock.calls.length;
     for (const prefix of ['/api', '/api/v2']) {
       await request(app.getHttpServer()).get(prefix).expect(404);
       await request(app.getHttpServer())
@@ -132,22 +107,11 @@ describe('REST URI version 1', () => {
         .expect(404);
       await request(app.getHttpServer()).get(`${prefix}/health`).expect(404);
       await request(app.getHttpServer())
-        .get(`${prefix}/auth/sso/login`)
-        .expect(404);
-      await request(app.getHttpServer())
         .post(`${prefix}/auth/refresh`)
-        .expect(404);
-      await request(app.getHttpServer())
-        .get(`${prefix}/auth/sso/callback?code=test-code&state=test-state`)
-        .expect(404);
-      await request(app.getHttpServer())
-        .post(`${prefix}/auth/sso/backchannel-logout`)
-        .send({ logout_token: 'test-logout' })
         .expect(404);
     }
     expect(auth.login.mock.calls.length).toBe(loginCalls);
     expect(health.check.mock.calls.length).toBe(healthCalls);
-    expect(sso.newPkce.mock.calls.length).toBe(ssoCalls);
   });
 
   it('keeps CSRF on all three protected versioned session paths', async () => {
@@ -162,60 +126,6 @@ describe('REST URI version 1', () => {
       .set('X-CSRF-Token', 'test-csrf')
       .expect(201);
     expect(auth.refresh.mock.calls.length).toBe(calls + 1);
-  });
-
-  it('uses versioned SSO cookies and handles callbacks and backchannel logout', async () => {
-    const login = await request(app.getHttpServer())
-      .get('/api/v1/auth/sso/login')
-      .expect(302);
-    expect(login.headers.location).toBe('https://idp.example.test/authorize');
-    expect(login.headers['set-cookie']).toEqual(
-      expect.arrayContaining([
-        expect.stringContaining('ssoVerifier=test-verifier;'),
-        expect.stringContaining('Path=/api/v1/auth/sso'),
-      ]),
-    );
-    const callback = await request(app.getHttpServer())
-      .get('/api/v1/auth/sso/callback?error=login_required')
-      .expect(302);
-    expect(
-      callback.headers['set-cookie'].every((cookie: string) =>
-        cookie.includes('Path=/api/v1/auth/sso'),
-      ),
-    ).toBe(true);
-    await request(app.getHttpServer())
-      .post('/api/v1/auth/sso/backchannel-logout')
-      .send({ logout_token: 'test-logout' })
-      .expect(200, {});
-    expect(auth.revokeSession).toHaveBeenCalledWith('test-sid', 'test-sub');
-  });
-
-  it('completes SSO at the new callback and clears matching cookie paths on logout', async () => {
-    const callback = await request(app.getHttpServer())
-      .get('/api/v1/auth/sso/callback?code=test-code&state=test-state')
-      .set('Cookie', 'ssoVerifier=test-verifier; ssoState=test-state')
-      .expect(302);
-    expect(sso.exchange).toHaveBeenCalledWith(
-      new URL(
-        'http://localhost:3001/api/v1/auth/sso/callback?code=test-code&state=test-state',
-      ),
-      'test-verifier',
-      'test-state',
-    );
-    const idCookie = callback.headers['set-cookie'].find((cookie: string) =>
-      cookie.startsWith('ssoIdToken='),
-    );
-    expect(idCookie).toContain('Path=/api/v1/auth/sso');
-    const logout = await request(app.getHttpServer())
-      .get('/api/v1/auth/sso/logout')
-      .set('Cookie', 'ssoIdToken=test-id-token')
-      .expect(302);
-    expect(logout.headers.location).toBe('https://idp.example.test/logout');
-    expect(
-      logout.headers['set-cookie'].find((cookie: string) =>
-        cookie.startsWith('ssoIdToken='),
-      ),
-    ).toContain('Path=/api/v1/auth/sso');
   });
 
   it('keeps Swagger UI stable and emits complete versioned operation paths', async () => {

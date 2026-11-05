@@ -1,7 +1,7 @@
 /**
  * Session lifetime policy per audience (OWASP idle + absolute timeouts).
  *
- * - `admin`: dashboard password/Google/2FA, SSO and impersonation sessions.
+ * - `admin`: dashboard password/Google/2FA and impersonation sessions.
  *
  * Idle = longest gap between refreshes; each refresh slides the session's
  * `expiresAt` forward, never past `absoluteExpiresAt`. Absolute = hard limit

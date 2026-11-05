@@ -47,7 +47,6 @@ export class SessionsService extends BaseService<UserSession> {
     context: SessionContext = {},
     opts: {
       audience?: SessionAudience;
-      isSso?: boolean;
       impersonatedById?: number;
     } = {},
   ): Promise<StartedSession> {
@@ -59,7 +58,6 @@ export class SessionsService extends BaseService<UserSession> {
       userId,
       ipAddress: context.ipAddress ?? null,
       userAgent: context.userAgent ?? null,
-      isSso: !!opts.isSso,
       impersonatedById: opts.impersonatedById ?? null,
       audience,
       lastActiveAt: now,

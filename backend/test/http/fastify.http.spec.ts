@@ -37,8 +37,6 @@ import { TurnstileService } from '@/auth/turnstile.service';
 import { TwoFactorService } from '@/auth/two-factor.service';
 import { OAuthClientService } from '@/oauth/oauth-client.service';
 import { SessionsService } from '@/sessions/sessions.service';
-import { SsoController } from '@/sso/sso.controller';
-import { SsoService } from '@/sso/sso.service';
 import { UsersController } from '@/users/users.controller';
 import { UsersService } from '@/users/users.service';
 import { MediaController } from '@/media/media.controller';
@@ -80,9 +78,6 @@ const config = new ConfigService({
   JWT_SECRET: secret,
   MEDIA_MAX_FILE_SIZE: 2 * 1024 * 1024,
   MEDIA_MAX_CONCURRENT_UPLOADS: 1,
-  SSO_REDIRECT_URI: 'https://app.example.test/api/v1/auth/sso/callback',
-  SSO_SUCCESS_REDIRECT: 'https://app.example.test',
-  SSO_POST_LOGOUT_URI: 'https://app.example.test',
 });
 const auth = {
   validateUser: mock(async () => profile),
@@ -92,7 +87,6 @@ const auth = {
   getProfile: mock(async () => profile),
   blacklistToken: mock(async () => undefined),
   switchRole: mock(async () => tokens()),
-  revokeSession: mock(async () => undefined),
 };
 const uploadPipe = new MediaUploadPipe(config);
 const upload = mock(async (file: UploadedMultipartFile, userId: number) => {
@@ -109,23 +103,6 @@ const updateUser = mock(async (_user: unknown, id: number, dto: object) => ({
   id,
   ...dto,
 }));
-const sso = {
-  enabled: true,
-  newPkce: async () => ({
-    verifier: 'legacy-verifier',
-    state: 'legacy-state',
-    challenge: 'challenge',
-  }),
-  buildAuthUrl: () => new URL('https://idp.example.test/authorize'),
-  exchange: mock(async () => ({
-    claims: { sub: '1' },
-    idToken: 'id-token',
-    sid: 'sid-1',
-  })),
-  provisionUser: async () => profile,
-  endSessionUrl: () => new URL('https://idp.example.test/logout'),
-  verifyLogoutToken: async () => ({ sid: 'sid-1', sub: '1' }),
-};
 
 @Controller('fixture')
 class FixtureController {
@@ -199,7 +176,6 @@ async function createFixture(
     ],
     controllers: [
       AuthController,
-      SsoController,
       MediaController,
       UsersController,
       FixtureController,
@@ -221,7 +197,6 @@ async function createFixture(
       { provide: SessionsService, useValue: { revokeBySessionId: mock() } },
       { provide: OAuthClientService, useValue: {} },
       { provide: EventEmitter2, useValue: { emit: mock() } },
-      { provide: SsoService, useValue: sso },
       {
         provide: MediaService,
         useValue: {
@@ -485,34 +460,6 @@ describe('Fastify HTTP integration without database or external services', () =>
     } finally {
       await throttled.close();
     }
-  });
-
-  it('accepts legacy SSO PKCE cookies and preserves redirects and cookie paths', async () => {
-    const start = await app.inject('/api/v1/auth/sso/login');
-    expect(start.statusCode).toBe(302);
-    expect(start.headers.location).toBe('https://idp.example.test/authorize');
-    for (const cookie of start.headers['set-cookie'] as string[]) {
-      expect(cookie).toContain('Path=/api/v1/auth/sso');
-      expect(cookie).toContain('Max-Age=600');
-    }
-    const callback = await app.inject({
-      url: '/api/v1/auth/sso/callback?code=code&state=legacy-state',
-      headers: { cookie: 'ssoVerifier=legacy-verifier; ssoState=legacy-state' },
-    });
-    expect(callback.statusCode).toBe(302);
-    expect(callback.headers.location).toBe('https://app.example.test');
-    expect(sso.exchange).toHaveBeenCalledWith(
-      new URL(
-        'https://app.example.test/api/v1/auth/sso/callback?code=code&state=legacy-state',
-      ),
-      'legacy-verifier',
-      'legacy-state',
-    );
-    const expired = await app.inject(
-      '/api/v1/auth/sso/callback?code=code&state=state',
-    );
-    expect(expired.statusCode).toBe(302);
-    expect(expired.headers.location).toContain('ssoError=session_expired');
   });
 
   it('uploads media and avatars larger than the JSON body limit, and supports text-only avatar updates', async () => {

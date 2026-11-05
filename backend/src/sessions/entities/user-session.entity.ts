@@ -56,11 +56,6 @@ export class UserSession {
   @Column({ name: 'impersonatedById', type: 'int', nullable: true })
   impersonatedById: number | null;
 
-  /** True for sessions minted through the OIDC SSO flow. */
-  @ApiProperty()
-  @Column({ name: 'isSso', default: false })
-  isSso: boolean;
-
   /** Starter dashboard session policy. */
   @ApiProperty({ enum: ['admin'] })
   @Column({ name: 'audience', type: 'varchar', length: 16, default: 'admin' })
