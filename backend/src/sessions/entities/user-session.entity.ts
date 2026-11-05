@@ -6,6 +6,7 @@ import {
   UpdateDateColumn,
   DeleteDateColumn,
   Index,
+  Check,
   ManyToOne,
   JoinColumn,
 } from 'typeorm';
@@ -21,6 +22,7 @@ import type { SessionAudience } from '../session-policy';
  * "sign out this device" possible without waiting for the token TTL.
  */
 @Entity('user_sessions')
+@Check('CHK_user_sessions_deadlines', '"expiresAt" <= "absoluteExpiresAt"')
 export class UserSession {
   @ApiProperty()
   @PrimaryGeneratedColumn({ name: 'id' })
@@ -55,6 +57,13 @@ export class UserSession {
   @ApiProperty({ nullable: true })
   @Column({ name: 'impersonatedById', type: 'int', nullable: true })
   impersonatedById: number | null;
+
+  @ManyToOne(() => User, { onDelete: 'SET NULL', nullable: true })
+  @JoinColumn({
+    name: 'impersonatedById',
+    foreignKeyConstraintName: 'FK_user_sessions_impersonatedById',
+  })
+  impersonatedBy: User | null;
 
   /** Starter dashboard session policy. */
   @ApiProperty({ enum: ['admin'] })

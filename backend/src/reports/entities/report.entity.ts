@@ -8,6 +8,7 @@ import {
   ManyToOne,
   JoinColumn,
   Index,
+  Check,
 } from 'typeorm';
 import { ApiProperty } from '@nestjs/swagger';
 import { User } from '../../users/entities/user.entity';
@@ -38,6 +39,14 @@ const numericTransformer = {
 };
 
 @Entity('reports')
+@Check(
+  'CHK_reports_geo',
+  '"latitude" BETWEEN -90 AND 90 AND "longitude" BETWEEN -180 AND 180',
+)
+@Check(
+  'CHK_reports_confidence',
+  '"confidence" IS NULL OR ("confidence" BETWEEN 0 AND 1)',
+)
 export class Report {
   @ApiProperty()
   @PrimaryGeneratedColumn({ name: 'id' })

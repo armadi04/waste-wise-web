@@ -4,9 +4,12 @@ import {
   DeleteDateColumn,
   Entity,
   Index,
+  JoinColumn,
+  ManyToOne,
   PrimaryGeneratedColumn,
 } from 'typeorm';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
+import { User } from '../../users/entities/user.entity';
 
 @Entity('invitations')
 export class Invitation {
@@ -30,6 +33,13 @@ export class Invitation {
   @ApiPropertyOptional()
   @Column({ name: 'invitedBy', type: 'int', nullable: true })
   invitedBy: number | null;
+
+  @ManyToOne(() => User, { onDelete: 'SET NULL', nullable: true })
+  @JoinColumn({
+    name: 'invitedBy',
+    foreignKeyConstraintName: 'FK_invitations_invitedBy',
+  })
+  inviter: User | null;
 
   @ApiProperty()
   @Column({ name: 'expiresAt', type: 'timestamptz', precision: 3 })
