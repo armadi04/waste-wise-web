@@ -5174,7 +5174,26 @@
       },
       "UpdateReportDto": {
         "type": "object",
-        "properties": {}
+        "properties": {
+          "description": {
+            "type": "string",
+            "minLength": 3,
+            "maxLength": 2000
+          },
+          "mediaId": {
+            "type": "number"
+          },
+          "latitude": {
+            "type": "number",
+            "minimum": -90,
+            "maximum": 90
+          },
+          "longitude": {
+            "type": "number",
+            "minimum": -180,
+            "maximum": 180
+          }
+        }
       },
       "UpdateReportStatusDto": {
         "type": "object",
