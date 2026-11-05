@@ -306,10 +306,16 @@
   outline-offset: 2px !important;
   box-shadow: 0 0 0 2px var(--app-focus-offset) !important;
 }
-.app-field input:focus-visible,
-.app-field textarea:focus-visible {
-  outline: none !important;
-  box-shadow: none !important;
+/* The ring is drawn on the field wrapper. HeroUI puts an important outline
+   utility (`!outline-solid`) on the inner <input>; important declarations in
+   an earlier layer beat both later layers and unlayered ones, so this must
+   live in a layer that precedes `utilities`. */
+@layer components {
+  .app-field input:focus-visible,
+  .app-field textarea:focus-visible {
+    outline: none !important;
+    box-shadow: none !important;
+  }
 }
 a:not(.app-button) {
   color: var(--app-link);
