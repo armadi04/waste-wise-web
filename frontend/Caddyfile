@@ -6,6 +6,16 @@
 :3000 {
 	root * /srv/dist
 
+	# TLS is terminated by the platform proxy; these headers apply to every response.
+	header {
+		X-Content-Type-Options nosniff
+		X-Frame-Options DENY
+		Referrer-Policy strict-origin-when-cross-origin
+		Permissions-Policy "camera=(), microphone=(), geolocation=()"
+		Strict-Transport-Security "max-age=31536000"
+		-Server
+	}
+
 	route {
 		@backend path /api /api/* /socket.io /socket.io/* /graphql
 		handle @backend {
