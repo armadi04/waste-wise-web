@@ -18,7 +18,7 @@ Keep UI/email/notification copy in the language of the existing screen or produc
 Match existing Prettier/ESLint style: two spaces, single quotes, no semicolons, trailing
 commas and import ordering. Use `@/` for src imports. TanStack `(group)` and `$resource`
 route filenames follow framework syntax. Do not rename API fields or database identifiers
-as a formatting change. OAuth/OIDC fields retain protocol spelling (`access_token`, etc.).
+as a formatting change. OAuth fields retain protocol spelling (`access_token`, etc.).
 
 ## Feature organization
 

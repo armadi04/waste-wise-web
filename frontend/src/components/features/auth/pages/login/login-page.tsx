@@ -1,20 +1,15 @@
 import { Divider } from '@heroui/react'
 import { Link } from '@tanstack/react-router'
-import { Building2, Eye, EyeOff, Lock, LogIn, User } from 'lucide-react'
-import { apiUrl } from '@/lib/api'
+import { Eye, EyeOff, Lock, LogIn, User } from 'lucide-react'
 import { Button, Input } from '@/components/shared/controls'
 import { LoginTwoFactorForm } from '@/components/features/auth/pages/login/child/login-two-factor-form'
-import {
-  SSO_ERRORS,
-  routeApi,
-} from '@/components/features/auth/pages/login/lib/login-page-helpers'
 import { AuthPageShell } from '@/components/layout/auth-page-shell'
 import {
   GOOGLE_LOGIN_ENABLED,
   GoogleLoginButton,
 } from '@/components/ui/google-login-button'
 import { TurnstileWidget } from '@/components/ui/turnstile-widget'
-import { useAuthGuard, useLogin, useSilentSso } from '@/hooks/auth'
+import { useAuthGuard, useLogin } from '@/hooks/auth'
 import { turnstileErrorMessages } from '@/lib/config/turnstile'
 import {
   BRAND_DESCRIPTION,
@@ -25,10 +20,6 @@ import {
 
 export function LoginPage() {
   useAuthGuard({ isAuthPage: true })
-  useSilentSso()
-
-  const { sso_error: ssoError } = routeApi.useSearch()
-  const ssoFailure = ssoError ? SSO_ERRORS[ssoError] : null
 
   const {
     register,
@@ -109,20 +100,6 @@ export function LoginPage() {
       </div>
 
       <div className="space-y-6">
-        {ssoFailure && (
-          <div className="flex gap-3 rounded-large border border-[var(--app-danger-border)] app-status-danger bg-[var(--app-danger-background)] text-[var(--app-danger-foreground)] p-4">
-            <ssoFailure.icon className="mt-0.5 h-5 w-5 shrink-0 text-[var(--app-danger)]" />
-            <div className="space-y-1">
-              <p className="text-sm font-semibold text-[var(--app-danger)]">
-                {ssoFailure.title}
-              </p>
-              <p className="text-xs text-default-600">
-                {ssoFailure.description}
-              </p>
-            </div>
-          </div>
-        )}
-
         <form className="flex flex-col gap-4" onSubmit={onSubmit} noValidate>
           <Input
             {...register('email')}
@@ -207,34 +184,17 @@ export function LoginPage() {
           </Button>
         </form>
 
-        {/* Divider */}
-        <div className="flex items-center gap-4">
-          <Divider className="flex-1" />
-          <span className="text-default-400 text-sm">or</span>
-          <Divider className="flex-1" />
-        </div>
-
-        {/* Social / SSO login row */}
-        <div className="flex gap-3">
-          {/* Google — only when VITE_GOOGLE_CLIENT_ID is set */}
-          {GOOGLE_LOGIN_ENABLED && (
+        {/* Social login — only when VITE_GOOGLE_CLIENT_ID is set */}
+        {GOOGLE_LOGIN_ENABLED && (
+          <>
+            <div className="flex items-center gap-4">
+              <Divider className="flex-1" />
+              <span className="text-default-400 text-sm">or</span>
+              <Divider className="flex-1" />
+            </div>
             <GoogleLoginButton onChallenge={onTwoFactorChallenge} />
-          )}
-
-          {/* Passport SSO — full-page redirect into the OIDC flow */}
-          <Button
-            as="a"
-            href={apiUrl('/auth/sso/login')}
-            variant="flat"
-            color="primary"
-            className="flex-1"
-            startContent={
-              <Building2 className="w-5 h-5 text-[var(--app-link)]" />
-            }
-          >
-            <span className="text-[var(--app-link)] font-medium">Passport</span>
-          </Button>
-        </div>
+          </>
+        )}
       </div>
     </AuthPageShell>
   )

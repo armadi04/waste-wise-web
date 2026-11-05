@@ -41,8 +41,6 @@ export interface CurrentUser {
   // The role the user is currently acting as; absent until a multi-role user
   // picks one. When set, `roles`/`permissions` are scoped to it.
   activeRole?: string
-  // OIDC session id — present only when the session was minted via SSO login.
-  sid?: string
   // Set while an administrator is signed in as this user; holds their own id.
   impersonatorId?: number
 }

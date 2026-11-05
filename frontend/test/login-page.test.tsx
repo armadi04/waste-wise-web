@@ -56,7 +56,6 @@ vi.mock('@/components/ui/turnstile-widget/turnstile-widget', () => ({
   TurnstileWidget: () => null,
 }))
 vi.mock('@/hooks/auth/use-auth', () => ({ useAuthGuard: vi.fn() }))
-vi.mock('@/hooks/auth/use-silent-sso', () => ({ useSilentSso: vi.fn() }))
 vi.mock('@/hooks/auth/use-login', () => ({
   useLogin: () => ({
     register: () => ({}),

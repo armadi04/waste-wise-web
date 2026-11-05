@@ -9,7 +9,6 @@ const session = (overrides: Partial<UserSession>): UserSession => ({
   userId: 1,
   ipAddress: null,
   userAgent: null,
-  isSso: false,
   impersonatedById: null,
   audience: 'admin',
   lastActiveAt: '2026-10-05T11:00:00Z',

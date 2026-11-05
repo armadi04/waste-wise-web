@@ -30,8 +30,7 @@ Selectors: `hasRole`, `hasPermission`, `hasAnyPermission`, `hasAllPermissions`.
 > `navigate({ to: '/' })` on success for both email and Google flows.
 
 `logout()` calls the service (which clears cookies and redirects to `/login`) then
-`syncAuth()`. For **SSO sessions** (the session identity carries a `sid`), the service instead
-redirects to `/api/v1/auth/sso/logout` so the IdP session is ended too (RP-initiated logout).
+`syncAuth()`.
 
 ## Accessing auth in components
 
@@ -43,8 +42,9 @@ const { isAuthenticated, user, login, logout, hasPermission } = useAuth()
 ```
 
 Also in `use-auth.ts`:
+
 - **`useProfile()`** — react-query hook for the full profile (`['profile']`,
-  `enabled: isAuthenticated()`, 5-min stale time). The *server* truth about the user
+  `enabled: isAuthenticated()`, 5-min stale time). The _server_ truth about the user
   (with populated roles/permissions), alongside the flattened session identity.
 - **`useAuthGuard({ isAuthPage?, redirectPath? })`** — redirects: logged-in users away
   from auth pages, logged-out users to `/login`.
@@ -58,9 +58,9 @@ Two layers, both checked against the user:
 
 Two ways to check, depending on what data you have:
 
-| Hook | Source | Use when |
-|---|---|---|
-| `useAuth().hasPermission(p)` | server session identity (`auth.store`) | quick check, no network |
+| Hook                                                          | Source                                                | Use when                                 |
+| ------------------------------------------------------------- | ----------------------------------------------------- | ---------------------------------------- |
+| `useAuth().hasPermission(p)`                                  | server session identity (`auth.store`)                | quick check, no network                  |
 | `useUserPermission().hasPermission(p)` (`use-permissions.ts`) | `useProfile()` data, falling back to session identity | UI check (backend remains authoritative) |
 
 `useUserPermission` is what columns and the sidebar use — it reads the profile's
@@ -69,7 +69,7 @@ profile loads.
 
 ```ts
 const { hasPermission } = useUserPermission()
-const columns = getColumns({ /* …, */ hasPermission })   // hide row actions by permission
+const columns = getColumns({ /* …, */ hasPermission }) // hide row actions by permission
 onCreate: hasPermission('users.invite') ? openInvite : undefined
 ```
 
@@ -83,17 +83,6 @@ The sidebar (`useSidebarLogic` in `use-sidebar.ts`) filters `sidebarData` by bot
 2. On submit → `auth.store.login()` → `auth.service.login()` sets the cookie → `syncAuth()`.
 3. On success the hook navigates to `/` and toasts; on failure it resets Turnstile and
    toasts. A persisted `auth_error` in `sessionStorage` is surfaced on next mount.
-
-**SSO login** is a plain full-page link, not a store action: the "Sign in with Stekom SSO"
-button on the login page points at `<a href="/api/v1/auth/sso/login">`. The backend runs the
-OIDC flow, sets the same session cookies, and redirects back into the SPA — `auth.store`
-hydrates from `/api/v1/auth/me` on load, so no client-side token handling is needed.
-Enabled when the backend has `SSO_ISSUER` configured.
-
-**Silent login** (`useSilentSso`, `src/hooks/use-silent-sso.ts`) — when `VITE_SSO_SILENT=true`,
-the login page redirects an unauthenticated visitor once to `/api/v1/auth/sso/silent`
-(`prompt=none`). An active IdP session logs them straight in; otherwise the backend bounces
-back and a one-shot `sso_silent` cookie keeps the login form from looping.
 
 ## Email verification gate
 

@@ -11,7 +11,6 @@ export interface UserSession {
   userId: number
   ipAddress: string | null
   userAgent: string | null
-  isSso: boolean
   /** Set when an administrator opened this session by signing in as the user. */
   impersonatedById: number | null
   /** Starter dashboard session policy. */

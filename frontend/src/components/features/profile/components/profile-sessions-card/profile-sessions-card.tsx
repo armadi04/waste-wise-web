@@ -80,11 +80,6 @@ export function ProfileSessionsCard() {
                         This device
                       </Chip>
                     )}
-                    {session.isSso && (
-                      <Chip size="sm" variant="flat" color="secondary">
-                        SSO
-                      </Chip>
-                    )}
                   </div>
                   <p className="truncate text-xs text-default-400">
                     {session.ipAddress ?? 'Unknown IP'} · active{' '}
