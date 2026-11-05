@@ -1816,7 +1816,7 @@
             "bearer": []
           }
         ],
-        "summary": "View a public (non-private) media file",
+        "summary": "View a media file (private files need a session)",
         "tags": [
           "Media"
         ]

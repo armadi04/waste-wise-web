@@ -104,6 +104,12 @@ describe('MediaService lifecycle', () => {
     expect(result.cleanupAt).toBeNull();
     expect(result.cleanupLeaseToken).toBeNull();
   });
+  it('stores the private flag requested by the caller', async () => {
+    await service.uploadFile(file, 7, false, true);
+    expect(repository.create).toHaveBeenCalledWith(
+      expect.objectContaining({ isPrivate: true }),
+    );
+  });
   it('does not create remote objects when staging persistence fails', async () => {
     repository.save.mockRejectedValue(new Error('Database unavailable'));
     await expect(service.uploadFile(file, 7)).rejects.toThrow(
@@ -111,7 +117,7 @@ describe('MediaService lifecycle', () => {
     );
     expect(adapter.upload).not.toHaveBeenCalled();
   });
-  it('rejects non-image avatars before staging or remote upload', async () => {
+  it('rejects non-image uploads before staging or remote upload', async () => {
     await expect(service.uploadFile(file, 7, true)).rejects.toThrow(
       'image is required',
     );

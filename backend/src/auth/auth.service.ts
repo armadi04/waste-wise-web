@@ -167,11 +167,27 @@ export class AuthService {
     });
   }
 
+  /**
+   * Allowed Google OAuth client IDs (comma-separated GOOGLE_CLIENT_ID). Empty
+   * means Google sign-in is unconfigured and must fail closed: with no audience
+   * google-auth-library skips the `aud` comparison entirely.
+   */
+  private googleAudiences(): string[] {
+    const audiences = (this.configService.get<string>('GOOGLE_CLIENT_ID') ?? '')
+      .split(',')
+      .map((value) => value.trim())
+      .filter(Boolean);
+    if (!audiences.length)
+      throw new ServiceUnavailableException('Google sign-in is not configured');
+    return audiences;
+  }
+
   async validateGoogleUser(token: string): Promise<Omit<User, 'password'>> {
     try {
+      const audience = this.googleAudiences();
       const ticket = await this.googleClient.verifyIdToken({
         idToken: token,
-        audience: this.configService.get<string>('GOOGLE_CLIENT_ID'),
+        audience,
       });
       const payload = ticket.getPayload();
       if (!payload || !payload.email) {
@@ -226,6 +242,17 @@ export class AuthService {
     accessToken: string,
   ): Promise<Omit<User, 'password'>> {
     try {
+      // An access token is a bearer credential for whichever app requested it.
+      // Only accept tokens Google issued to one of our own OAuth clients.
+      const audiences = this.googleAudiences();
+      const info = await this.googleClient.getTokenInfo(accessToken);
+      if (
+        !audiences.includes(info.aud) &&
+        !audiences.includes(info.azp ?? '')
+      ) {
+        throw new UnauthorizedException('Invalid Google access token');
+      }
+
       const response = await fetch(
         'https://www.googleapis.com/oauth2/v3/userinfo',
         {
@@ -246,6 +273,12 @@ export class AuthService {
       };
       if (!payload || !payload.email) {
         throw new UnauthorizedException('Invalid Google user information');
+      }
+      if (
+        info.email &&
+        info.email.toLowerCase() !== payload.email.toLowerCase()
+      ) {
+        throw new UnauthorizedException('Invalid Google access token');
       }
 
       return await this.resolveGoogleUser({

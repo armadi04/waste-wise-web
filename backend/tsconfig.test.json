@@ -1,0 +1,12 @@
+{
+  // Type-checks src + test together (Bun runs specs as ES modules with top-level await).
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "module": "esnext",
+    "moduleResolution": "bundler",
+    "noEmit": true,
+    "incremental": false,
+    "noImplicitAny": true
+  },
+  "include": ["src/**/*.ts", "test/**/*.ts"]
+}

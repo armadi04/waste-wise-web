@@ -32,13 +32,15 @@ export class ClassificationService {
     if (!baseUrl) return this.failed('ML_UNAVAILABLE');
 
     const timeout = this.config.get<number>('ML_SERVICE_TIMEOUT_MS') ?? 15000;
+    // One deadline for the whole classification (media fetch + inference), so a
+    // slow storage read cannot push the request past the client's own timeout.
+    const signal = AbortSignal.timeout(timeout);
+    const token = this.config.get<string>('ML_SERVICE_TOKEN');
 
     let bytes: ArrayBuffer;
     try {
       const signedUrl = await this.storage.forMedia(media).getSignedUrl(media);
-      const imageResponse = await fetch(signedUrl, {
-        signal: AbortSignal.timeout(timeout),
-      });
+      const imageResponse = await fetch(signedUrl, { signal });
       if (!imageResponse.ok) return this.failed('MEDIA_UNAVAILABLE');
       bytes = await imageResponse.arrayBuffer();
     } catch {
@@ -57,7 +59,8 @@ export class ClassificationService {
         {
           method: 'POST',
           body: form,
-          signal: AbortSignal.timeout(timeout),
+          headers: token ? { 'X-Internal-Token': token } : undefined,
+          signal,
         },
       );
       if (!response.ok) {

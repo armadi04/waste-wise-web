@@ -47,7 +47,7 @@ Read repo-wide [working rules](../../CLAUDE.md), [Architecture](ARCHITECTURE.md)
 
 ## Verification
 
-Run `bun run lint`, `bun run test` and `bun run build`. Default test commands run unit tests
+Run `bun run lint`, `bun run typecheck`, `bun run test` and `bun run build`. Default test commands run unit tests
 only. For HTTP adapter/auth/upload/GraphQL/realtime changes also run `bun run test:http`
 (mocked dependencies, no database; Socket.IO uses loopback). Run `bun run test:e2e` or individual database integration specs only when explicitly requested by
 the user, using the dedicated integration database. If requested E2E cannot run, report that

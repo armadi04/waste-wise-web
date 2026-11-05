@@ -29,25 +29,16 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
       jwtFromRequest: ExtractJwt.fromExtractors([
         ExtractJwt.fromAuthHeaderAsBearerToken(),
         cookieExtractor,
-        (req: Request) => {
-          const query = req.query as Record<string, unknown>;
-          const token = query.token;
-          return typeof token === 'string' ? token : null;
-        },
       ]),
       ignoreExpiration: false,
-      secretOrKey: configService.get<string>('JWT_SECRET') || 'secretKey',
+      secretOrKey: configService.getOrThrow<string>('JWT_SECRET'),
       passReqToCallback: true,
     });
   }
 
   async validate(req: Request, payload: JwtPayload) {
-    const query = req.query as Record<string, unknown>;
-    const queryToken = query.token;
     const token =
-      ExtractJwt.fromAuthHeaderAsBearerToken()(req) ||
-      cookieExtractor(req) ||
-      (typeof queryToken === 'string' ? queryToken : undefined);
+      ExtractJwt.fromAuthHeaderAsBearerToken()(req) || cookieExtractor(req);
 
     if (token && (await this.authService.isTokenBlacklisted(token))) {
       throw new UnauthorizedException('Token is invalidated');

@@ -102,7 +102,7 @@ All under `/api/v1/auth`. Tighter throttles protect the credential routes.
 
 - **Google** — `AuthController.googleLogin` branches on the token: a `ya29.`-prefixed value
   is validated as a Google *access token*, anything else as an *id token*
-  (`google-auth-library`). Requires `GOOGLE_CLIENT_ID`.
+  (`google-auth-library`). Requires `GOOGLE_CLIENT_ID` (comma-separated client IDs); sign-in fails closed when empty. Access-token logins (`ya29.`) are checked with Google tokeninfo and rejected unless `aud`/`azp` is one of those clients.
 - **Turnstile** — `TurnstileService.verify` checks the Cloudflare CAPTCHA before login.
   Uses `TURNSTILE_SECRET` (`TURNSTILE_SECRET_KEY` is a legacy fallback).
   Required by default in staging/production; local development activates when a secret is set.

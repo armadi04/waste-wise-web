@@ -34,7 +34,7 @@ import { SessionsModule } from '../sessions/sessions.module';
     JwtModule.registerAsync({
       imports: [ConfigModule],
       useFactory: (configService: ConfigService) => ({
-        secret: configService.get<string>('JWT_SECRET') || 'secretKey',
+        secret: configService.getOrThrow<string>('JWT_SECRET'),
         signOptions: { expiresIn: ACCESS_TOKEN_TTL },
       }),
       inject: [ConfigService],

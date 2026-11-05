@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unnecessary-type-assertion -- needed by tsconfig.test.json (bundler resolution) */
 import type { NestFastifyApplication } from '@nestjs/platform-fastify';
 import { createHttpAdapter } from '@/config/http';
 import { afterAll, beforeAll, describe, expect, it } from 'bun:test';
@@ -25,7 +26,7 @@ describe('PostgreSQL health probes on a disposable database', () => {
   let pool: InspectablePool;
   let app: NestFastifyApplication;
   let sql = 'SELECT 1';
-  let sqlState: string | undefined;
+  let sqlState = undefined as string | undefined;
 
   beforeAll(async () => {
     if (
@@ -76,7 +77,7 @@ describe('PostgreSQL health probes on a disposable database', () => {
     configureApiRouting(app);
     const { AllExceptionsFilter } =
       await import('@/common/filters/all-exceptions.filter');
-    app.useGlobalFilters(new AllExceptionsFilter({ error: () => {} }));
+    app.useGlobalFilters(new AllExceptionsFilter({ error: () => {} } as never));
     await app.init();
     await app.getHttpAdapter().getInstance().ready();
   });
@@ -101,7 +102,7 @@ describe('PostgreSQL health probes on a disposable database', () => {
       .get('/api/v1/health')
       .expect(503);
     expect(Date.now() - start).toBeLessThan(2500);
-    expect(sqlState).toBe('57014'); // PostgreSQL query_canceled, not a Promise race.
+    expect(sqlState as string | undefined).toBe('57014'); // PostgreSQL query_canceled, not a Promise race.
     expect(JSON.stringify(response.body)).not.toContain('pg_sleep');
     expect(pool.totalCount).toBe(0);
     expect(pool.waitingCount).toBe(0);

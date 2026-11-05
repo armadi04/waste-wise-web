@@ -124,6 +124,8 @@ const baseEnvSchema = z.object({
 
   // ML service (optional; reports still save when unavailable)
   ML_SERVICE_URL: z.string().url().optional(),
+  // Shared secret sent as X-Internal-Token; must match the ML service's INTERNAL_TOKEN.
+  ML_SERVICE_TOKEN: z.string().min(16).optional(),
   ML_SERVICE_TIMEOUT_MS: z.coerce
     .number()
     .int()

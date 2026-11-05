@@ -42,6 +42,44 @@ describe('ClassificationService', () => {
     globalThis.fetch = originalFetch;
   });
 
+  it('shares one deadline between media fetch and inference and sends the internal token', async () => {
+    const config = {
+      get: jest.fn((key: string) => {
+        if (key === 'ML_SERVICE_URL') return 'http://ml:8000';
+        if (key === 'ML_SERVICE_TOKEN') return 'internal-secret-token';
+        return undefined;
+      }),
+    };
+    const storage = {
+      forMedia: jest.fn(() => ({
+        getSignedUrl: jest.fn(() => Promise.resolve('https://media/file')),
+      })),
+    };
+    service = new ClassificationService(config as never, storage as never);
+    fetchMock
+      .mockResolvedValueOnce({
+        ok: true,
+        arrayBuffer: () => Promise.resolve(new ArrayBuffer(4)),
+      })
+      .mockResolvedValueOnce({
+        ok: true,
+        json: () =>
+          Promise.resolve({ predicted_class: 'paper', confidence: 0.9 }),
+      });
+
+    await service.classify(media);
+
+    const first = fetchMock.mock.calls[0][1] as { signal: AbortSignal };
+    const second = fetchMock.mock.calls[1][1] as {
+      signal: AbortSignal;
+      headers: Record<string, string>;
+    };
+    expect(second.signal).toBe(first.signal);
+    expect(second.headers).toEqual({
+      'X-Internal-Token': 'internal-secret-token',
+    });
+  });
+
   it('maps ML class names to stored waste categories', async () => {
     fetchMock
       .mockResolvedValueOnce({

@@ -26,7 +26,7 @@ describe('JwtStrategy', () => {
       touch: jest.fn(() => Promise.resolve()),
     };
     const configService = {
-      get: jest.fn(() => 'test-secret'),
+      getOrThrow: jest.fn(() => 'test-secret'),
     } as unknown as ConfigService;
     strategy = new JwtStrategy(
       configService,
@@ -94,7 +94,7 @@ describe('JwtStrategy', () => {
     expect(result.emailVerified).toBe(true);
   });
 
-  it('should extract the token from the query string when no header is present', async () => {
+  it('does not accept a token from the query string', async () => {
     authService.isTokenBlacklisted.mockResolvedValue(false);
     authService.getProfile.mockResolvedValue({
       id: 1,
@@ -110,6 +110,6 @@ describe('JwtStrategy', () => {
 
     await strategy.validate(req, payload);
 
-    expect(authService.isTokenBlacklisted).toHaveBeenCalledWith('query-token');
+    expect(authService.isTokenBlacklisted).not.toHaveBeenCalled();
   });
 });

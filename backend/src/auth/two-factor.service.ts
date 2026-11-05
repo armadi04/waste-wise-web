@@ -44,7 +44,7 @@ export class TwoFactorService {
     private readonly eventEmitter: EventEmitter2,
   ) {
     this.key = crypto.scryptSync(
-      this.configService.get<string>('JWT_SECRET') ?? 'secretKey',
+      this.configService.getOrThrow<string>('JWT_SECRET'),
       'nestplate.two-factor',
       32,
     );

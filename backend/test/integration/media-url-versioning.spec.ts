@@ -21,9 +21,8 @@ describe('media URI migration on a disposable database', () => {
       if (tables.length)
         throw new Error('Refusing migration test on a nonempty database');
       const migration = new VersionMediaUrls1791350000000();
-      db.migrations = db.migrations.filter(
-        (item) => item.name !== migration.name,
-      );
+      (db as { migrations: typeof db.migrations }).migrations =
+        db.migrations.filter((item) => item.name !== migration.name);
       await db.runMigrations();
       const origin = process.env.APP_URL;
       try {

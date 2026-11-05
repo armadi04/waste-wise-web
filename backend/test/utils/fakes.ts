@@ -41,7 +41,7 @@ export function makeFakeStorage(): MediaStorage {
 }
 
 export interface FakeClassifier {
-  classify: jest.Mock<Promise<ClassificationResult>, [Media]>;
+  classify: jest.Mock<(media: Media) => Promise<ClassificationResult>>;
 }
 
 export function makeFakeClassifier(
