@@ -1639,7 +1639,7 @@ export interface components {
             userAgent: string | null;
             impersonatedById: number | null;
             /** @enum {string} */
-            audience: "admin";
+            audience: "admin" | "mobile";
             /** Format: date-time */
             lastActiveAt: string;
             /** Format: date-time */
@@ -1663,7 +1663,7 @@ export interface components {
             userAgent: string | null;
             impersonatedById: number | null;
             /** @enum {string} */
-            audience: "admin";
+            audience: "admin" | "mobile";
             /** Format: date-time */
             lastActiveAt: string;
             /** Format: date-time */
