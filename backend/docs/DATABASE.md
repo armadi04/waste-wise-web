@@ -1,8 +1,8 @@
 # Database schema and ERD
 
 WasteWise uses **PostgreSQL**. The schema is owned by the TypeORM migrations in
-`backend/src/database/migrations`; this page documents the result after all 8 migrations
-(latest: `AddSchemaHardeningConstraints`). 17 application tables plus TypeORM's `migrations`
+`backend/src/database/migrations`; this page documents the result after all 9 migrations
+(latest schema change: `AddSchemaHardeningConstraints`; `PrivateReportMedia` only updates data). 17 application tables plus TypeORM's `migrations`
 bookkeeping table, 16 foreign keys and 5 enum types.
 
 | File | Purpose |

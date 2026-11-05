@@ -48,13 +48,28 @@ there is no root package-manager workspace.
 ## Repository layout
 
 ```text
-nestplate/
+waste-wise-web/
 ├── backend/      # NestJS API, schema, integrations, unit/integration tests
-├── frontend/     # React SPA, shared UI, typed routes, unit/browser tests
+├── frontend/     # React admin/user SPA, shared UI, typed routes, unit/browser tests
+├── docs/         # Static API reference (published with GitHub Pages)
 ├── CLAUDE.md     # Shared working rules
 ├── AGENTS.md     # Agent entry point
-└── DESIGN.md     # Starter UI conventions
+└── DESIGN.md     # UI conventions
 ```
+
+## Related repositories
+
+WasteWise is three independent projects that talk through the backend REST API:
+
+| Repository | Role |
+|---|---|
+| [`waste-wise-web`](https://github.com/armadi04/waste-wise-web) (this repo) | Backend API (NestJS + PostgreSQL) and the admin/user website |
+| [`waste-wise-apk`](https://github.com/armadi04/waste-wise-apk) | Mobile app (Expo React Native): Google sign-in, photo + GPS reports, report history |
+| [`waste-wise-ml`](https://github.com/armadi04/waste-wise-ml) | Image classifier (MobileNetV2) served by FastAPI; called only by the backend |
+
+Flow: the mobile app uploads a photo to the backend, the backend sends it to the ML service,
+and the predicted category and confidence are stored with the report. Clients cannot set
+those values.
 
 ## Getting started
 
@@ -147,3 +162,16 @@ to `BACKEND_URL` before SPA fallback. No root Compose file is included; orchestr
 Minimum services: PostgreSQL, backend, frontend, selected storage provider, and optionally
 Redis/SMTP. Configure HTTPS, runtime backend secrets and public frontend build values through
 your deployment. See both Operations guides for exact setup and initial account provisioning.
+
+First production deploy checklist:
+
+1. Run the backend once so migrations apply (the container entrypoint does this).
+2. Seed roles, permissions and the admin account **once** from a non-production runtime pointed
+   at the production database (`NODE_ENV=development bun run seed` in `backend/`); the seed refuses
+   to run with `NODE_ENV=production`, and the Google sign-in 503s until the `user` role exists.
+3. Backend env: `GOOGLE_CLIENT_ID` (comma-separated web/mobile client IDs), `TURNSTILE_SECRET` and
+   `TURNSTILE_ALLOWED_HOSTNAMES` (hostnames only, no scheme/port/path), `APP_URL` (public frontend
+   URL), `ALLOWED_ORIGINS`, `TRUST_PROXY`, and `ML_SERVICE_URL` + `ML_SERVICE_TOKEN`.
+4. Keep the ML service on a private network and give it the same secret as `INTERNAL_TOKEN`.
+5. Frontend build args: `VITE_API_URL`, `VITE_GOOGLE_CLIENT_ID`, `VITE_TURNSTILE_SITE_KEY`; runtime
+   env `BACKEND_URL`.
