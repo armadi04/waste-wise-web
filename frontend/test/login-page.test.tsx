@@ -35,8 +35,17 @@ vi.mock('@heroui/react', async (importOriginal) => ({
   ),
 }))
 vi.mock('@/components/layout/auth-page-shell/auth-page-shell', () => ({
-  AuthPageShell: ({ children }: { children: ReactNode }) => (
-    <div>{children}</div>
+  AuthPageShell: ({
+    children,
+    footerStart,
+  }: {
+    children: ReactNode
+    footerStart?: ReactNode
+  }) => (
+    <div>
+      {children}
+      {footerStart}
+    </div>
   ),
 }))
 vi.mock('@/components/ui/google-login-button/google-login-button', () => ({
@@ -47,7 +56,6 @@ vi.mock('@/components/ui/turnstile-widget/turnstile-widget', () => ({
   TurnstileWidget: () => null,
 }))
 vi.mock('@/hooks/auth/use-auth', () => ({ useAuthGuard: vi.fn() }))
-vi.mock('@/hooks/auth/use-silent-sso', () => ({ useSilentSso: vi.fn() }))
 vi.mock('@/hooks/auth/use-login', () => ({
   useLogin: () => ({
     register: () => ({}),
@@ -68,6 +76,13 @@ beforeEach(() => {
 afterEach(cleanup)
 
 describe('login page forms', () => {
+  it('shows the WasteWise brand in the heading', () => {
+    render(<LoginPage />)
+    expect(
+      screen.getByRole('heading', { name: /Welcome back to WasteWise/ }),
+    ).toBeTruthy()
+  })
+
   it('connects the email form to the login submission handler', () => {
     render(<LoginPage />)
     const form = screen.getByLabelText('Email').closest('form')!

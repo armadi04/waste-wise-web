@@ -5,6 +5,7 @@ import {
   SettingsCard,
 } from '@/components/features/settings/components/settings-primitives'
 import { usePwaInstall } from '@/hooks/global'
+import { BRAND_NAME } from '@/lib/constants/brand'
 
 export function InstallSection() {
   const { isInstallable, isInstalled, install } = usePwaInstall()
@@ -17,8 +18,8 @@ export function InstallSection() {
         label="Install App"
         description={
           isInstalled
-            ? 'Nestplate is installed and running as a native app on this device'
-            : 'Add Nestplate to your home screen for a faster, native-like experience'
+            ? `${BRAND_NAME} is installed and running as a native app on this device`
+            : `Add ${BRAND_NAME} to your home screen for a faster, native-like experience`
         }
         action={
           isInstalled ? (

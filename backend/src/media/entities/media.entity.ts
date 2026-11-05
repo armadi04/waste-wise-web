@@ -16,24 +16,21 @@ import { ApiProperty } from '@nestjs/swagger';
 import type { MediaProvider } from '../storage/media-storage';
 
 @Entity('media')
-@Check('CHK_media_provider', "\"provider\" IN ('depot', 's3')")
+@Check('CHK_media_provider', '"provider" IN (\'s3\')')
 @Check('CHK_media_state', "\"state\" IN ('pending', 'ready', 'deleting')")
 @Check(
   'CHK_media_size',
   '"size" IS NULL OR ("size" >= 0 AND "size" <= 9007199254740991)',
 )
-@Check(
-  'CHK_media_ready_object',
-  '"state" <> \'ready\' OR ("path" IS NOT NULL AND ("provider" <> \'depot\' OR "depotFileId" IS NOT NULL))',
-)
+@Check('CHK_media_ready_object', '"state" <> \'ready\' OR "path" IS NOT NULL')
 @Index('IDX_media_cleanup', ['state', 'cleanupAt', 'cleanupLeaseUntil'])
 export class Media {
   @ApiProperty()
   @PrimaryGeneratedColumn({ name: 'id' })
   id: number;
 
-  @ApiProperty({ enum: ['depot', 's3'] })
-  @Column({ name: 'provider', type: 'varchar', default: 'depot' })
+  @ApiProperty({ enum: ['s3'] })
+  @Column({ name: 'provider', type: 'varchar', default: 's3' })
   provider: MediaProvider;
 
   @ApiProperty()
@@ -120,10 +117,6 @@ export class Media {
   @ApiProperty({ nullable: true })
   @Column({ name: 'path', type: 'varchar', nullable: true })
   path: string | null;
-
-  @ApiProperty({ type: Number, nullable: true })
-  @Column({ name: 'depotFileId', type: 'int', nullable: true })
-  depotFileId: number | null;
 
   @ApiProperty({ nullable: true })
   @Column({ name: 'url', type: 'varchar', nullable: true })

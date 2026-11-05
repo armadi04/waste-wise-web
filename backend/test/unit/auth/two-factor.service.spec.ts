@@ -72,7 +72,7 @@ describe('TwoFactorService', () => {
           provide: ConfigService,
           useValue: {
             get: jest.fn((key: string) =>
-              key === 'JWT_SECRET' ? 'test-secret-value-1234' : 'Nestplate',
+              key === 'JWT_SECRET' ? 'test-secret-value-1234' : 'WasteWise',
             ),
           },
         },

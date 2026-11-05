@@ -101,7 +101,7 @@ describe('Health HTTP contract with real Terminus checks and a database driver m
     expect(response.body.details.database).not.toHaveProperty('stack');
     expect(release).toHaveBeenCalledWith(true);
     await request(app.getHttpServer()).get('/api/v1').expect(200, {
-      name: 'Nestplate API',
+      name: 'WasteWise API',
       apiVersion: API_VERSION,
       docs: SWAGGER_UI_PATH,
     });

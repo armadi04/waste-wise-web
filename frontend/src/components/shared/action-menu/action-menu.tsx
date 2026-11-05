@@ -19,7 +19,13 @@ export interface RowAction {
  * Entries with `show === false` are filtered out; when none remain the
  * button is not rendered at all.
  */
-export function ActionMenu({ actions }: { actions: Array<RowAction> }) {
+export function ActionMenu({
+  actions,
+  ariaLabel = 'Actions',
+}: {
+  actions: Array<RowAction>
+  ariaLabel?: string
+}) {
   const visible = actions.filter((action) => action.show !== false)
 
   if (visible.length === 0) return null
@@ -31,7 +37,7 @@ export function ActionMenu({ actions }: { actions: Array<RowAction> }) {
           isIconOnly
           size="sm"
           variant="light"
-          aria-label="Actions"
+          aria-label={ariaLabel}
           className="text-default-400 data-[hover]:bg-default-100"
         >
           <MoreVertical size={16} />

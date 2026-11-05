@@ -1,5 +1,11 @@
 import { jest } from 'bun:test';
 import type { MediaStorage } from '@/media/storage/media-storage';
+import {
+  ClassificationStatus,
+  WasteCategory,
+} from '@/reports/entities/report.entity';
+import type { Media } from '@/media/entities/media.entity';
+import type { ClassificationResult } from '@/reports/classification.service';
 
 export interface FakeMailService {
   sendVerificationEmail: jest.Mock;
@@ -24,13 +30,30 @@ export function makeFakeStorage(): MediaStorage {
       const stored = {
         ...object,
         path: `uploads/${id}-${file.originalname}`,
-        depotFileId: id,
       };
       await onReserved(stored);
       return stored;
     },
     getSignedUrl: async (object) =>
-      `https://depot.test/signed/${object.depotFileId}`,
+      `https://storage.test/signed/${object.path}`,
     delete: async () => undefined,
+  };
+}
+
+export interface FakeClassifier {
+  classify: jest.Mock<Promise<ClassificationResult>, [Media]>;
+}
+
+export function makeFakeClassifier(
+  result: ClassificationResult = {
+    status: ClassificationStatus.COMPLETED,
+    category: WasteCategory.PLASTIC_WASTE,
+    confidence: 0.94,
+    modelVersion: '1.0.0',
+    errorCode: null,
+  },
+): FakeClassifier {
+  return {
+    classify: jest.fn(async () => result),
   };
 }

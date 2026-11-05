@@ -2,14 +2,14 @@
 
 ## Build and deployment
 
-Build from `backend/`. SDK installation uses a GitHub Packages package-read token:
+Build from `backend/`:
 
 ```bash
-docker build --secret id=node_auth,env=NODE_AUTH_TOKEN -t nestplate-api .
+docker build -t nestplate-api .
 ```
 
-The secret contains the raw token, not an entire `.npmrc`. Runtime uses Bun and UTC.
-Supply DB/JWT/storage and optional Redis/SMTP/OIDC credentials at runtime.
+Runtime uses Bun and UTC.
+Supply DB/JWT/storage and optional Redis/SMTP credentials at runtime.
 Keep `NODE_ENV=production`, `DB_SYNCHRONIZE=false`, `DB_SEED=false`.
 Entrypoint runs pending compiled migrations before starting the API on port 3000.
 The starter baseline requires a new database with schema-creation privileges.
@@ -20,21 +20,11 @@ runtime to production and disable seed. Automatic production seeding is intentio
 Back up schema/data before later migrations; reverting an image does not revert a database.
 
 Frontend Caddy proxies `/api` (including Swagger and its documents), `/socket.io` and `/graphql` to this service. Use HTTPS, exact
-origins, browser-facing `APP_URL`, matching SSO callback/logout URLs and appropriate `TRUST_PROXY`.
+origins, browser-facing `APP_URL` and appropriate `TRUST_PROXY`.
 
-## Media providers
+## Media storage
 
-Default:
-
-```env
-MEDIA_PROVIDER=depot
-DEPOT_BASE_URL=https://depot.example.com
-DEPOT_API_KEY=your_write_scoped_key
-```
-
-`DEPOT_BASE_URL` is an origin without `/api/v1`. Depot owns its S3 configuration.
-
-Direct AWS or compatible storage:
+Media uses S3-compatible storage (AWS or compatible endpoints):
 
 ```env
 MEDIA_PROVIDER=s3
@@ -48,7 +38,7 @@ S3_SECRET_ACCESS_KEY=your_secret
 
 Direct S3 uses Bun S3Client, opaque per-user keys and 5-minute GET URLs. Path-style supports
 compatible endpoints such as MinIO; AWS can infer the endpoint from region/bucket.
-Legacy env keys create `depot-default` and `s3-default` profiles. New rows record the selected
+Legacy env keys create the `s3-default` profile. New rows record the selected
 profile and a fingerprint of its physical location (not credentials). Reads/deletes fail closed
 if the location changes or the profile disappears. Credential rotation remains supported.
 
@@ -57,15 +47,15 @@ profile IDs and choose `MEDIA_STORAGE_PROFILE`. Example shape:
 
 ```json
 {
-  "primary": { "provider": "depot", "baseUrl": "https://depot.example.com", "apiKey": "runtime-secret" },
+  "primary": { "provider": "s3", "region": "us-east-1", "bucket": "primary", "accessKeyId": "runtime-secret", "secretAccessKey": "runtime-secret", "forcePathStyle": false },
   "archive": { "provider": "s3", "region": "us-east-1", "bucket": "archive", "accessKeyId": "runtime-secret", "secretAccessKey": "runtime-secret", "forcePathStyle": false }
 }
 ```
 
 S3 profiles optionally accept `endpoint`. Switch to a NEW profile when changing a bucket or
-Depot service, retaining the old profile for its existing files/cleanup jobs. Never reuse an
+storage service, retaining the old profile for its existing files/cleanup jobs. Never reuse an
 existing ID for another location. Profiles/credentials load per process; restart on change.
-Switching defaults does not migrate objects. Rotated keys must retain the same bucket/Depot app
+Switching defaults does not migrate objects. Rotated keys must retain the same bucket
 scope; location fingerprints do not identify a provider's credential scope.
 
 ### Media hardening migration
@@ -95,9 +85,9 @@ Tune `MEDIA_MAX_FILE_SIZE` and `MEDIA_MAX_CONCURRENT_UPLOADS` together for the m
 SVG/HTML/plain text are excluded by default. Signature detection is not malware scanning.
 Missing/empty files return 400, oversize 413, unsupported content 415, saturated admission 429.
 
-Before remote I/O, a pending row persists its UUID key/name and location identity. Depot stores
-the reservation ID before PUT; crashes before that write recover by exact name and owner.
-S3 PUT/DELETE have abortable 30-second requests; Depot requests have 15-second timeouts.
+Before remote I/O, a pending row persists its UUID key/name and location identity. The
+key is persisted before the PUT, so a crash is recovered by deleting that exact key.
+S3 PUT/DELETE have abortable 30-second requests.
 Only ready rows are listed or served. Failed/abandoned uploads are reclaimed after a 15-minute
 safety window. The UTC worker runs every minute, uses SKIP LOCKED, renewable fenced leases and
 bounded batches. Failed cleanup retries indefinitely with backoff capped at one hour.
@@ -140,51 +130,43 @@ HTTP 200 means both checks succeeded; a failed or timed-out check returns HTTP 5
 The Terminus `status`, `info`, `error`, and `details` structure remains stable, with
 sanitized failure messages. The exception filter adds `code: "SERVICE_UNAVAILABLE"`
 on HTTP 503. This check does not validate schema or business operations, nor probe
-storage, SMTP, Redis or OIDC. Their operational acceptance checks remain separate.
+storage, SMTP or Redis. Their operational acceptance checks remain separate.
 Use `/api/v1/health` for dependency connectivity monitoring; `/api/v1` only identifies
 the API. Choose readiness and restart policies according to these limited guarantees.
 
 ### Staging acceptance procedure
 
-Use an isolated staging deployment, disposable data and a test IdP client. Record the
+Use an isolated staging deployment, disposable data. Record the
 release, browser, frontend/backend origins, date, expected result and observed result
 for each step. Keep tokens, cookies, authorization codes and credential URLs out of
 screenshots, exported network traces and logs.
 
 1. Confirm `VITE_API_URL` is empty for the same-origin proxy, or an HTTP(S) backend
-   origin. Register the exact `SSO_REDIRECT_URI` ending in
-   `/api/v1/auth/sso/callback` and backchannel URL ending in
-   `/api/v1/auth/sso/backchannel-logout` in the test IdP. Verify frontend success/logout
-   targets and the explicit CORS allowlist for any separate frontend origin.
+   origin. Verify the explicit CORS allowlist for any separate frontend origin.
 2. Through the deployed proxy, request `/api/v1`, `/api/v1/health`, a protected REST
-   route and an SSO navigation. Verify API responses are not the SPA fallback and the
+   route. Verify API responses are not the SPA fallback and the
    proxy preserves the path, HTTPS scheme and intended client IP under `TRUST_PROXY`.
    Verify legacy and unsupported version paths do not reach migrated handlers.
    Swagger is disabled in production mode; test `/api/docs`, its assets and documents
    only in the existing non-production mode, without enabling it for production.
-3. Complete interactive SSO against the actual test IdP. Verify the callback path,
-   successful session identity, PKCE cookie cleanup and frontend redirect. Test an
-   expired attempt, invalid state and silent login without an IdP session; each must
-   fail safely without an authentication loop. Test logout and a real signed
-   backchannel logout event, then verify session revocation.
-4. In browser developer tools, check HTTPS `Secure`, token `HttpOnly`, cookie paths,
+3. In browser developer tools, check HTTPS `Secure`, token `HttpOnly`, cookie paths,
    CORS credential headers and preflight results. Exercise `/auth/me` (under the REST
    base), refresh, logout and a CSRF-protected mutation. Cross-origin and cross-site
    are different: the existing host-only cookies, readable CSRF/auth flags and
    `SameSite` policy do not automatically support arbitrary separate hosts/sites.
    Verify the actual intended topology; use the existing same-origin proxy if these
    tests fail. Do not loosen cookie/CORS policy solely to make a check pass.
-5. Inject failures only into disposable dependencies owned by this staging test.
+4. Inject failures only into disposable dependencies owned by this staging test.
    Verify a PostgreSQL failure yields sanitized HTTP 503, root identity still yields
    HTTP 200, then restore connectivity and verify health, login, refresh and a real
-   business read recover. Exercise unavailable IdP and a proxy/backend interruption
+   business read recover. Exercise a proxy/backend interruption
    separately; verify safe error handling and recovery. Do not stop shared or
    production services. Record timings, pool/connection counts and error rates.
 
-Repository unit tests use mocks for HTTP/SSO behavior. The dedicated PostgreSQL
+Repository unit tests use mocks for HTTP behavior. The dedicated PostgreSQL
 integration spec tests real server cancellation (SQLSTATE `57014`), full probe pool,
 concurrent probes, terminated connections, cleanup, recovery and isolation from business query timeouts.
-Neither proves the actual IdP, deployed proxy or browser cookie topology; those steps
+Neither proves the deployed proxy or browser cookie topology; those steps
 remain pending until this staging procedure has recorded results.
 
 ## Integration diagnostics
@@ -198,7 +180,6 @@ remain pending until this staging procedure has recorded results.
 | Missing admin | New DB, controlled seed, ADMIN_EMAIL/PASSWORD |
 | Email not delivered | SMTP setup, outbound_emails status/lastError and MAIL_FROM |
 | Storage fails | Recorded provider, key scope, bucket/endpoint, network, signed URL |
-| SSO unavailable | Discovery/client/callback configuration and provider connectivity |
 
 SMTP dispatches every 30 seconds using SKIP LOCKED leases and bounded retries (five attempts).
 OTP helper messages expire and redact after delivery/failure. Queued is not delivered.
@@ -214,16 +195,12 @@ Configure the following before deployment, keeping the deployment origin unchang
 | Consumer | Previous path | New path | Action |
 |---|---|---|---|
 | Hosting/load balancer probe | `/api/health` | `/api/v1/health` | Change the HTTP probe path; retain the existing port and response criteria. |
-| OIDC callback | `/api/auth/sso/callback` | `/api/v1/auth/sso/callback` | Set runtime `SSO_REDIRECT_URI` and register exactly the same complete URL in the IdP client's allowed redirect URIs. |
-| OIDC backchannel logout | `/api/auth/sso/backchannel-logout` | `/api/v1/auth/sso/backchannel-logout` | Update the IdP client's backchannel logout URL to the complete new URL. |
 | Machine token consumer | `/api/oauth/token` | `/api/v1/oauth/token` | Update the token endpoint configuration and all REST resource URLs. |
 | External REST clients | `/api/<resource>` | `/api/v1/<resource>` | Update the configured API base or operation paths exactly once. |
 
-The local callback example is `http://localhost:3001/api/v1/auth/sso/callback`.
-Keep `SSO_POST_LOGOUT_URI` and `SSO_SUCCESS_REDIRECT` as their existing frontend
-URLs. The Caddy and Vite `/api` matchers already cover `/api/v1`; do not strip or
+The Caddy and Vite `/api` matchers already cover `/api/v1`; do not strip or
 rewrite the version. `VITE_API_URL` and `APP_URL` are origins, without `/api/v1`.
-Private environment files and external IdP/hosting settings are not edited by this change.
+Private environment files and external hosting settings are not edited by this change.
 
 ### Stored media URL migration and rollback
 
@@ -251,7 +228,7 @@ latest applied migration with `bun run migration:show`, then run
 Rollback restores only recorded rows still containing the migration's new URL,
 then removes its backup table. Changed or missing rows abort the entire rollback
 and preserve the backup for manual review; do not overwrite those rows blindly.
-Restore IdP callback/backchannel and hosting probe paths with the previous release.
+Restore hosting probe paths with the previous release.
 Version 1 uploads created after migration are not in the backup; review them before
 rolling back to a release that cannot serve version 1 URLs.
 
@@ -275,14 +252,14 @@ complete `/api/v1` prefix and `servers` contains no extra prefix. Thus Swagger
 
 Nest common/core/testing and the Socket.IO platform packages are pinned to 12.1.2;
 Fastify is pinned to 5.12.5. Further Nest minor upgrades require compatibility analysis.
-REST/OpenAPI, cookie/SSO routes, optional `/graphql` and `/socket.io` paths are unchanged.
+REST/OpenAPI, cookie routes, optional `/graphql` and `/socket.io` paths are unchanged.
 The frontend and database schema need no changes.
 
 ### Compatibility audit
 
 | Surface | Migration and evidence |
 |---|---|
-| Cookies / Passport / SSO | Fastify request/reply, cookie hook, seconds conversion at the serialization boundary; isolated HTTP tests cover legacy unsigned cookies, JWT signatures, cookie flags/lifetimes, PKCE, redirects and logout. No signed-cookie secret existed; none is introduced. |
+| Cookies / Passport | Fastify request/reply, cookie hook, seconds conversion at the serialization boundary; isolated HTTP tests cover legacy unsigned cookies, JWT signatures, cookie flags/lifetimes, redirects and logout. No signed-cookie secret existed; none is introduced. |
 | CSRF | Global SessionCsrfGuard runs before throttling and Passport on refresh/logout/switch-role, including Bearer requests. Conditional CookieCsrfGuard semantics remain unchanged. |
 | Multipart | Native Nest Fastify interceptors; media/avatar memory storage explicitly retains fileSize from MEDIA_MAX_FILE_SIZE, files=1, fields=20, parts=21. Form-only routes retain their previous module/default limits. Admission precedes buffering. HTTP tests check exact limit boundaries, statuses and error payloads; unexpected-field wording is normalized to the previous Multer wording. |
 | Parsers / errors | 100 KiB JSON/urlencoded limit, empty JSON bodies and indexed form arrays are preserved. Known HTTP status/error codes and masking of unknown errors remain. |

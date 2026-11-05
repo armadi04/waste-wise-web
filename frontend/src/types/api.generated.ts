@@ -4,6 +4,23 @@
  */
 
 export interface paths {
+    "/api/v1/app/force-refresh": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Tell every connected client to drop its cache and reload */
+        post: operations["AppRefreshController_forceRefresh_v1"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1": {
         parameters: {
             query?: never;
@@ -21,15 +38,15 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/users": {
+    "/api/v1/audit-logs": {
         parameters: {
             query?: never;
             header?: never;
             path?: never;
             cookie?: never;
         };
-        /** Get all users */
-        get: operations["UsersController_findAll_v1"];
+        /** Read the audit trail */
+        get: operations["AuditController_findAll_v1"];
         put?: never;
         post?: never;
         delete?: never;
@@ -38,433 +55,17 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/users/{id}": {
+    "/api/v1/audit-logs/actions": {
         parameters: {
             query?: never;
             header?: never;
             path?: never;
             cookie?: never;
         };
-        /** Get a user by ID */
-        get: operations["UsersController_findOne_v1"];
+        /** The distinct actions recorded so far */
+        get: operations["AuditController_findActions_v1"];
         put?: never;
         post?: never;
-        /** Delete a user */
-        delete: operations["UsersController_remove_v1"];
-        options?: never;
-        head?: never;
-        /** Update a user */
-        patch: operations["UsersController_update_v1"];
-        trace?: never;
-    };
-    "/api/v1/users/bulk-delete": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /** Delete multiple users */
-        post: operations["UsersController_bulkRemove_v1"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/v1/users/{id}/roles/sync": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /** Sync user roles */
-        post: operations["UsersController_syncRoles_v1"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/v1/users/{id}/roles/attach": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /** Attach roles to user */
-        post: operations["UsersController_attachRoles_v1"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/v1/users/{id}/roles/detach": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /** Detach roles from user */
-        post: operations["UsersController_detachRoles_v1"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/v1/users/{id}/permissions/sync": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /** Sync user permissions */
-        post: operations["UsersController_syncPermissions_v1"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/v1/users/{id}/permissions/attach": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /** Attach permissions to user */
-        post: operations["UsersController_attachPermissions_v1"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/v1/users/{id}/permissions/detach": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /** Detach permissions from user */
-        post: operations["UsersController_detachPermissions_v1"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/v1/media/upload": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /** Upload a new media file */
-        post: operations["MediaController_uploadFile_v1"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/v1/media": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** Get all media */
-        get: operations["MediaController_findAll_v1"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/v1/media/{id}": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** Get a media by ID */
-        get: operations["MediaController_findOne_v1"];
-        put?: never;
-        post?: never;
-        /** Delete a media */
-        delete: operations["MediaController_remove_v1"];
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/v1/media/{id}/view": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** View a public (non-private) media file */
-        get: operations["MediaController_viewFile_v1"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/v1/media/{id}/stream": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** Stream a media file */
-        get: operations["MediaController_streamFile_v1"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/v1/media/bulk-delete": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /** Delete multiple media */
-        post: operations["MediaController_bulkRemove_v1"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/v1/roles": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** Get all roles */
-        get: operations["RolesController_findAll_v1"];
-        put?: never;
-        /** Create a new role */
-        post: operations["RolesController_create_v1"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/v1/roles/{id}": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** Get a role by ID */
-        get: operations["RolesController_findOne_v1"];
-        put?: never;
-        post?: never;
-        /** Delete a role */
-        delete: operations["RolesController_remove_v1"];
-        options?: never;
-        head?: never;
-        /** Update a role */
-        patch: operations["RolesController_update_v1"];
-        trace?: never;
-    };
-    "/api/v1/roles/bulk-delete": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /** Delete multiple roles */
-        post: operations["RolesController_bulkRemove_v1"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/v1/roles/{id}/permissions/sync": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /** Sync role permissions */
-        post: operations["RolesController_syncPermissions_v1"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/v1/roles/{id}/permissions/attach": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /** Attach permissions to role */
-        post: operations["RolesController_attachPermissions_v1"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/v1/roles/{id}/permissions/detach": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /** Detach permissions from role */
-        post: operations["RolesController_detachPermissions_v1"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/v1/invitations": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** List invitations */
-        get: operations["InvitationsController_findAll_v1"];
-        put?: never;
-        /** Generate and send an invite link */
-        post: operations["InvitationsController_create_v1"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/v1/invitations/{id}/resend": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /** Resend an invitation email */
-        post: operations["InvitationsController_resend_v1"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/v1/invitations/bulk-delete": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /** Revoke multiple invitations */
-        post: operations["InvitationsController_bulkRemove_v1"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/v1/invitations/{id}": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        post?: never;
-        /** Revoke an invitation */
-        delete: operations["InvitationsController_remove_v1"];
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/v1/invitations/accept": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** Resolve an invitation by token (prefill) */
-        get: operations["InvitationsController_getByToken_v1"];
-        put?: never;
-        /** Accept an invitation and create the account */
-        post: operations["InvitationsController_accept_v1"];
         delete?: never;
         options?: never;
         head?: never;
@@ -499,6 +100,74 @@ export interface paths {
         put?: never;
         /** Login with Google */
         post: operations["AuthController_googleLogin_v1"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/auth/mobile/google": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Login with Google for a native mobile client */
+        post: operations["AuthController_mobileGoogleLogin_v1"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/auth/mobile/2fa/verify": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Finish a mobile login with two-factor verification */
+        post: operations["AuthController_mobileVerifyTwoFactor_v1"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/auth/mobile/refresh": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Rotate a mobile refresh token */
+        post: operations["AuthController_mobileRefresh_v1"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/auth/mobile/logout": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Revoke a mobile refresh token and device session */
+        post: operations["AuthController_mobileLogout_v1"];
         delete?: never;
         options?: never;
         head?: never;
@@ -794,6 +463,301 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/changelog": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Published release notes, newest first */
+        get: operations["ChangelogController_findAll_v1"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/health": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Service health and PostgreSQL connectivity
+         * @description Checks PostgreSQL connectivity with a dedicated pool (1 second acquisition timeout, 1 second server statement timeout, 1.5 second transport fallback) and a 300 MiB heap limit. This does not validate schema or business operations. Returns HTTP 200 when both checks succeed, otherwise HTTP 503 with sanitized dependency status.
+         */
+        get: operations["HealthController_check_v1"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/invitations": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List invitations */
+        get: operations["InvitationsController_findAll_v1"];
+        put?: never;
+        /** Generate and send an invite link */
+        post: operations["InvitationsController_create_v1"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/invitations/{id}/resend": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Resend an invitation email */
+        post: operations["InvitationsController_resend_v1"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/invitations/bulk-delete": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Revoke multiple invitations */
+        post: operations["InvitationsController_bulkRemove_v1"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/invitations/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /** Revoke an invitation */
+        delete: operations["InvitationsController_remove_v1"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/invitations/accept": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Resolve an invitation by token (prefill) */
+        get: operations["InvitationsController_getByToken_v1"];
+        put?: never;
+        /** Accept an invitation and create the account */
+        post: operations["InvitationsController_accept_v1"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/media/upload": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Upload a new media file */
+        post: operations["MediaController_uploadFile_v1"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/media": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get all media */
+        get: operations["MediaController_findAll_v1"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/media/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get a media by ID */
+        get: operations["MediaController_findOne_v1"];
+        put?: never;
+        post?: never;
+        /** Delete a media */
+        delete: operations["MediaController_remove_v1"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/media/{id}/view": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** View a public (non-private) media file */
+        get: operations["MediaController_viewFile_v1"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/media/{id}/stream": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Stream a media file */
+        get: operations["MediaController_streamFile_v1"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/media/bulk-delete": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Delete multiple media */
+        post: operations["MediaController_bulkRemove_v1"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/notifications": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get current user notifications */
+        get: operations["NotificationsController_findAll_v1"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/notifications/unread-count": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get unread notifications count */
+        get: operations["NotificationsController_getUnreadCount_v1"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/notifications/{id}/read": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /** Mark a notification as read */
+        patch: operations["NotificationsController_markAsRead_v1"];
+        trace?: never;
+    };
+    "/api/v1/notifications/read-all": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Mark all notifications as read */
+        post: operations["NotificationsController_markAllAsRead_v1"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/oauth/token": {
         parameters: {
             query?: never;
@@ -859,6 +823,236 @@ export interface paths {
         put?: never;
         /** Revoke (soft-delete) multiple OAuth clients */
         post: operations["OAuthController_bulkRemove_v1"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/permissions": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get all permissions */
+        get: operations["PermissionsController_findAll_v1"];
+        put?: never;
+        /** Create a new permission */
+        post: operations["PermissionsController_create_v1"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/permissions/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get a permission by ID */
+        get: operations["PermissionsController_findOne_v1"];
+        put?: never;
+        post?: never;
+        /** Delete a permission */
+        delete: operations["PermissionsController_remove_v1"];
+        options?: never;
+        head?: never;
+        /** Update a permission */
+        patch: operations["PermissionsController_update_v1"];
+        trace?: never;
+    };
+    "/api/v1/permissions/bulk-delete": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Delete multiple permissions */
+        post: operations["PermissionsController_bulkRemove_v1"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/stats/reports": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Report statistics scoped to the current user */
+        get: operations["ReportsStatsController_reports_v1"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/reports": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List reports visible to the current user */
+        get: operations["ReportsController_findAll_v1"];
+        put?: never;
+        /** Create a report */
+        post: operations["ReportsController_create_v1"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/reports/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get a report by ID */
+        get: operations["ReportsController_findOne_v1"];
+        put?: never;
+        post?: never;
+        /** Soft-delete a report */
+        delete: operations["ReportsController_remove_v1"];
+        options?: never;
+        head?: never;
+        /** Update a report */
+        patch: operations["ReportsController_update_v1"];
+        trace?: never;
+    };
+    "/api/v1/reports/{id}/status": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /** Update report handling status */
+        patch: operations["ReportsController_updateStatus_v1"];
+        trace?: never;
+    };
+    "/api/v1/roles": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get all roles */
+        get: operations["RolesController_findAll_v1"];
+        put?: never;
+        /** Create a new role */
+        post: operations["RolesController_create_v1"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/roles/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get a role by ID */
+        get: operations["RolesController_findOne_v1"];
+        put?: never;
+        post?: never;
+        /** Delete a role */
+        delete: operations["RolesController_remove_v1"];
+        options?: never;
+        head?: never;
+        /** Update a role */
+        patch: operations["RolesController_update_v1"];
+        trace?: never;
+    };
+    "/api/v1/roles/bulk-delete": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Delete multiple roles */
+        post: operations["RolesController_bulkRemove_v1"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/roles/{id}/permissions/sync": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Sync role permissions */
+        post: operations["RolesController_syncPermissions_v1"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/roles/{id}/permissions/attach": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Attach permissions to role */
+        post: operations["RolesController_attachPermissions_v1"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/roles/{id}/permissions/detach": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Detach permissions from role */
+        post: operations["RolesController_detachPermissions_v1"];
         delete?: never;
         options?: never;
         head?: never;
@@ -950,199 +1144,6 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/permissions": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** Get all permissions */
-        get: operations["PermissionsController_findAll_v1"];
-        put?: never;
-        /** Create a new permission */
-        post: operations["PermissionsController_create_v1"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/v1/permissions/{id}": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** Get a permission by ID */
-        get: operations["PermissionsController_findOne_v1"];
-        put?: never;
-        post?: never;
-        /** Delete a permission */
-        delete: operations["PermissionsController_remove_v1"];
-        options?: never;
-        head?: never;
-        /** Update a permission */
-        patch: operations["PermissionsController_update_v1"];
-        trace?: never;
-    };
-    "/api/v1/permissions/bulk-delete": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /** Delete multiple permissions */
-        post: operations["PermissionsController_bulkRemove_v1"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/v1/notifications": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** Get current user notifications */
-        get: operations["NotificationsController_findAll_v1"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/v1/notifications/unread-count": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** Get unread notifications count */
-        get: operations["NotificationsController_getUnreadCount_v1"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/v1/notifications/{id}/read": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        /** Mark a notification as read */
-        patch: operations["NotificationsController_markAsRead_v1"];
-        trace?: never;
-    };
-    "/api/v1/notifications/read-all": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /** Mark all notifications as read */
-        post: operations["NotificationsController_markAllAsRead_v1"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/v1/app/force-refresh": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /** Tell every connected client to drop its cache and reload */
-        post: operations["AppRefreshController_forceRefresh_v1"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/v1/health": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /**
-         * Service health and PostgreSQL connectivity
-         * @description Checks PostgreSQL connectivity with a dedicated pool (1 second acquisition timeout, 1 second server statement timeout, 1.5 second transport fallback) and a 300 MiB heap limit. This does not validate schema or business operations. Returns HTTP 200 when both checks succeed, otherwise HTTP 503 with sanitized dependency status.
-         */
-        get: operations["HealthController_check_v1"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/v1/audit-logs": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** Read the audit trail */
-        get: operations["AuditController_findAll_v1"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/v1/audit-logs/actions": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** The distinct actions recorded so far */
-        get: operations["AuditController_findActions_v1"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
     "/api/v1/stats/overview": {
         parameters: {
             query?: never;
@@ -1169,23 +1170,6 @@ export interface paths {
         };
         /** Accounts created per day */
         get: operations["StatsController_signups_v1"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/v1/changelog": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** Published release notes, newest first */
-        get: operations["ChangelogController_findAll_v1"];
         put?: never;
         post?: never;
         delete?: never;
@@ -1242,12 +1226,184 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/users": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get all users */
+        get: operations["UsersController_findAll_v1"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/users/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get a user by ID */
+        get: operations["UsersController_findOne_v1"];
+        put?: never;
+        post?: never;
+        /** Delete a user */
+        delete: operations["UsersController_remove_v1"];
+        options?: never;
+        head?: never;
+        /** Update a user */
+        patch: operations["UsersController_update_v1"];
+        trace?: never;
+    };
+    "/api/v1/users/bulk-delete": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Delete multiple users */
+        post: operations["UsersController_bulkRemove_v1"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/users/{id}/status": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /** Activate or deactivate a user account */
+        patch: operations["UsersController_updateStatus_v1"];
+        trace?: never;
+    };
+    "/api/v1/users/{id}/roles/sync": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Sync user roles */
+        post: operations["UsersController_syncRoles_v1"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/users/{id}/roles/attach": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Attach roles to user */
+        post: operations["UsersController_attachRoles_v1"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/users/{id}/roles/detach": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Detach roles from user */
+        post: operations["UsersController_detachRoles_v1"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/users/{id}/permissions/sync": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Sync user permissions */
+        post: operations["UsersController_syncPermissions_v1"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/users/{id}/permissions/attach": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Attach permissions to user */
+        post: operations["UsersController_attachPermissions_v1"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/users/{id}/permissions/detach": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Detach permissions from user */
+        post: operations["UsersController_detachPermissions_v1"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
     schemas: {
         ApiInfo: {
-            /** @example Nestplate API */
+            /** @example WasteWise API */
             name: string;
             /** @example 1 */
             apiVersion: string;
@@ -1259,17 +1415,104 @@ export interface components {
             page: number;
             lastPage: number;
         };
+        AuditLog: {
+            id: number;
+            action: string;
+            actorId: number | null;
+            actorEmail: string | null;
+            subjectType: string | null;
+            subjectId: string | null;
+            summary: string | null;
+            metadata: Record<string, never> | null;
+            ipAddress: string | null;
+            /** Format: date-time */
+            createdAt: string;
+        };
+        PaginatedAuditResponse: {
+            meta: components["schemas"]["PaginationMetaDto"];
+            data: components["schemas"]["AuditLog"][];
+        };
+        MobileAuthSessionDto: {
+            accessToken: string;
+            refreshToken: string;
+            /** Format: date-time */
+            sessionExpiresAt: string;
+        };
+        MobileTwoFactorChallengeDto: {
+            /** @example true */
+            twoFactorRequired: boolean;
+            challengeToken: string;
+        };
+        LoginDto: {
+            /** @example admin@example.com */
+            email: string;
+            /** @example password123 */
+            password: string;
+            /** @description Cloudflare Turnstile verification token */
+            turnstileToken?: string;
+        };
+        GoogleLoginDto: {
+            /** @description Google ID Token */
+            token: string;
+        };
+        TwoFactorVerifyDto: {
+            /** @description The challenge token returned by /auth/login */
+            challengeToken: string;
+            /** @description A 6-digit code from the authenticator app, or a recovery code */
+            code: string;
+        };
+        MobileRefreshTokenDto: {
+            /** @description WasteWise refresh token issued to a mobile client */
+            refreshToken: string;
+        };
+        TwoFactorStatusDto: {
+            enabled: boolean;
+            /** @description Unused recovery codes left */
+            recoveryCodesRemaining: number;
+        };
+        TwoFactorEnrollmentDto: {
+            /** @description Base32 TOTP secret for manual entry */
+            secret: string;
+            /** @description otpauth:// URI for authenticator apps */
+            otpauthUrl: string;
+            /** @description PNG data URL of the otpauth QR code */
+            qrDataUrl: string;
+        };
+        TwoFactorCodeDto: {
+            /** @description A 6-digit code from the authenticator app, or a recovery code */
+            code: string;
+        };
+        RecoveryCodesDto: {
+            /** @description One-time recovery codes; shown only once */
+            recoveryCodes: string[];
+        };
+        MessageResponseDto: {
+            message: string;
+        };
+        ForgotPasswordDto: {
+            /** @example user@example.com */
+            email: string;
+        };
+        ResetPasswordDto: {
+            /** @example a1b2c3d4-... */
+            token: string;
+            /** @example newpassword123 */
+            password: string;
+        };
+        ResendVerificationDto: {
+            /** @example user@example.com */
+            email: string;
+        };
         Media: {
             id: number;
             /** @enum {string} */
-            provider: "depot" | "s3";
+            provider: "s3";
             storageProfile: string;
             filename: string;
             originalName: string | null;
             mimetype: string;
             size: number | null;
             path: string | null;
-            depotFileId: number | null;
             url: string | null;
             driveId: string | null;
             webviewLink: string | null;
@@ -1307,6 +1550,7 @@ export interface components {
             fullname: string | null;
             phone: string | null;
             notificationsEnabled: boolean;
+            isActive: boolean;
             avatar: components["schemas"]["Media"] | null;
             media: components["schemas"]["Media"][];
             roles: components["schemas"]["Role"][];
@@ -1316,50 +1560,34 @@ export interface components {
             /** Format: date-time */
             twoFactorEnabledAt: string | null;
             /** @enum {string} */
-            registerMethod: "EMAIL_OTP" | "GOOGLE" | "INVITATION" | "SSO" | "SEEDER" | "UNKNOWN";
+            registerMethod: "EMAIL_OTP" | "GOOGLE" | "INVITATION" | "SEEDER" | "UNKNOWN";
+            /**
+             * @description Derived account state; populated by the API presenter.
+             * @enum {string}
+             */
+            accountStatus?: "INACTIVE" | "ACTIVE" | "UNVERIFIED" | "LOCKED";
             /** Format: date-time */
             createdAt: string;
             /** Format: date-time */
             updatedAt: string;
         };
-        PaginatedUserResponse: {
-            meta: components["schemas"]["PaginationMetaDto"];
-            data: components["schemas"]["User"][];
+        SwitchRoleDto: {
+            /**
+             * @description Name of the role to act as
+             * @example admin
+             */
+            role: string;
         };
-        UpdateUserDto: Record<string, never>;
-        BulkDeleteDto: {
-            /** @description IDs of the rows to delete */
-            ids: number[];
+        ReleaseNotesDto: {
+            /** @example 1.4.0 */
+            version: string;
+            /** @description Release body in Markdown */
+            notes: string;
+            /** Format: date-time */
+            publishedAt: string | null;
+            /** @description Release page URL */
+            url: string;
         };
-        ManageRolesDto: Record<string, never>;
-        ManageUserPermissionsDto: Record<string, never>;
-        PaginatedMediaResponse: {
-            meta: components["schemas"]["PaginationMetaDto"];
-            data: components["schemas"]["Media"][];
-        };
-        MediaBulkDeleteDto: {
-            ids: number[];
-        };
-        MediaDeletionResultDto: {
-            id: number;
-            /** @enum {string} */
-            status: "deleted" | "queued" | "already-deleted" | "failed";
-            /** @enum {string} */
-            code?: "NOT_FOUND" | "DELETE_FAILED";
-        };
-        MediaBulkDeleteResultDto: {
-            deleted: number;
-            queued: number;
-            failed: number;
-            results: components["schemas"]["MediaDeletionResultDto"][];
-        };
-        CreateRoleDto: Record<string, never>;
-        PaginatedRoleResponse: {
-            meta: components["schemas"]["PaginationMetaDto"];
-            data: components["schemas"]["Role"][];
-        };
-        UpdateRoleDto: Record<string, never>;
-        ManagePermissionsDto: Record<string, never>;
         CreateInvitationDto: {
             /** @example user@example.com */
             email: string;
@@ -1383,6 +1611,10 @@ export interface components {
             /** Format: date-time */
             createdAt: string;
         };
+        BulkDeleteDto: {
+            /** @description IDs of the rows to delete */
+            ids: number[];
+        };
         AcceptInvitationDto: {
             token: string;
             /** @example John Doe */
@@ -1392,48 +1624,44 @@ export interface components {
             /** @example password123 */
             password: string;
         };
-        LoginDto: {
-            /** @example admin@example.com */
-            email: string;
-            /** @example password123 */
-            password: string;
-            /** @description Cloudflare Turnstile verification token */
-            turnstileToken?: string;
+        PaginatedMediaResponse: {
+            meta: components["schemas"]["PaginationMetaDto"];
+            data: components["schemas"]["Media"][];
         };
-        GoogleLoginDto: {
-            /** @description Google ID Token */
-            token: string;
+        MediaBulkDeleteDto: {
+            ids: number[];
         };
-        TwoFactorVerifyDto: {
-            /** @description The challenge token returned by /auth/login */
-            challengeToken: string;
-            /** @description A 6-digit code from the authenticator app, or a recovery code */
-            code: string;
+        MediaDeletionResultDto: {
+            id: number;
+            /** @enum {string} */
+            status: "deleted" | "queued" | "already-deleted" | "failed";
+            /** @enum {string} */
+            code?: "NOT_FOUND" | "DELETE_FAILED";
         };
-        TwoFactorCodeDto: {
-            /** @description A 6-digit code from the authenticator app, or a recovery code */
-            code: string;
+        MediaBulkDeleteResultDto: {
+            deleted: number;
+            queued: number;
+            failed: number;
+            results: components["schemas"]["MediaDeletionResultDto"][];
         };
-        ForgotPasswordDto: {
-            /** @example user@example.com */
-            email: string;
+        Notification: {
+            id: number;
+            userId: number | null;
+            user: components["schemas"]["User"] | null;
+            targetRole: string | null;
+            actorId: number | null;
+            title: string;
+            message: string;
+            /** @enum {string} */
+            type: "info" | "success" | "warning" | "error";
+            isRead: boolean;
+            link: string | null;
+            /** Format: date-time */
+            createdAt: string;
         };
-        ResetPasswordDto: {
-            /** @example a1b2c3d4-... */
-            token: string;
-            /** @example newpassword123 */
-            password: string;
-        };
-        ResendVerificationDto: {
-            /** @example user@example.com */
-            email: string;
-        };
-        SwitchRoleDto: {
-            /**
-             * @description Name of the role to act as
-             * @example admin
-             */
-            role: string;
+        PaginatedNotificationResponse: {
+            meta: components["schemas"]["PaginationMetaDto"];
+            data: components["schemas"]["Notification"][];
         };
         TokenRequestDto: {
             /** @enum {string} */
@@ -1453,6 +1681,72 @@ export interface components {
             /** @description Enable or disable the client. */
             isActive?: boolean;
         };
+        CreatePermissionDto: Record<string, never>;
+        PaginatedPermissionResponse: {
+            meta: components["schemas"]["PaginationMetaDto"];
+            data: components["schemas"]["Permission"][];
+        };
+        UpdatePermissionDto: Record<string, never>;
+        ReportCategoryCountsDto: {
+            organic: number;
+            plastic: number;
+            paper: number;
+            unclassified: number;
+        };
+        Report: {
+            id: number;
+            reporterId: number;
+            reporter: components["schemas"]["User"];
+            media: components["schemas"]["Media"];
+            mediaId: number;
+            description: string;
+            latitude: number | null;
+            longitude: number | null;
+            /** @enum {string|null} */
+            predictedCategory: "ORGANIC_WASTE" | "PLASTIC_WASTE" | "PAPER_WASTE" | null;
+            confidence: number | null;
+            modelVersion: string | null;
+            /** @enum {string} */
+            classificationStatus: "COMPLETED" | "FAILED";
+            classificationError: string | null;
+            /** @enum {string} */
+            status: "PENDING" | "IN_PROGRESS" | "COMPLETED" | "REJECTED";
+            /** Format: date-time */
+            createdAt: string;
+            /** Format: date-time */
+            updatedAt: string;
+        };
+        ReportStatsDto: {
+            total: number;
+            pending: number;
+            inProgress: number;
+            completed: number;
+            rejected: number;
+            byCategory: components["schemas"]["ReportCategoryCountsDto"];
+            recentReports: components["schemas"]["Report"][];
+        };
+        PaginatedReportResponse: {
+            meta: components["schemas"]["PaginationMetaDto"];
+            data: components["schemas"]["Report"][];
+        };
+        CreateReportDto: {
+            description: string;
+            mediaId: number;
+            latitude?: number;
+            longitude?: number;
+        };
+        UpdateReportDto: Record<string, never>;
+        UpdateReportStatusDto: {
+            /** @enum {string} */
+            status: "PENDING" | "IN_PROGRESS" | "COMPLETED" | "REJECTED";
+        };
+        CreateRoleDto: Record<string, never>;
+        PaginatedRoleResponse: {
+            meta: components["schemas"]["PaginationMetaDto"];
+            data: components["schemas"]["Role"][];
+        };
+        UpdateRoleDto: Record<string, never>;
+        ManagePermissionsDto: Record<string, never>;
         OwnSessionResponse: {
             id: number;
             sessionId: string;
@@ -1460,7 +1754,6 @@ export interface components {
             ipAddress: string | null;
             userAgent: string | null;
             impersonatedById: number | null;
-            isSso: boolean;
             /** @enum {string} */
             audience: "admin";
             /** Format: date-time */
@@ -1485,7 +1778,6 @@ export interface components {
             ipAddress: string | null;
             userAgent: string | null;
             impersonatedById: number | null;
-            isSso: boolean;
             /** @enum {string} */
             audience: "admin";
             /** Format: date-time */
@@ -1504,44 +1796,6 @@ export interface components {
         PaginatedSessionResponse: {
             meta: components["schemas"]["PaginationMetaDto"];
             data: components["schemas"]["UserSession"][];
-        };
-        CreatePermissionDto: Record<string, never>;
-        PaginatedPermissionResponse: {
-            meta: components["schemas"]["PaginationMetaDto"];
-            data: components["schemas"]["Permission"][];
-        };
-        UpdatePermissionDto: Record<string, never>;
-        Notification: {
-            id: number;
-            userId: number | null;
-            user: components["schemas"]["User"] | null;
-            targetRole: string | null;
-            actorId: number | null;
-            title: string;
-            message: string;
-            /** @enum {string} */
-            type: "info" | "success" | "warning" | "error";
-            isRead: boolean;
-            link: string | null;
-            /** Format: date-time */
-            createdAt: string;
-        };
-        AuditLog: {
-            id: number;
-            action: string;
-            actorId: number | null;
-            actorEmail: string | null;
-            subjectType: string | null;
-            subjectId: string | null;
-            summary: string | null;
-            metadata: Record<string, never> | null;
-            ipAddress: string | null;
-            /** Format: date-time */
-            createdAt: string;
-        };
-        PaginatedAuditResponse: {
-            meta: components["schemas"]["PaginationMetaDto"];
-            data: components["schemas"]["AuditLog"][];
         };
         TimeZoneConfigResponseDto: {
             defaultTimeZone: string;
@@ -1564,6 +1818,16 @@ export interface components {
             localDateTime: string;
             timeZone: string;
         };
+        PaginatedUserResponse: {
+            meta: components["schemas"]["PaginationMetaDto"];
+            data: components["schemas"]["User"][];
+        };
+        UpdateUserDto: Record<string, never>;
+        UpdateUserStatusDto: {
+            isActive: boolean;
+        };
+        ManageRolesDto: Record<string, never>;
+        ManageUserPermissionsDto: Record<string, never>;
     };
     responses: never;
     parameters: never;
@@ -1573,6 +1837,28 @@ export interface components {
 }
 export type $defs = Record<string, never>;
 export interface operations {
+    AppRefreshController_forceRefresh_v1: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** Format: date-time */
+                        issuedAt?: string;
+                    };
+                };
+            };
+        };
+    };
     AppController_getApiInfo_v1: {
         parameters: {
             query?: never;
@@ -1593,7 +1879,7 @@ export interface operations {
             };
         };
     };
-    UsersController_findAll_v1: {
+    AuditController_findAll_v1: {
         parameters: {
             query?: {
                 page?: number;
@@ -1602,11 +1888,8 @@ export interface operations {
                 sort?: string;
                 direction?: "ASC" | "DESC";
                 paginated?: boolean;
-                timeZone?: "Asia/Jakarta" | "Asia/Makassar" | "Asia/Jayapura";
-                /** @description Creation window in the selected report timezone, default Asia/Jakarta; 1m and 3m use 30 and 90 days. */
-                createdIn?: "today" | "7d" | "1m" | "3m";
-                /** @description Method used to first create the account. */
-                registerMethod?: "EMAIL_OTP" | "GOOGLE" | "INVITATION" | "SSO" | "SEEDER" | "UNKNOWN";
+                /** @description Restrict to a single action */
+                action?: string;
             };
             header?: never;
             path?: never;
@@ -1619,287 +1902,18 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["PaginatedUserResponse"];
+                    "application/json": components["schemas"]["PaginatedAuditResponse"];
                 };
             };
         };
     };
-    UsersController_findOne_v1: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                id: string;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["User"];
-                };
-            };
-        };
-    };
-    UsersController_remove_v1: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                id: string;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-        };
-    };
-    UsersController_update_v1: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                id: string;
-            };
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "multipart/form-data": components["schemas"]["UpdateUserDto"];
-            };
-        };
-        responses: {
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["User"];
-                };
-            };
-        };
-    };
-    UsersController_bulkRemove_v1: {
+    AuditController_findActions_v1: {
         parameters: {
             query?: never;
             header?: never;
             path?: never;
             cookie?: never;
         };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["BulkDeleteDto"];
-            };
-        };
-        responses: {
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-        };
-    };
-    UsersController_syncRoles_v1: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                id: string;
-            };
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["ManageRolesDto"];
-            };
-        };
-        responses: {
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["User"];
-                };
-            };
-        };
-    };
-    UsersController_attachRoles_v1: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                id: string;
-            };
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["ManageRolesDto"];
-            };
-        };
-        responses: {
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["User"];
-                };
-            };
-        };
-    };
-    UsersController_detachRoles_v1: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                id: string;
-            };
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["ManageRolesDto"];
-            };
-        };
-        responses: {
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["User"];
-                };
-            };
-        };
-    };
-    UsersController_syncPermissions_v1: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                id: string;
-            };
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["ManageUserPermissionsDto"];
-            };
-        };
-        responses: {
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["User"];
-                };
-            };
-        };
-    };
-    UsersController_attachPermissions_v1: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                id: string;
-            };
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["ManageUserPermissionsDto"];
-            };
-        };
-        responses: {
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["User"];
-                };
-            };
-        };
-    };
-    UsersController_detachPermissions_v1: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                id: string;
-            };
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["ManageUserPermissionsDto"];
-            };
-        };
-        responses: {
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["User"];
-                };
-            };
-        };
-    };
-    MediaController_uploadFile_v1: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "multipart/form-data": {
-                    /** Format: binary */
-                    file?: string;
-                };
-            };
-        };
-        responses: {
-            201: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Media"];
-                };
-            };
-        };
-    };
-    MediaController_findAll_v1: {
-        parameters: {
-            query?: {
-                page?: number;
-                limit?: number;
-                search?: string;
-                sort?: string;
-                direction?: "ASC" | "DESC";
-                paginated?: boolean;
-            };
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
         requestBody?: never;
         responses: {
             200: {
@@ -1907,476 +1921,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["PaginatedMediaResponse"];
-                };
-            };
-        };
-    };
-    MediaController_findOne_v1: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                id: number;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Media"];
-                };
-            };
-        };
-    };
-    MediaController_remove_v1: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                id: number;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["MediaDeletionResultDto"];
-                };
-            };
-        };
-    };
-    MediaController_viewFile_v1: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                id: number;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-        };
-    };
-    MediaController_streamFile_v1: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                id: number;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-        };
-    };
-    MediaController_bulkRemove_v1: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["MediaBulkDeleteDto"];
-            };
-        };
-        responses: {
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["MediaBulkDeleteResultDto"];
-                };
-            };
-        };
-    };
-    RolesController_findAll_v1: {
-        parameters: {
-            query?: {
-                page?: number;
-                limit?: number;
-                search?: string;
-                sort?: string;
-                direction?: "ASC" | "DESC";
-                paginated?: boolean;
-            };
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["PaginatedRoleResponse"];
-                };
-            };
-        };
-    };
-    RolesController_create_v1: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["CreateRoleDto"];
-            };
-        };
-        responses: {
-            201: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Role"];
-                };
-            };
-        };
-    };
-    RolesController_findOne_v1: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                id: string;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Role"];
-                };
-            };
-        };
-    };
-    RolesController_remove_v1: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                id: string;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-        };
-    };
-    RolesController_update_v1: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                id: string;
-            };
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["UpdateRoleDto"];
-            };
-        };
-        responses: {
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Role"];
-                };
-            };
-        };
-    };
-    RolesController_bulkRemove_v1: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["BulkDeleteDto"];
-            };
-        };
-        responses: {
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-        };
-    };
-    RolesController_syncPermissions_v1: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                id: string;
-            };
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["ManagePermissionsDto"];
-            };
-        };
-        responses: {
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Role"];
-                };
-            };
-        };
-    };
-    RolesController_attachPermissions_v1: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                id: string;
-            };
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["ManagePermissionsDto"];
-            };
-        };
-        responses: {
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Role"];
-                };
-            };
-        };
-    };
-    RolesController_detachPermissions_v1: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                id: string;
-            };
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["ManagePermissionsDto"];
-            };
-        };
-        responses: {
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Role"];
-                };
-            };
-        };
-    };
-    InvitationsController_findAll_v1: {
-        parameters: {
-            query?: {
-                page?: number;
-                limit?: number;
-                search?: string;
-                sort?: string;
-                direction?: "ASC" | "DESC";
-                paginated?: boolean;
-            };
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Invitation"][];
-                };
-            };
-        };
-    };
-    InvitationsController_create_v1: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["CreateInvitationDto"];
-            };
-        };
-        responses: {
-            201: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-        };
-    };
-    InvitationsController_resend_v1: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                id: string;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Invitation"];
-                };
-            };
-        };
-    };
-    InvitationsController_bulkRemove_v1: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["BulkDeleteDto"];
-            };
-        };
-        responses: {
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-        };
-    };
-    InvitationsController_remove_v1: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                id: string;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-        };
-    };
-    InvitationsController_getByToken_v1: {
-        parameters: {
-            query: {
-                token: string;
-            };
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": {
-                        email?: string;
-                    };
-                };
-            };
-        };
-    };
-    InvitationsController_accept_v1: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["AcceptInvitationDto"];
-            };
-        };
-        responses: {
-            201: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": {
-                        message?: string;
-                    };
+                    "application/json": string[];
                 };
             };
         };
@@ -2449,6 +1994,108 @@ export interface operations {
             };
         };
     };
+    AuthController_mobileGoogleLogin_v1: {
+        parameters: {
+            query?: never;
+            header: {
+                "user-agent": string;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["GoogleLoginDto"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MobileAuthSessionDto"] | components["schemas"]["MobileTwoFactorChallengeDto"];
+                };
+            };
+        };
+    };
+    AuthController_mobileVerifyTwoFactor_v1: {
+        parameters: {
+            query?: never;
+            header: {
+                "user-agent": string;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["TwoFactorVerifyDto"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MobileAuthSessionDto"];
+                };
+            };
+        };
+    };
+    AuthController_mobileRefresh_v1: {
+        parameters: {
+            query?: never;
+            header: {
+                "user-agent": string;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["MobileRefreshTokenDto"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MobileAuthSessionDto"];
+                };
+            };
+        };
+    };
+    AuthController_mobileLogout_v1: {
+        parameters: {
+            query?: never;
+            header: {
+                authorization: string;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["MobileRefreshTokenDto"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        message?: string;
+                    };
+                };
+            };
+        };
+    };
     AuthController_verifyTwoFactor_v1: {
         parameters: {
             query?: never;
@@ -2490,10 +2137,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": {
-                        enabled?: boolean;
-                        recoveryCodesRemaining?: number;
-                    };
+                    "application/json": components["schemas"]["TwoFactorStatusDto"];
                 };
             };
         };
@@ -2512,11 +2156,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": {
-                        secret?: string;
-                        otpauthUrl?: string;
-                        qrDataUrl?: string;
-                    };
+                    "application/json": components["schemas"]["TwoFactorEnrollmentDto"];
                 };
             };
         };
@@ -2539,9 +2179,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": {
-                        recoveryCodes?: string[];
-                    };
+                    "application/json": components["schemas"]["RecoveryCodesDto"];
                 };
             };
         };
@@ -2564,9 +2202,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": {
-                        message?: string;
-                    };
+                    "application/json": components["schemas"]["MessageResponseDto"];
                 };
             };
         };
@@ -2589,9 +2225,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": {
-                        recoveryCodes?: string[];
-                    };
+                    "application/json": components["schemas"]["RecoveryCodesDto"];
                 };
             };
         };
@@ -2856,155 +2490,7 @@ export interface operations {
             };
         };
     };
-    OAuthController_token_v1: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["TokenRequestDto"];
-            };
-        };
-        responses: {
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-        };
-    };
-    OAuthController_findAll_v1: {
-        parameters: {
-            query?: {
-                page?: number;
-                limit?: number;
-                search?: string;
-                sort?: string;
-                direction?: "ASC" | "DESC";
-                paginated?: boolean;
-            };
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-        };
-    };
-    OAuthController_create_v1: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["CreateOAuthClientDto"];
-            };
-        };
-        responses: {
-            201: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-        };
-    };
-    OAuthController_findOne_v1: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                id: string;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-        };
-    };
-    OAuthController_remove_v1: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                id: string;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-        };
-    };
-    OAuthController_update_v1: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                id: string;
-            };
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["UpdateOAuthClientDto"];
-            };
-        };
-        responses: {
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-        };
-    };
-    OAuthController_bulkRemove_v1: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["BulkDeleteDto"];
-            };
-        };
-        responses: {
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-        };
-    };
-    SessionsController_findMine_v1: {
+    ChangelogController_findAll_v1: {
         parameters: {
             query?: never;
             header?: never;
@@ -3018,334 +2504,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["OwnSessionResponse"][];
-                };
-            };
-        };
-    };
-    SessionsController_revokeOthers_v1: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            201: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": {
-                        revoked?: number;
-                    };
-                };
-            };
-        };
-    };
-    SessionsController_revokeMine_v1: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                id: string;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["UserSession"];
-                };
-            };
-        };
-    };
-    SessionsController_findAll_v1: {
-        parameters: {
-            query?: {
-                page?: number;
-                limit?: number;
-                search?: string;
-                sort?: string;
-                direction?: "ASC" | "DESC";
-                paginated?: boolean;
-            };
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["PaginatedSessionResponse"];
-                };
-            };
-        };
-    };
-    SessionsController_revoke_v1: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                id: string;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["UserSession"];
-                };
-            };
-        };
-    };
-    PermissionsController_findAll_v1: {
-        parameters: {
-            query?: {
-                page?: number;
-                limit?: number;
-                search?: string;
-                sort?: string;
-                direction?: "ASC" | "DESC";
-                paginated?: boolean;
-            };
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["PaginatedPermissionResponse"];
-                };
-            };
-        };
-    };
-    PermissionsController_create_v1: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["CreatePermissionDto"];
-            };
-        };
-        responses: {
-            201: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Permission"];
-                };
-            };
-        };
-    };
-    PermissionsController_findOne_v1: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                id: string;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Permission"];
-                };
-            };
-        };
-    };
-    PermissionsController_remove_v1: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                id: string;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-        };
-    };
-    PermissionsController_update_v1: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                id: string;
-            };
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["UpdatePermissionDto"];
-            };
-        };
-        responses: {
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Permission"];
-                };
-            };
-        };
-    };
-    PermissionsController_bulkRemove_v1: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["BulkDeleteDto"];
-            };
-        };
-        responses: {
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-        };
-    };
-    NotificationsController_findAll_v1: {
-        parameters: {
-            query?: {
-                page?: number;
-                limit?: number;
-                search?: string;
-                sort?: string;
-                direction?: "ASC" | "DESC";
-                paginated?: boolean;
-            };
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Notification"][];
-                };
-            };
-        };
-    };
-    NotificationsController_getUnreadCount_v1: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": number;
-                };
-            };
-        };
-    };
-    NotificationsController_markAsRead_v1: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                id: string;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-        };
-    };
-    NotificationsController_markAllAsRead_v1: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-        };
-    };
-    AppRefreshController_forceRefresh_v1: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            201: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": {
-                        /** Format: date-time */
-                        issuedAt?: string;
-                    };
+                    "application/json": components["schemas"]["ReleaseNotesDto"][];
                 };
             };
         };
@@ -3498,7 +2657,7 @@ export interface operations {
             };
         };
     };
-    AuditController_findAll_v1: {
+    InvitationsController_findAll_v1: {
         parameters: {
             query?: {
                 page?: number;
@@ -3507,8 +2666,6 @@ export interface operations {
                 sort?: string;
                 direction?: "ASC" | "DESC";
                 paginated?: boolean;
-                /** @description Restrict to a single action */
-                action?: string;
             };
             header?: never;
             path?: never;
@@ -3521,12 +2678,323 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["PaginatedAuditResponse"];
+                    "application/json": components["schemas"]["Invitation"][];
                 };
             };
         };
     };
-    AuditController_findActions_v1: {
+    InvitationsController_create_v1: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CreateInvitationDto"];
+            };
+        };
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    InvitationsController_resend_v1: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Invitation"];
+                };
+            };
+        };
+    };
+    InvitationsController_bulkRemove_v1: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["BulkDeleteDto"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    InvitationsController_remove_v1: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    InvitationsController_getByToken_v1: {
+        parameters: {
+            query: {
+                token: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        email?: string;
+                    };
+                };
+            };
+        };
+    };
+    InvitationsController_accept_v1: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["AcceptInvitationDto"];
+            };
+        };
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        message?: string;
+                    };
+                };
+            };
+        };
+    };
+    MediaController_uploadFile_v1: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "multipart/form-data": {
+                    /** Format: binary */
+                    file?: string;
+                };
+            };
+        };
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Media"];
+                };
+            };
+        };
+    };
+    MediaController_findAll_v1: {
+        parameters: {
+            query?: {
+                page?: number;
+                limit?: number;
+                search?: string;
+                sort?: string;
+                direction?: "ASC" | "DESC";
+                paginated?: boolean;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PaginatedMediaResponse"];
+                };
+            };
+        };
+    };
+    MediaController_findOne_v1: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Media"];
+                };
+            };
+        };
+    };
+    MediaController_remove_v1: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MediaDeletionResultDto"];
+                };
+            };
+        };
+    };
+    MediaController_viewFile_v1: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    MediaController_streamFile_v1: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    MediaController_bulkRemove_v1: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["MediaBulkDeleteDto"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MediaBulkDeleteResultDto"];
+                };
+            };
+        };
+    };
+    NotificationsController_findAll_v1: {
+        parameters: {
+            query?: {
+                page?: number;
+                limit?: number;
+                search?: string;
+                sort?: string;
+                direction?: "ASC" | "DESC";
+                paginated?: boolean;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PaginatedNotificationResponse"];
+                };
+            };
+        };
+    };
+    NotificationsController_getUnreadCount_v1: {
         parameters: {
             query?: never;
             header?: never;
@@ -3540,7 +3008,810 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": string[];
+                    "application/json": number;
+                };
+            };
+        };
+    };
+    NotificationsController_markAsRead_v1: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    NotificationsController_markAllAsRead_v1: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    OAuthController_token_v1: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["TokenRequestDto"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    OAuthController_findAll_v1: {
+        parameters: {
+            query?: {
+                page?: number;
+                limit?: number;
+                search?: string;
+                sort?: string;
+                direction?: "ASC" | "DESC";
+                paginated?: boolean;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    OAuthController_create_v1: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CreateOAuthClientDto"];
+            };
+        };
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    OAuthController_findOne_v1: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    OAuthController_remove_v1: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    OAuthController_update_v1: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["UpdateOAuthClientDto"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    OAuthController_bulkRemove_v1: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["BulkDeleteDto"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    PermissionsController_findAll_v1: {
+        parameters: {
+            query?: {
+                page?: number;
+                limit?: number;
+                search?: string;
+                sort?: string;
+                direction?: "ASC" | "DESC";
+                paginated?: boolean;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PaginatedPermissionResponse"];
+                };
+            };
+        };
+    };
+    PermissionsController_create_v1: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CreatePermissionDto"];
+            };
+        };
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Permission"];
+                };
+            };
+        };
+    };
+    PermissionsController_findOne_v1: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Permission"];
+                };
+            };
+        };
+    };
+    PermissionsController_remove_v1: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    PermissionsController_update_v1: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["UpdatePermissionDto"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Permission"];
+                };
+            };
+        };
+    };
+    PermissionsController_bulkRemove_v1: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["BulkDeleteDto"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    ReportsStatsController_reports_v1: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ReportStatsDto"];
+                };
+            };
+        };
+    };
+    ReportsController_findAll_v1: {
+        parameters: {
+            query?: {
+                page?: number;
+                limit?: number;
+                search?: string;
+                sort?: string;
+                direction?: "ASC" | "DESC";
+                paginated?: boolean;
+                status?: "PENDING" | "IN_PROGRESS" | "COMPLETED" | "REJECTED";
+                category?: "ORGANIC_WASTE" | "PLASTIC_WASTE" | "PAPER_WASTE";
+                /** @description Inclusive start date (YYYY-MM-DD) */
+                from?: string;
+                /** @description Inclusive end date (YYYY-MM-DD) */
+                to?: string;
+                /** @description Reporter id (admin scope only) */
+                reporterId?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PaginatedReportResponse"];
+                };
+            };
+        };
+    };
+    ReportsController_create_v1: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CreateReportDto"];
+            };
+        };
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Report"];
+                };
+            };
+        };
+    };
+    ReportsController_findOne_v1: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Report"];
+                };
+            };
+        };
+    };
+    ReportsController_remove_v1: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    ReportsController_update_v1: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["UpdateReportDto"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Report"];
+                };
+            };
+        };
+    };
+    ReportsController_updateStatus_v1: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["UpdateReportStatusDto"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Report"];
+                };
+            };
+        };
+    };
+    RolesController_findAll_v1: {
+        parameters: {
+            query?: {
+                page?: number;
+                limit?: number;
+                search?: string;
+                sort?: string;
+                direction?: "ASC" | "DESC";
+                paginated?: boolean;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PaginatedRoleResponse"];
+                };
+            };
+        };
+    };
+    RolesController_create_v1: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CreateRoleDto"];
+            };
+        };
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Role"];
+                };
+            };
+        };
+    };
+    RolesController_findOne_v1: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Role"];
+                };
+            };
+        };
+    };
+    RolesController_remove_v1: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    RolesController_update_v1: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["UpdateRoleDto"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Role"];
+                };
+            };
+        };
+    };
+    RolesController_bulkRemove_v1: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["BulkDeleteDto"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    RolesController_syncPermissions_v1: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ManagePermissionsDto"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Role"];
+                };
+            };
+        };
+    };
+    RolesController_attachPermissions_v1: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ManagePermissionsDto"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Role"];
+                };
+            };
+        };
+    };
+    RolesController_detachPermissions_v1: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ManagePermissionsDto"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Role"];
+                };
+            };
+        };
+    };
+    SessionsController_findMine_v1: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["OwnSessionResponse"][];
+                };
+            };
+        };
+    };
+    SessionsController_revokeOthers_v1: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        revoked?: number;
+                    };
+                };
+            };
+        };
+    };
+    SessionsController_revokeMine_v1: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["UserSession"];
+                };
+            };
+        };
+    };
+    SessionsController_findAll_v1: {
+        parameters: {
+            query?: {
+                page?: number;
+                limit?: number;
+                search?: string;
+                sort?: string;
+                direction?: "ASC" | "DESC";
+                paginated?: boolean;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PaginatedSessionResponse"];
+                };
+            };
+        };
+    };
+    SessionsController_revoke_v1: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["UserSession"];
                 };
             };
         };
@@ -3568,23 +3839,6 @@ export interface operations {
                 days?: string;
                 timeZone: string;
             };
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-        };
-    };
-    ChangelogController_findAll_v1: {
-        parameters: {
-            query?: never;
             header?: never;
             path?: never;
             cookie?: never;
@@ -3679,6 +3933,299 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["TimePreviewResponseDto"];
+                };
+            };
+        };
+    };
+    UsersController_findAll_v1: {
+        parameters: {
+            query?: {
+                page?: number;
+                limit?: number;
+                search?: string;
+                sort?: string;
+                direction?: "ASC" | "DESC";
+                paginated?: boolean;
+                accountStatus?: "INACTIVE" | "ACTIVE" | "UNVERIFIED" | "LOCKED";
+                timeZone?: "Asia/Jakarta" | "Asia/Makassar" | "Asia/Jayapura";
+                /** @description Creation window in the selected report timezone, default Asia/Jakarta; 1m and 3m use 30 and 90 days. */
+                createdIn?: "today" | "7d" | "1m" | "3m";
+                /** @description Method used to first create the account. */
+                registerMethod?: "EMAIL_OTP" | "GOOGLE" | "INVITATION" | "SEEDER" | "UNKNOWN";
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PaginatedUserResponse"];
+                };
+            };
+        };
+    };
+    UsersController_findOne_v1: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["User"];
+                };
+            };
+        };
+    };
+    UsersController_remove_v1: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    UsersController_update_v1: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "multipart/form-data": components["schemas"]["UpdateUserDto"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["User"];
+                };
+            };
+        };
+    };
+    UsersController_bulkRemove_v1: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["BulkDeleteDto"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    UsersController_updateStatus_v1: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["UpdateUserStatusDto"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["User"];
+                };
+            };
+        };
+    };
+    UsersController_syncRoles_v1: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ManageRolesDto"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["User"];
+                };
+            };
+        };
+    };
+    UsersController_attachRoles_v1: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ManageRolesDto"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["User"];
+                };
+            };
+        };
+    };
+    UsersController_detachRoles_v1: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ManageRolesDto"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["User"];
+                };
+            };
+        };
+    };
+    UsersController_syncPermissions_v1: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ManageUserPermissionsDto"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["User"];
+                };
+            };
+        };
+    };
+    UsersController_attachPermissions_v1: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ManageUserPermissionsDto"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["User"];
+                };
+            };
+        };
+    };
+    UsersController_detachPermissions_v1: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ManageUserPermissionsDto"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["User"];
                 };
             };
         };

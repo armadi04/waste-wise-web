@@ -18,7 +18,6 @@ import { Permission } from '@/permissions/entities/permission.entity';
 import { User } from '@/users/entities/user.entity';
 import { RegisterMethodEnum } from '@/users/register-method.enum';
 import { createdInRange } from '@/common/helpers/created-in-range';
-import { AddUserRegisterMethod1790816400000 } from '@/database/migrations/1790816400000-AddUserRegisterMethod';
 
 describe('Users (e2e)', () => {
   let ctx: TestContext;
@@ -170,66 +169,6 @@ describe('Users (e2e)', () => {
     });
   });
 
-  it('migrates historic registration methods conservatively and supports reversal', async () => {
-    // All DDL and fixtures stay inside a transaction on nestplate_test.
-    expect(ctx.dataSource.options.database).toBe('nestplate_test');
-    const runner = ctx.dataSource.createQueryRunner();
-    await runner.connect();
-    await runner.startTransaction();
-    try {
-      await runner.query("SET LOCAL TIME ZONE 'UTC'");
-      const migration = new AddUserRegisterMethod1790816400000();
-      await migration.down(runner);
-      const historic = ['invited', 'late-invite', 'verified', 'sso'];
-      for (const name of historic) {
-        await runner.query(
-          `INSERT INTO "users" ("email", "password", "createdAt", "emailVerifiedAt") VALUES ($1, 'fixture-hash', '2026-01-01 00:00:00', '2026-01-01 00:00:01')`,
-          [`migration-${name}@example.test`],
-        );
-      }
-      await runner.query(`INSERT INTO "invitations" ("email", "token", "expiresAt", "acceptedAt") VALUES
-        ('migration-invited@example.test', 'migration-invited-token', now(), '2026-01-01 00:00:10+00'),
-        ('migration-late-invite@example.test', 'migration-late-token', now(), '2026-01-02 00:00:00+00')`);
-      await migration.up(runner);
-      const rows = await runner.query(
-        `SELECT "email", "registerMethod" FROM "users" WHERE "email" LIKE 'migration-%' ORDER BY "email"`,
-      );
-      expect(rows).toEqual([
-        {
-          email: 'migration-invited@example.test',
-          registerMethod: 'INVITATION',
-        },
-        {
-          email: 'migration-late-invite@example.test',
-          registerMethod: 'UNKNOWN',
-        },
-        { email: 'migration-sso@example.test', registerMethod: 'UNKNOWN' },
-        { email: 'migration-verified@example.test', registerMethod: 'UNKNOWN' },
-      ]);
-      expect(
-        (
-          await runner.query(
-            `SELECT "registerMethod" FROM "users" WHERE "email" = $1`,
-            [adminEmail()],
-          )
-        )[0].registerMethod,
-      ).toBe('SEEDER');
-      const indexes = await runner.query(
-        `SELECT indexname FROM pg_indexes WHERE tablename = 'users' AND indexname = 'IDX_users_registerMethod'`,
-      );
-      expect(indexes).toHaveLength(1);
-      await migration.down(runner);
-      expect(
-        await runner.query(
-          `SELECT column_name FROM information_schema.columns WHERE table_name = 'users' AND column_name = 'registerMethod'`,
-        ),
-      ).toEqual([]);
-    } finally {
-      await runner.rollbackTransaction();
-      await runner.release();
-    }
-  });
-
   describe('GET /users/:id', () => {
     it('lets a user read their own record (owner) without users.read', async () => {
       const user = await createUser(ctx, { email: 'owner@b.com' });
@@ -321,6 +260,36 @@ describe('Users (e2e)', () => {
         .delete('/api/v1/users/999999')
         .set('Authorization', `Bearer ${admin}`)
         .expect(404);
+    });
+  });
+
+  describe('account status', () => {
+    it('exposes active, unverified and locked states', async () => {
+      const active = await createUser(ctx, { email: 'active@b.com' });
+      const unverified = await createUser(ctx, {
+        email: 'unverified-status@b.com',
+        verified: false,
+      });
+      const locked = await createUser(ctx, { email: 'locked@b.com' });
+      const userRepo = ctx.app.get<Repository<User>>(getRepositoryToken(User));
+      await userRepo.update(locked.id, {
+        lockedUntil: new Date(Date.now() + 60_000),
+      });
+
+      const res = await request(server)
+        .get('/api/v1/users')
+        .query({ paginated: false })
+        .set('Authorization', `Bearer ${admin}`)
+        .expect(200);
+      const byEmail = new Map(
+        (res.body as Array<User>).map((user) => [
+          user.email,
+          user.accountStatus,
+        ]),
+      );
+      expect(byEmail.get(active.email)).toBe('ACTIVE');
+      expect(byEmail.get(unverified.email)).toBe('UNVERIFIED');
+      expect(byEmail.get(locked.email)).toBe('LOCKED');
     });
   });
 

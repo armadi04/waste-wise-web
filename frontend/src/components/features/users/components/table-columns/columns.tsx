@@ -6,6 +6,8 @@ import {
   Pencil,
   Shield,
   Trash2,
+  UserCheck,
+  UserX,
 } from 'lucide-react'
 import type { GetColumnsParams } from '@/components/features/users/components/table-columns/types'
 import type { Column } from '@/components/shared/datatable'
@@ -16,12 +18,15 @@ import {
   REGISTER_METHOD_COLOR,
   REGISTER_METHOD_LABEL,
 } from '@/lib/constants/register-method'
+import { ACCOUNT_STATUS_LABEL } from '@/lib/constants/account-status'
+import { AccountStatusBadge } from '@/components/features/users/components/account-status-badge'
 import { formatBusinessDate as format } from '@/lib/utils/format'
 
 export const getColumns = ({
   onView,
   onEdit,
   onDelete,
+  onToggleActive,
   onManageRoles,
   onManagePermissions,
   onResetPassword,
@@ -48,13 +53,25 @@ export const getColumns = ({
     name: 'Roles',
     uid: 'roles',
     render: (item) => (
-      <div className="flex items-center gap-2">
-        <span className="text-small text-default-500">
-          {item.roles?.length || 0} roles
-        </span>
-      </div>
+      <span className="text-small text-default-600">
+        {item.roles?.map((role) => role.name).join(', ') || 'No role'}
+      </span>
     ),
     exportValue: (item) => item.roles?.map((r) => r.name).join(', ') || '',
+  },
+  {
+    name: 'Account Status',
+    uid: 'accountStatus',
+    render: (item) => (
+      <AccountStatusBadge
+        status={item.accountStatus}
+        emailVerifiedAt={item.emailVerifiedAt}
+      />
+    ),
+    exportValue: (item) =>
+      ACCOUNT_STATUS_LABEL[
+        item.accountStatus ?? (item.emailVerifiedAt ? 'ACTIVE' : 'UNVERIFIED')
+      ],
   },
   {
     name: 'Permissions',
@@ -97,6 +114,7 @@ export const getColumns = ({
     uid: 'actions',
     render: (item) => (
       <ActionMenu
+        ariaLabel={`Actions for ${item.email}`}
         actions={[
           {
             key: 'view',
@@ -140,6 +158,20 @@ export const getColumns = ({
             onPress: () => onImpersonate(item),
             show:
               hasPermission('users.impersonate') && item.id !== currentUserId,
+          },
+          {
+            key: 'toggle-active',
+            label: item.isActive === false ? 'Activate user' : 'Deactivate user',
+            icon:
+              item.isActive === false ? (
+                <UserCheck size={16} />
+              ) : (
+                <UserX size={16} />
+              ),
+            onPress: () => onToggleActive(item),
+            danger: item.isActive !== false,
+            show:
+              hasPermission('users.manage_status') && item.id !== currentUserId,
           },
           {
             key: 'delete',

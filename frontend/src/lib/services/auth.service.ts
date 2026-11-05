@@ -72,17 +72,8 @@ export async function getProfile(): Promise<UserProfile> {
   return response.data
 }
 
-/**
- * Logout user — clear server session and redirect. `sid` (when the session was
- * minted via SSO) routes through RP-initiated logout so the IdP session ends too.
- */
-export async function logout(sid?: string): Promise<void> {
-  if (sid) {
-    clearAuthFlag()
-    window.location.href = apiUrl('/auth/sso/logout')
-    return
-  }
-
+/** Logout user — clear the server session. */
+export async function logout(): Promise<void> {
   try {
     await api.post(
       '/auth/logout',
@@ -110,7 +101,6 @@ export async function getCurrentUser(): Promise<CurrentUser | null> {
       permissions: Array<string>
       emailVerified: boolean
       activeRole?: string
-      sid?: string
       impersonatorId?: number
     }>('/auth/me')
     return {
@@ -120,7 +110,6 @@ export async function getCurrentUser(): Promise<CurrentUser | null> {
       permissions: data.permissions ?? [],
       emailVerified: data.emailVerified ?? false,
       activeRole: data.activeRole,
-      sid: data.sid,
       impersonatorId: data.impersonatorId,
     }
   } catch (error) {

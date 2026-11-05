@@ -7,6 +7,7 @@ import { RegisterMethodEnum } from '@/users/register-method.enum';
 import { User } from '../../users/entities/user.entity';
 import * as bcrypt from 'bcrypt';
 import type { PermissionType } from '@/auth/permissions.type';
+import { resolveDemoUser } from './demo-user';
 
 /**
  * Every permission the app ships with. Exported so the e2e database cleaner can
@@ -29,6 +30,7 @@ export const SEEDED_PERMISSIONS: Array<{
   { name: 'menu.oauth', description: 'View OAuth clients in sidebar' },
   { name: 'menu.sessions', description: 'View sessions in sidebar' },
   { name: 'menu.audit', description: 'View the audit trail in sidebar' },
+  { name: 'menu.reports', description: 'View reports in sidebar' },
 
   // App-wide operations
   {
@@ -52,6 +54,10 @@ export const SEEDED_PERMISSIONS: Array<{
   {
     name: 'users.manage_permissions',
     description: 'Manage user permissions (sync, attach, detach)',
+  },
+  {
+    name: 'users.manage_status',
+    description: 'Activate or deactivate user accounts',
   },
 
   // Role permissions
@@ -95,6 +101,19 @@ export const SEEDED_PERMISSIONS: Array<{
 
   // Audit trail
   { name: 'audit.read', description: 'Read the audit trail' },
+
+  // Reports
+  { name: 'reports.create', description: 'Create reports' },
+  { name: 'reports.read.own', description: 'Read own reports' },
+  { name: 'reports.read.all', description: 'Read all reports' },
+  { name: 'reports.update.own', description: 'Update own pending reports' },
+  { name: 'reports.update.all', description: 'Update all reports' },
+  { name: 'reports.delete.own', description: 'Delete own pending reports' },
+  { name: 'reports.delete.all', description: 'Delete all reports' },
+  {
+    name: 'reports.status.update',
+    description: 'Update report handling status',
+  },
 
   // Dashboard
   { name: 'stats.read', description: 'Read dashboard statistics' },
@@ -182,12 +201,30 @@ export class SeederService implements OnApplicationBootstrap {
       userRole = this.roleRepository.create({
         name: 'user',
         description: 'Standard user with base access',
-        permissions: getPermissions('menu.dashboard', 'media.read'),
+        permissions: getPermissions(
+          'menu.dashboard',
+          'menu.reports',
+          'media.read',
+          'media.create',
+          'reports.create',
+          'reports.read.own',
+          'reports.update.own',
+          'reports.delete.own',
+        ),
       });
       await this.roleRepository.save(userRole);
       this.logger.log('Created user role.');
     } else {
-      userRole.permissions = getPermissions('menu.dashboard', 'media.read');
+      userRole.permissions = getPermissions(
+        'menu.dashboard',
+        'menu.reports',
+        'media.read',
+        'media.create',
+        'reports.create',
+        'reports.read.own',
+        'reports.update.own',
+        'reports.delete.own',
+      );
       await this.roleRepository.save(userRole);
       this.logger.log('Updated user role permissions.');
     }
@@ -216,6 +253,27 @@ export class SeederService implements OnApplicationBootstrap {
       });
       await this.userRepository.save(adminUser);
       this.logger.log(`Created default superadmin user: ${adminEmail}`);
+    }
+
+    const demo = resolveDemoUser(process.env);
+    if (demo) {
+      const existingDemo = await this.userRepository.findOneBy({
+        email: demo.email,
+      });
+      if (!existingDemo) {
+        const userRole = await this.roleRepository.findOneBy({ name: 'user' });
+        const hashedPassword = await bcrypt.hash(demo.password, 10);
+        const demoUser = this.userRepository.create({
+          email: demo.email,
+          password: hashedPassword,
+          fullname: 'Demo User',
+          registerMethod: RegisterMethodEnum.SEEDER,
+          roles: userRole ? [userRole] : [],
+          emailVerifiedAt: new Date(),
+        });
+        await this.userRepository.save(demoUser);
+        this.logger.log(`Created demo user: ${demo.email}`);
+      }
     }
   }
 }

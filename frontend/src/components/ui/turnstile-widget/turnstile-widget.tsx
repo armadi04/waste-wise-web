@@ -48,7 +48,6 @@ export function TurnstileWidget(props: TurnstileWidgetProps) {
       onUnsupported={props.onError}
       onWidgetLoad={onWidgetLoad}
       scriptOptions={{ onError: props.onScriptError }}
-      style={{ marginInline: 'auto' }}
       options={{
         theme: isDark ? 'dark' : 'light',
         size: 'normal',

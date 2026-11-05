@@ -8,6 +8,7 @@ import {
 } from '@/components/features/settings/components/settings-primitives'
 import { useChangelog } from '@/hooks/changelog'
 import { usePwaUpdate } from '@/hooks/global/use-pwa-update'
+import { BRAND_NAME } from '@/lib/constants/brand'
 
 export function UpdateSection() {
   const {
@@ -42,7 +43,7 @@ export function UpdateSection() {
         description={
           updateAvailable
             ? 'A new version is ready. Update to get the latest features and fixes.'
-            : 'Check whether a newer version of Nestplate is available.'
+            : `Check whether a newer version of ${BRAND_NAME} is available.`
         }
         action={
           updateAvailable ? (

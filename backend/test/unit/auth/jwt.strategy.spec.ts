@@ -64,6 +64,22 @@ describe('JwtStrategy', () => {
     ).rejects.toThrow(UnauthorizedException);
   });
 
+  it('should reject an inactive account', async () => {
+    authService.isTokenBlacklisted.mockResolvedValue(false);
+    authService.getProfile.mockResolvedValue({
+      id: 1,
+      email: 'a@b.com',
+      isActive: false,
+      emailVerifiedAt: new Date(),
+      permissions: [],
+      roles: [],
+    });
+
+    await expect(
+      strategy.validate(makeRequest('abc'), payload),
+    ).rejects.toThrow(UnauthorizedException);
+  });
+
   it('should return the authenticated user with merged permissions', async () => {
     authService.isTokenBlacklisted.mockResolvedValue(false);
     authService.getProfile.mockResolvedValue({

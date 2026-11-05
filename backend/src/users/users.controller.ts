@@ -43,6 +43,7 @@ import { CacheService } from '../common/cache/cache.service';
 import { CacheInterceptor } from '@nestjs/cache-manager';
 import type { IAuthRequest } from '../auth/interfaces/auth-request.interface';
 import { UsersQueryDto } from './dto/users-query.dto';
+import { UpdateUserStatusDto } from './dto/update-user-status.dto';
 import { BulkDeleteDto } from '../common/dto/bulk-delete.dto';
 import { User } from './entities/user.entity';
 import { PaginatedResponseDto } from '../common/services/base.service';
@@ -177,6 +178,25 @@ export class UsersController {
     await this.cacheService.clearKeys('*/users*');
     this.recordAudit(req, 'user.deleted', +id, `Deleted user #${id}`);
     return result;
+  }
+
+  @Patch(':id/status')
+  @UseGuards(PermissionsGuard)
+  @Permissions('users.manage_status')
+  @ApiOperation({ summary: 'Activate or deactivate a user account' })
+  @ApiResponse({ status: 200, type: User })
+  @UseInterceptors(NoFilesInterceptor())
+  async updateStatus(
+    @Req() req: IAuthRequest,
+    @Param('id') id: string,
+    @Body() dto: UpdateUserStatusDto,
+  ) {
+    return this.usersService.setActiveAs(
+      req.user,
+      +id,
+      dto.isActive,
+      req.ip ?? null,
+    );
   }
 
   // Role Management Endpoints

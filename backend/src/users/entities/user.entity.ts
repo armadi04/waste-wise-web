@@ -18,6 +18,8 @@ import { Media } from '../../media/entities/media.entity';
 import { Exclude } from 'class-transformer';
 import { ApiProperty } from '@nestjs/swagger';
 import { RegisterMethodEnum } from '../register-method.enum';
+import { ACCOUNT_STATUS_VALUES } from '../account-status';
+import type { AccountStatus } from '../account-status';
 
 @Entity('users')
 @Index('UQ_users_email_active', { synchronize: false })
@@ -62,6 +64,10 @@ export class User {
   @ApiProperty()
   @Column({ name: 'notificationsEnabled', type: 'boolean', default: true })
   notificationsEnabled: boolean;
+
+  @ApiProperty()
+  @Column({ name: 'isActive', type: 'boolean', default: true })
+  isActive: boolean;
 
   @ApiProperty({ type: () => Media, nullable: true })
   @OneToOne('Media')
@@ -146,6 +152,13 @@ export class User {
     default: RegisterMethodEnum.UNKNOWN,
   })
   registerMethod: RegisterMethodEnum;
+
+  @ApiProperty({
+    enum: ACCOUNT_STATUS_VALUES,
+    required: false,
+    description: 'Derived account state; populated by the API presenter.',
+  })
+  accountStatus?: AccountStatus;
 
   @ApiProperty()
   @CreateDateColumn({ name: 'createdAt', type: 'timestamptz', precision: 3 })

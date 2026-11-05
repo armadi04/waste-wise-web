@@ -10,17 +10,11 @@ describe('versioned API URL composition', () => {
   })
 
   it.each(['', 'https://api.example.test', 'https://api.example.test/'])(
-    'resolves resource, refresh and SSO URLs with origin %s',
+    'resolves resource and refresh URLs with origin %s',
     async (origin) => {
       vi.stubEnv('VITE_API_URL', origin)
       const { default: api, apiUrl } = await import('@/lib/api')
-      for (const path of [
-        '/users',
-        '/auth/refresh',
-        '/auth/sso/login',
-        '/auth/sso/silent',
-        '/auth/sso/logout',
-      ]) {
+      for (const path of ['/users', '/auth/refresh']) {
         const expected = `${normalizeApiOrigin(origin)}/api/v1${path}`
         expect(apiUrl(path)).toBe(expected)
         expect(api.getUri({ url: path })).toBe(expected)

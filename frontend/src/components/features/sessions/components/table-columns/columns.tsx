@@ -39,11 +39,6 @@ export const getColumns = ({
         <Chip size="sm" variant="flat" color="default">
           {item.audience === 'admin' ? 'Admin' : item.audience}
         </Chip>
-        {item.isSso && (
-          <Chip size="sm" variant="flat" color="secondary">
-            SSO
-          </Chip>
-        )}
         {item.impersonatedById !== null && (
           <Chip size="sm" variant="flat" color="warning">
             Impersonated
@@ -99,6 +94,7 @@ export const getColumns = ({
     uid: 'actions',
     render: (item) => (
       <ActionMenu
+        ariaLabel={`Actions for session ${item.sessionId}`}
         actions={[
           {
             key: 'revoke',

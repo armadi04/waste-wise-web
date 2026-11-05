@@ -12,6 +12,8 @@
 
 // Global stores
 export { useAuthStore } from '@/lib/stores/auth.store'
+export { useBackgroundStore } from '@/lib/stores/background.store'
+export type { BackgroundStyle } from '@/lib/stores/background.store'
 export { useCommandPaletteStore } from '@/lib/stores/command-palette.store'
 export { useConfirmationStore } from '@/lib/stores/confirmation.store'
 export type { ConfirmationOptions } from '@/lib/stores/confirmation.store'
@@ -34,5 +36,6 @@ export type {
 export { useInvitationsUiStore } from '@/lib/stores/invitations-ui.store'
 export { useMediaUiStore } from '@/lib/stores/media-ui.store'
 export { usePermissionsUiStore } from '@/lib/stores/permissions-ui.store'
+export { useReportsUiStore } from '@/lib/stores/reports-ui.store'
 export { useRolesUiStore } from '@/lib/stores/roles-ui.store'
 export { useUsersUiStore } from '@/lib/stores/users-ui.store'

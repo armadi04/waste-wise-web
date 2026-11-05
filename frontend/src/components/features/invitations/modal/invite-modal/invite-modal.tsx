@@ -156,7 +156,7 @@ export function InviteModal({
                             key={role.id}
                             className={`flex items-start gap-2 p-3 rounded-large border-2 cursor-pointer transition-colors ${
                               selectedRoles.has(role.id)
-                                ? 'app-selected border border-[var(--app-selected-border)]'
+                                ? 'app-selected border-transparent'
                                 : 'border-transparent bg-default-100 hover:bg-default-200'
                             }`}
                             onClick={() => toggleRole(role.id)}

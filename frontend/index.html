@@ -5,9 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
     <!-- Primary -->
-    <title>Nestplate Starter</title>
-    <meta name="description" content="Nestplate Starter dashboard" />
-    <meta name="theme-color" content="#F8FAFC" />
+    <title>WasteWise</title>
+    <meta name="description" content="Smart Waste Management Platform" />
+    <meta name="theme-color" content="#FFFFFF" />
     <meta name="color-scheme" content="light dark" />
     <meta name="referrer" content="strict-origin-when-cross-origin" />
 
@@ -34,9 +34,25 @@
         document.documentElement.classList.remove('light', 'dark')
         document.documentElement.classList.add(dark ? 'dark' : 'light')
         document.documentElement.style.colorScheme = dark ? 'dark' : 'light'
+        let background = 'gradient'
+        try {
+          const savedBackground = JSON.parse(
+            localStorage.getItem('background-store') || 'null',
+          )
+          const legacyBackground = localStorage.getItem('background')
+          const style =
+            savedBackground?.state?.style ?? legacyBackground ?? 'gradient'
+          if (['gradient', 'neutral', 'gray'].includes(style))
+            background = style
+        } catch {
+          /* Unavailable or malformed storage: use the default gradient. */
+        }
+        document.documentElement.dataset.background = background
         document.querySelector('meta[name="theme-color"]').content = dark
-          ? '#0F172A'
-          : '#F8FAFC'
+          ? '#000000'
+          : background === 'gray'
+            ? '#f5f5f7'
+            : '#ffffff'
       })()
     </script>
 
@@ -49,21 +65,37 @@
     />
 
     <!-- Favicon -->
-    <link rel="icon" type="image/x-icon" href="/favicon.ico" sizes="48x48" />
-    <link rel="icon" type="image/svg+xml" href="/favicon.svg" sizes="any" />
-    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <link
+      rel="icon"
+      type="image/x-icon"
+      href="/favicon_io/favicon.ico"
+      sizes="16x16 32x32 48x48"
+    />
+    <link
+      rel="icon"
+      type="image/png"
+      href="/favicon_io/favicon-32x32.png"
+      sizes="32x32"
+    />
+    <link
+      rel="icon"
+      type="image/png"
+      href="/favicon_io/favicon-16x16.png"
+      sizes="16x16"
+    />
+    <link rel="apple-touch-icon" href="/favicon_io/apple-touch-icon.png" />
 
     <!-- PWA / iOS -->
     <meta name="mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="default" />
-    <meta name="apple-mobile-web-app-title" content="Nestplate" />
+    <meta name="apple-mobile-web-app-title" content="WasteWise" />
 
     <!-- Open Graph -->
     <meta property="og:type" content="website" />
-    <meta property="og:title" content="Nestplate Starter" />
-    <meta property="og:description" content="Nestplate Starter dashboard" />
-    <meta property="og:site_name" content="Nestplate" />
+    <meta property="og:title" content="WasteWise" />
+    <meta property="og:description" content="Smart Waste Management Platform" />
+    <meta property="og:site_name" content="WasteWise" />
   </head>
   <body>
     <div id="app"></div>

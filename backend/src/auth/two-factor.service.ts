@@ -70,7 +70,7 @@ export class TwoFactorService {
 
     const secret = generateSecret();
     const otpauthUrl = generateURI({
-      issuer: this.configService.get<string>('APP_NAME') ?? 'Nestplate',
+      issuer: this.configService.get<string>('APP_NAME') ?? 'WasteWise',
       label: user.email,
       secret,
     });

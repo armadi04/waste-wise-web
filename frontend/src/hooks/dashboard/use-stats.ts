@@ -2,6 +2,7 @@ import { useQuery } from '@tanstack/react-query'
 import {
   healthQueryOptions,
   recentActivityQueryOptions,
+  reportStatsQueryOptions,
   signupsTrendQueryOptions,
   statsOverviewQueryOptions,
 } from '@/lib/query/options'
@@ -22,3 +23,6 @@ export const useRecentActivity = (limit = 8, enabled = true) =>
 
 export const useHealth = (enabled = true) =>
   useQuery(healthQueryOptions(enabled))
+
+export const useReportStats = (enabled = true) =>
+  useQuery(reportStatsQueryOptions(enabled))

@@ -94,7 +94,7 @@ export function SocketBridge() {
       ) {
         const n = new Notification(notification.title, {
           body: notification.message,
-          icon: '/favicon.ico',
+          icon: '/favicon_io/favicon.ico',
         })
         n.onclick = () => {
           window.focus()

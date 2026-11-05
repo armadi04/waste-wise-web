@@ -52,9 +52,11 @@ const baseEnvSchema = z.object({
   // Admin seed
   ADMIN_EMAIL: z.string().email(),
   ADMIN_PASSWORD: z.string().min(8),
+  DEMO_USER_EMAIL: z.string().email().optional(),
+  DEMO_USER_PASSWORD: z.string().min(8).optional(),
 
   // Only the selected storage provider requires credentials at startup.
-  MEDIA_PROVIDER: z.enum(['depot', 's3']).default('depot'),
+  MEDIA_PROVIDER: z.enum(['s3']).default('s3'),
   MEDIA_STORAGE_PROFILE: z
     .string()
     .regex(/^[a-zA-Z0-9][a-zA-Z0-9_-]{0,63}$/)
@@ -78,8 +80,6 @@ const baseEnvSchema = z.object({
     .default(
       'image/jpeg,image/png,image/webp,image/gif,application/pdf,video/mp4,audio/mpeg,audio/wav,application/zip',
     ),
-  DEPOT_BASE_URL: z.string().url().optional(),
-  DEPOT_API_KEY: z.string().min(1).optional(),
   S3_ENDPOINT: z.string().url().optional(),
   S3_REGION: z.string().min(1).optional(),
   S3_BUCKET: z.string().min(1).optional(),
@@ -100,15 +100,6 @@ const baseEnvSchema = z.object({
   TURNSTILE_ALLOWED_HOSTNAMES: z.string().optional(),
   TURNSTILE_SECRET: z.string().optional(),
   TURNSTILE_SECRET_KEY: z.string().optional(), // Legacy alias; TURNSTILE_SECRET takes precedence.
-
-  // SSO / OIDC (optional — enables "Sign in with SSO"). Omit SSO_ISSUER to disable.
-  SSO_ISSUER: z.string().url().optional(),
-  SSO_CLIENT_ID: z.string().optional(),
-  SSO_CLIENT_SECRET: z.string().optional(),
-  SSO_REDIRECT_URI: z.string().url().optional(),
-  SSO_POST_LOGOUT_URI: z.string().url().optional(),
-  SSO_SUCCESS_REDIRECT: z.string().default('/'),
-  SSO_DEFAULT_ROLE: z.string().default('user'),
 
   // Mail (optional — omit SMTP_HOST to leave delivery disabled)
   SMTP_HOST: z.string().optional(),
@@ -138,10 +129,19 @@ const baseEnvSchema = z.object({
   GRAPHQL_MAX_DEPTH: z.coerce.number().default(10),
   GRAPHQL_PERSISTED_ONLY: boolFromEnv(false),
 
+  // ML service (optional; reports still save when unavailable)
+  ML_SERVICE_URL: z.string().url().optional(),
+  ML_SERVICE_TIMEOUT_MS: z.coerce
+    .number()
+    .int()
+    .min(1000)
+    .max(60000)
+    .default(15000),
+
   // App
   APP_URL: z.string().url().default('http://localhost:3001'),
   // Shown as the issuer in authenticator apps for two-factor codes.
-  APP_NAME: z.string().default('Nestplate'),
+  APP_NAME: z.string().default('WasteWise'),
   ALLOWED_ORIGINS: z.string().default('*'),
   // Unset/false ignores forwarded headers. Otherwise use actual proxy addresses/CIDRs.
   TRUST_PROXY: z.string().optional(),

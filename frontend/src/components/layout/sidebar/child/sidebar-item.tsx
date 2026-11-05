@@ -2,6 +2,7 @@ import { PopoverContent, PopoverTrigger } from '@heroui/react'
 import { AnimatePresence, motion, useReducedMotion } from 'framer-motion'
 import { ChevronRight } from 'lucide-react'
 import type { NavItem } from '@/lib/constants/sidebar'
+import { NAV_ACTIVE_CLASSES, NAV_IDLE_CLASSES } from '@/lib/constants/nav'
 import { Popover, Tooltip } from '@/components/shared/controls'
 
 export const SidebarItem = ({
@@ -32,12 +33,8 @@ export const SidebarItem = ({
   }
 
   const buttonClasses = `
-    relative flex items-center rounded-medium cursor-pointer transition-all duration-200
-    ${
-      isActive
-        ? 'app-selected font-medium'
-        : 'text-default-500 hover:text-default-900 hover:bg-default-100'
-    }
+    relative flex items-center rounded-lg cursor-pointer transition-all duration-200
+    ${isActive ? NAV_ACTIVE_CLASSES : NAV_IDLE_CLASSES}
     ${isCollapsed ? 'size-11 shrink-0 justify-center px-0' : 'w-full min-h-[40px] h-10 gap-3 px-3'}
   `
 
@@ -49,9 +46,7 @@ export const SidebarItem = ({
       className={buttonClasses}
       onClick={handlePress}
     >
-      <span
-        className={`shrink-0 transition-colors ${isActive ? 'text-[var(--app-selected-foreground)]' : 'text-default-500'}`}
-      >
+      <span className="shrink-0 transition-colors [&>svg]:stroke-2">
         {item.icon}
       </span>
 
@@ -71,7 +66,7 @@ export const SidebarItem = ({
         <motion.span
           animate={{ rotate: isExpanded ? 90 : 0 }}
           transition={{ duration: reducedMotion ? 0 : 0.2 }}
-          className="text-default-400"
+          className="text-default-500"
         >
           <ChevronRight size={16} />
         </motion.span>
@@ -95,16 +90,22 @@ export const SidebarItem = ({
           </PopoverTrigger>
           <PopoverContent className="p-2 min-w-[180px]">
             <div className="w-full flex flex-col gap-1">
-              <p className="text-xs font-semibold text-default-400 px-2 py-1 mb-1">
+              <p className="text-xs font-semibold text-default-500 px-2 py-1 mb-1">
                 {item.label}
               </p>
               {item.children?.map((child) => (
                 <button
                   key={child.key}
                   onClick={() => onSelect(child.key, child.href)}
-                  className="w-full flex items-center gap-3 px-2 py-2 rounded-large hover:bg-default-100 text-default-600 transition-colors text-sm"
+                  className={`w-full flex items-center gap-3 px-2 py-2 rounded-lg transition-colors text-sm ${
+                    activeKey === child.key
+                      ? NAV_ACTIVE_CLASSES
+                      : NAV_IDLE_CLASSES
+                  }`}
                 >
-                  {child.icon}
+                  <span className="shrink-0 [&>svg]:stroke-2">
+                    {child.icon}
+                  </span>
                   <span>{child.label}</span>
                 </button>
               ))}

@@ -21,7 +21,7 @@ describe('AppController (e2e)', () => {
       .get('/api/v1')
       .expect(200)
       .expect({
-        name: 'Nestplate API',
+        name: 'WasteWise API',
         apiVersion: API_VERSION,
         docs: SWAGGER_UI_PATH,
       });

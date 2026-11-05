@@ -17,7 +17,6 @@ import { MailService } from '../../../src/mail/mail.service';
 import { BlacklistedToken } from '../../../src/auth/entities/blacklisted-token.entity';
 import { PasswordResetToken } from '../../../src/auth/entities/password-reset-token.entity';
 import { EmailVerificationToken } from '../../../src/auth/entities/email-verification-token.entity';
-import { RevokedSsoSession } from '../../../src/auth/entities/revoked-sso-session.entity';
 import { User } from '../../../src/users/entities/user.entity';
 import { SessionsService } from '../../../src/sessions/sessions.service';
 import type { AuthenticatedUser } from '../../../src/auth/interfaces/auth-request.interface';
@@ -26,6 +25,7 @@ describe('AuthService', () => {
   let service: AuthService;
   let usersService: {
     findOneByEmail: jest.Mock;
+    findOrCreateGoogleUser: jest.Mock;
     findOne: jest.Mock;
     update: jest.Mock;
     markEmailVerified: jest.Mock;
@@ -55,11 +55,6 @@ describe('AuthService', () => {
     createQueryBuilder: jest.Mock;
   };
   let blacklistInsert: Record<string, jest.Mock>;
-  let revokedSsoSessionRepository: {
-    create: jest.Mock;
-    save: jest.Mock;
-    findOneBy: jest.Mock;
-  };
   let userRepository: { update: jest.Mock };
   const sessionDeadline = new Date('2030-01-01T08:00:00Z');
   let sessionsService: {
@@ -73,6 +68,7 @@ describe('AuthService', () => {
   beforeEach(async () => {
     usersService = {
       findOneByEmail: jest.fn(),
+      findOrCreateGoogleUser: jest.fn(),
       findOne: jest.fn(),
       update: jest.fn(),
       markEmailVerified: jest.fn(),
@@ -106,11 +102,6 @@ describe('AuthService', () => {
       save: jest.fn((e) => Promise.resolve(e)),
       findOneBy: jest.fn(),
       createQueryBuilder: jest.fn(() => blacklistInsert),
-    };
-    revokedSsoSessionRepository = {
-      create: jest.fn((dto) => dto),
-      save: jest.fn((e) => Promise.resolve(e)),
-      findOneBy: jest.fn(),
     };
     userRepository = { update: jest.fn(() => Promise.resolve({})) };
     sessionsService = {
@@ -153,10 +144,6 @@ describe('AuthService', () => {
         {
           provide: getRepositoryToken(EmailVerificationToken),
           useValue: verificationTokenRepository,
-        },
-        {
-          provide: getRepositoryToken(RevokedSsoSession),
-          useValue: revokedSsoSessionRepository,
         },
         {
           provide: ConfigService,
@@ -219,9 +206,34 @@ describe('AuthService', () => {
         service.validateUser('missing@b.com', 'secret'),
       ).resolves.toBeNull();
     });
+
+    it('should reject a correct password for an inactive account', async () => {
+      const hash = await bcrypt.hash('secret', 10);
+      usersService.findOneByEmail.mockResolvedValue({
+        id: 1,
+        email: 'inactive@b.com',
+        password: hash,
+        isActive: false,
+      });
+
+      await expect(
+        service.validateUser('inactive@b.com', 'secret'),
+      ).rejects.toThrow(ForbiddenException);
+    });
   });
 
   describe('login', () => {
+    it('refuses to mint tokens for an inactive account', async () => {
+      const user = {
+        id: 1,
+        email: 'inactive@b.com',
+        isActive: false,
+      } as User;
+
+      await expect(service.login(user)).rejects.toThrow(ForbiddenException);
+      expect(sessionsService.start).not.toHaveBeenCalled();
+    });
+
     it('keeps same-second login and rotation refresh tokens distinct and usable', async () => {
       const clock = jest.spyOn(Date, 'now').mockReturnValue(1791244800000);
       try {
@@ -425,7 +437,6 @@ describe('AuthService', () => {
         await service.login(user as unknown as User, { audience: 'admin' });
         expect(sessionsService.start).toHaveBeenLastCalledWith(1, undefined, {
           audience: 'admin',
-          isSso: false,
           impersonatedById: undefined,
         });
         expect(refreshExpiresIn()).toBe(2 * 60 * 60);
@@ -477,7 +488,6 @@ describe('AuthService', () => {
         await service.refresh('legacy');
         expect(sessionsService.start).toHaveBeenCalledWith(1, undefined, {
           audience: 'admin',
-          isSso: false,
         });
       });
     });
@@ -655,17 +665,39 @@ describe('AuthService', () => {
       );
     });
 
-    it('should throw when the email is not registered', async () => {
+    it('should reject an unverified Google email', async () => {
       (service as unknown as { googleClient: unknown }).googleClient = {
-        verifyIdToken: jest
-          .fn()
-          .mockResolvedValue({ getPayload: () => ({ email: 'x@b.com' }) }),
+        verifyIdToken: jest.fn().mockResolvedValue({
+          getPayload: () => ({ email: 'x@b.com', email_verified: false }),
+        }),
       };
-      usersService.findOneByEmail.mockResolvedValue(null);
 
       await expect(service.validateGoogleUser('tok')).rejects.toThrow(
-        UnauthorizedException,
+        'Google email is not verified',
       );
+      expect(usersService.findOrCreateGoogleUser).not.toHaveBeenCalled();
+    });
+
+    it('should auto-register an unknown Google account', async () => {
+      (service as unknown as { googleClient: unknown }).googleClient = {
+        verifyIdToken: jest.fn().mockResolvedValue({
+          getPayload: () => ({ email: 'x@b.com', name: 'Google User' }),
+        }),
+      };
+      usersService.findOrCreateGoogleUser.mockResolvedValue({
+        id: 1,
+        email: 'x@b.com',
+        password: 'secret-hash',
+        isActive: true,
+      });
+
+      const result = await service.validateGoogleUser('tok');
+
+      expect(usersService.findOrCreateGoogleUser).toHaveBeenCalledWith({
+        email: 'x@b.com',
+        fullname: 'Google User',
+      });
+      expect((result as Record<string, unknown>).password).toBeUndefined();
     });
 
     it('should return the user without password when registered', async () => {
@@ -674,10 +706,11 @@ describe('AuthService', () => {
           .fn()
           .mockResolvedValue({ getPayload: () => ({ email: 'x@b.com' }) }),
       };
-      usersService.findOneByEmail.mockResolvedValue({
+      usersService.findOrCreateGoogleUser.mockResolvedValue({
         id: 1,
         email: 'x@b.com',
         password: 'secret-hash',
+        isActive: true,
       });
 
       const result = await service.validateGoogleUser('tok');
@@ -702,12 +735,13 @@ describe('AuthService', () => {
     it('should return the registered user for a valid access token', async () => {
       globalThis.fetch = jest.fn().mockResolvedValue({
         ok: true,
-        json: async () => ({ email: 'x@b.com' }),
+        json: async () => ({ email: 'x@b.com', name: 'Google User' }),
       }) as never;
-      usersService.findOneByEmail.mockResolvedValue({
+      usersService.findOrCreateGoogleUser.mockResolvedValue({
         id: 1,
         email: 'x@b.com',
         password: 'secret-hash',
+        isActive: true,
       });
 
       const result = await service.validateGoogleAccessToken('ya29.x');
@@ -793,7 +827,6 @@ describe('AuthService', () => {
 
       expect(sessionsService.start).toHaveBeenCalledWith(2, undefined, {
         audience: 'admin',
-        isSso: false,
         impersonatedById: 1,
       });
       const payload = (jwtService.sign as jest.Mock).mock.calls[0][0] as {

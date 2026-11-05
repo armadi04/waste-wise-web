@@ -30,9 +30,9 @@ The starter baseline requires a new database. Applied migrations are immutable.
 
 | Location | Responsibility |
 |---|---|
-| `auth/`, `sso/`, `oauth/`, `sessions/` | Identity, factors, providers, RBAC, machine clients, device sessions |
+| `auth/`, `oauth/`, `sessions/` | Identity, factors, providers, RBAC, machine clients, device sessions |
 | `users/`, `roles/`, `permissions/`, `invitations/` | Administrative resources |
-| `media/` | Ownership and Depot/direct S3 adapters |
+| `media/` | Ownership and the S3 storage adapter |
 | `mail/` | Templates, SMTP outbox, retries and redaction |
 | `notifications/`, `app-refresh/` | Persisted notifications, realtime and refresh signals |
 | `audit/`, `stats/`, `health/`, `changelog/` | Audit, generic dashboard, probes, release notes |
@@ -61,13 +61,16 @@ account/device-specific. Generic report zones currently support Jakarta, Makassa
 ## Events and integrations
 
 Services emit domain events; listeners persist notifications and push them through the gateway.
-`system.create/update/delete`, `user.created/invited/deleted/roles_updated`, `user.notification`
-and `audit.record` are existing contracts. Feature services do not call the gateway directly.
+`system.create/update/delete`, `user.created/invited/deleted/roles_updated`, `user.notification`,
+`report.status_changed` and `audit.record` are existing contracts. Feature services do not call
+the gateway directly. `report.status_changed` (`src/reports/report-events.ts`) notifies the
+reporter, unless they changed it themselves, with a `/reports/:id` link and the idempotent event
+id `report:<id>:status:<status>`; a failed notification never fails the status update.
 Socket.IO namespace `notifications` accepts cookie or explicit token auth and emits
 `new_notification` and `app_refresh`. HTTP polling supplies a notification fallback.
 
-Media rows retain their immutable storage profile/location fingerprint, object key and optional
-Depot ID. Upload admission/size/content limits precede storage. Pending records exist before
+Media rows retain their immutable storage profile/location fingerprint, object key.
+Upload admission/size/content limits precede storage. Pending records exist before
 I/O; only ready rows are public. Deleting rows are hidden and retried by a persistent UTC
 cleanup worker with SKIP LOCKED and fenced leases. Reads/deletes use recorded profiles, never
 the new default. Keep archived profiles configured for existing files and cleanup jobs.

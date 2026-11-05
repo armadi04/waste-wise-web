@@ -31,13 +31,13 @@ export async function cleanDatabase(
   )
     throw new Error('Cleanup requires the dedicated nestplate_test database');
   await dataSource.query('UPDATE users SET "avatarId" = NULL');
+  await dataSource.query('DELETE FROM reports');
   await dataSource.query('DELETE FROM media');
   await dataSource.query('DELETE FROM notifications');
   await dataSource.query('DELETE FROM user_sessions');
   await dataSource.query('DELETE FROM audit_logs');
   await dataSource.query('DELETE FROM outbound_emails');
   await dataSource.query('DELETE FROM two_factor_recovery_codes');
-  await dataSource.query('DELETE FROM revoked_sso_sessions');
   await dataSource.query('DELETE FROM invitations');
   await dataSource.query('DELETE FROM blacklisted_tokens');
   await dataSource.query('DELETE FROM password_reset_tokens');

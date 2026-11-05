@@ -8,9 +8,6 @@ export interface AuthenticatedUser {
   emailVerified: boolean;
   // The role the user is currently acting as, if one has been chosen.
   activeRole?: string;
-  // OIDC session id — present only for SSO-minted sessions. Surfaced to the SPA
-  // (via /auth/me) so logout can be routed through RP-initiated logout.
-  sid?: string;
   // Present while this session is an impersonation: the administrator's own id.
   impersonatorId?: number;
   // Device-session id backing this token, so the sessions endpoints can tell

@@ -4,7 +4,7 @@ import { CacheService } from './cache.service';
 
 /**
  * Cache invalidation for writes that don't go through a controller that clears
- * its own keys: accounts are also created by Google sign-in, SSO
+ * its own keys: accounts are also created by Google sign-in
  * provisioning and invitation acceptance.
  */
 @Injectable()
@@ -15,5 +15,13 @@ export class CacheInvalidationListener {
   @OnEvent('user.roles_updated')
   async clearUsers() {
     await this.cacheService.clearKeys('*/users*');
+  }
+
+  @OnEvent('user.status_updated')
+  async clearUserStatusCaches() {
+    await Promise.all([
+      this.cacheService.clearKeys('*/users*'),
+      this.cacheService.clearKeys('*/sessions*'),
+    ]);
   }
 }

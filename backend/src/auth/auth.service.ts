@@ -3,6 +3,7 @@ import {
   ForbiddenException,
   Injectable,
   NotFoundException,
+  ServiceUnavailableException,
   UnauthorizedException,
 } from '@nestjs/common';
 import { EventEmitter2, OnEvent } from '@nestjs/event-emitter';
@@ -18,7 +19,6 @@ import {
 } from './entities/blacklisted-token.entity';
 import { PasswordResetToken } from './entities/password-reset-token.entity';
 import { EmailVerificationToken } from './entities/email-verification-token.entity';
-import { RevokedSsoSession } from './entities/revoked-sso-session.entity';
 import { ConfigService } from '@nestjs/config';
 import { OAuth2Client } from 'google-auth-library';
 import { MailService } from '../mail/mail.service';
@@ -70,8 +70,6 @@ export class AuthService {
     private resetTokenRepository: Repository<PasswordResetToken>,
     @InjectRepository(EmailVerificationToken)
     private verificationTokenRepository: Repository<EmailVerificationToken>,
-    @InjectRepository(RevokedSsoSession)
-    private revokedSsoSessionRepository: Repository<RevokedSsoSession>,
     @InjectRepository(User)
     private userRepository: Repository<User>,
     private configService: ConfigService,
@@ -100,6 +98,7 @@ export class AuthService {
       return null;
     }
 
+    this.assertActive(user);
     await this.clearFailedLogins(user);
 
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -115,11 +114,20 @@ export class AuthService {
       1,
       Math.ceil((user.lockedUntil.getTime() - Date.now()) / 60_000),
     );
-    throw new ForbiddenException(
-      `Too many failed sign-in attempts. Try again in ${minutes} minute${
+    throw new ForbiddenException({
+      message: `Too many failed sign-in attempts. Try again in ${minutes} minute${
         minutes === 1 ? '' : 's'
       }.`,
-    );
+      code: 'ACCOUNT_LOCKED',
+    });
+  }
+
+  assertActive(user: Pick<User, 'isActive'>): void {
+    if (user.isActive === false)
+      throw new ForbiddenException({
+        message: 'Account is inactive',
+        code: 'ACCOUNT_INACTIVE',
+      });
   }
 
   /**
@@ -170,22 +178,48 @@ export class AuthService {
         throw new UnauthorizedException('Invalid Google token');
       }
 
-      const user = await this.usersService.findOneByEmail(payload.email);
-      if (!user) {
-        throw new UnauthorizedException(
-          `Your email (${payload.email}) is not registered in this system. Please contact an administrator to get access.`,
-        );
-      }
-
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
-      const { password, ...result } = user;
-      return result;
+      return await this.resolveGoogleUser({
+        email: payload.email,
+        fullname: payload.name,
+        emailVerified: payload.email_verified,
+      });
     } catch (error) {
-      if (error instanceof UnauthorizedException) {
+      if (
+        error instanceof UnauthorizedException ||
+        error instanceof ForbiddenException ||
+        error instanceof ServiceUnavailableException
+      ) {
         throw error;
       }
       throw new UnauthorizedException('Google authentication failed');
     }
+  }
+
+  /**
+   * Existing Google accounts sign in; unknown ones are auto-registered by the
+   * users service with the default `user` role. The backend remains the source
+   * of truth for identity, account status, roles and permissions.
+   */
+  private async resolveGoogleUser(payload: {
+    email?: string | null;
+    fullname?: string | null;
+    emailVerified?: boolean;
+  }): Promise<Omit<User, 'password'>> {
+    if (!payload.email) {
+      throw new UnauthorizedException('Invalid Google identity');
+    }
+    if (payload.emailVerified === false) {
+      throw new UnauthorizedException('Google email is not verified');
+    }
+    const user = await this.usersService.findOrCreateGoogleUser({
+      email: payload.email,
+      fullname: payload.fullname,
+    });
+    this.assertActive(user);
+
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const { password, ...result } = user;
+    return result;
   }
 
   async validateGoogleAccessToken(
@@ -205,23 +239,26 @@ export class AuthService {
         throw new UnauthorizedException('Invalid Google access token');
       }
 
-      const payload = (await response.json()) as { email: string };
+      const payload = (await response.json()) as {
+        email?: string;
+        name?: string;
+        email_verified?: boolean;
+      };
       if (!payload || !payload.email) {
         throw new UnauthorizedException('Invalid Google user information');
       }
 
-      const user = await this.usersService.findOneByEmail(payload.email);
-      if (!user) {
-        throw new UnauthorizedException(
-          `Your email (${payload.email}) is not registered in this system. Please contact an administrator to get access.`,
-        );
-      }
-
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
-      const { password, ...result } = user;
-      return result;
+      return await this.resolveGoogleUser({
+        email: payload.email,
+        fullname: payload.name,
+        emailVerified: payload.email_verified,
+      });
     } catch (error) {
-      if (error instanceof UnauthorizedException) {
+      if (
+        error instanceof UnauthorizedException ||
+        error instanceof ForbiddenException ||
+        error instanceof ServiceUnavailableException
+      ) {
         throw error;
       }
       throw new UnauthorizedException('Google access token validation failed');
@@ -242,7 +279,6 @@ export class AuthService {
   private buildTokens(
     user: Omit<User, 'password'>,
     opts: {
-      sid?: string;
       activeRole?: string;
       sessionId?: string;
       impersonatorId?: number;
@@ -266,7 +302,6 @@ export class AuthService {
       roles: activeRole ? [activeRole] : [],
       emailVerified: !!user.emailVerifiedAt,
       ...(activeRole ? { activeRole } : {}),
-      ...(opts.sid ? { sid: opts.sid } : {}),
       ...(opts.sessionId ? { sessionId: opts.sessionId } : {}),
       ...(opts.impersonatorId ? { impersonatorId: opts.impersonatorId } : {}),
     };
@@ -311,36 +346,37 @@ export class AuthService {
     try {
       payload = this.jwtService.verify<JwtPayload>(token);
     } catch {
-      throw new UnauthorizedException(
-        'Your sign-in attempt expired — start again',
-      );
+      throw new UnauthorizedException({
+        message: 'Your sign-in attempt expired — start again',
+        code: 'TWO_FACTOR_CHALLENGE_EXPIRED',
+      });
     }
     if (payload.tokenType !== '2fa') {
-      throw new UnauthorizedException('Invalid verification token');
+      throw new UnauthorizedException({
+        message: 'Invalid verification token',
+        code: 'TWO_FACTOR_CHALLENGE_INVALID',
+      });
     }
     return payload.sub;
   }
 
-  // `sid` is the OIDC session id, passed only for SSO logins so the session can
-  // be revoked on back-channel logout. `context` (IP + user agent) is recorded
+  // `context` (IP + user agent) is recorded
   // on the device session so the user can recognise it in the session list.
   async login(
     user: Omit<User, 'password'>,
     opts: {
-      sid?: string;
       context?: SessionContext;
       impersonatorId?: number;
       /** Session lifetime policy. */
       audience?: SessionAudience;
     } = {},
   ) {
+    this.assertActive(user);
     const session = await this.sessionsService.start(user.id, opts.context, {
       audience: opts.audience ?? 'admin',
-      isSso: !!opts.sid,
       impersonatedById: opts.impersonatorId,
     });
     return this.buildTokens(user, {
-      sid: opts.sid,
       sessionId: session.sessionId,
       impersonatorId: opts.impersonatorId,
       audience: session.audience,
@@ -353,7 +389,6 @@ export class AuthService {
   async switchRole(
     userId: number,
     roleName: string,
-    sid?: string,
     sessionId?: string,
     impersonatorId?: number,
   ) {
@@ -361,6 +396,7 @@ export class AuthService {
     if (!user) {
       throw new UnauthorizedException('User no longer exists');
     }
+    this.assertActive(user);
     if (!user.roles?.some((r) => r.name === roleName)) {
       throw new ForbiddenException('You do not have that role');
     }
@@ -370,7 +406,6 @@ export class AuthService {
       : null;
     return this.buildTokens(user, {
       activeRole: roleName,
-      sid,
       sessionId,
       impersonatorId,
       audience: session?.audience,
@@ -473,19 +508,6 @@ export class AuthService {
     return this.login(impersonator, { context });
   }
 
-  async revokeSession(sid: string, sub?: string | null): Promise<void> {
-    const existing = await this.revokedSsoSessionRepository.findOneBy({ sid });
-    if (existing) return;
-    await this.revokedSsoSessionRepository.save(
-      this.revokedSsoSessionRepository.create({ sid, sub: sub ?? null }),
-    );
-  }
-
-  async isSessionRevoked(sid: string): Promise<boolean> {
-    const found = await this.revokedSsoSessionRepository.findOneBy({ sid });
-    return !!found;
-  }
-
   async blacklistToken(token: string, reason: BlacklistReason = 'logout') {
     // Idempotent: a token can already be listed (rotated, then logged out).
     await this.blacklistedTokenRepository
@@ -565,11 +587,6 @@ export class AuthService {
       throw new UnauthorizedException('Invalid or expired refresh token');
     }
 
-    // An SSO session that has been revoked (back-channel logout) can't be refreshed.
-    if (payload.sid && (await this.isSessionRevoked(payload.sid))) {
-      throw new UnauthorizedException('Session has been revoked');
-    }
-
     // A device session the user (or an admin) signed out can't be refreshed
     // either — otherwise revoking it would only last until the access token expired.
     if (
@@ -583,6 +600,7 @@ export class AuthService {
     if (!user) {
       throw new UnauthorizedException('User no longer exists');
     }
+    this.assertActive(user);
 
     // Carry the chosen role forward (buildTokens drops it if the user no longer
     // holds it).
@@ -601,12 +619,10 @@ export class AuthService {
     } else {
       session = await this.sessionsService.start(user.id, context, {
         audience: 'admin',
-        isSso: !!payload.sid,
       });
     }
 
     const tokens = this.buildTokens(user, {
-      sid: payload.sid,
       activeRole: payload.activeRole,
       sessionId: session.sessionId,
       impersonatorId: payload.impersonatorId,

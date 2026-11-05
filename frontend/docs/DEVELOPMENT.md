@@ -16,12 +16,11 @@ backend. Leave `VITE_API_URL` empty. Preserve existing env files.
 
 ## Public build configuration
 
-| Variable                | Purpose                                                            |
-| ----------------------- | ------------------------------------------------------------------ |
+| Variable                | Purpose                                                                                         |
+| ----------------------- | ----------------------------------------------------------------------------------------------- |
 | VITE_API_URL            | Empty for same-origin API/socket; optional absolute backend origin, without `/api` or `/api/v1` |
-| VITE_GOOGLE_CLIENT_ID   | Public Google client ID; optional Google button                    |
-| VITE_TURNSTILE_SITE_KEY | Public CAPTCHA site key                                            |
-| VITE_SSO_SILENT         | true enables one-attempt silent SSO                                |
+| VITE_GOOGLE_CLIENT_ID   | Public Google client ID; optional Google button                                                 |
+| VITE_TURNSTILE_SITE_KEY | Public CAPTCHA site key                                                                         |
 
 All VITE values ship to browsers; secrets stay backend-side. Rebuild after changing them.
 Cross-origin access requires cookie credentials and exact backend `ALLOWED_ORIGINS`.
@@ -36,7 +35,7 @@ Vitest discovers unit tests under `test/`, excluding `test/e2e/`.
 Browser E2E is optional, only run when explicitly requested: `bun run test:e2e`.
 Frontend CI runs default checks; manually dispatch with `run_e2e=true` for browser tests.
 Playwright uses mocked browser API responses and its own Vite port; it does not prove live
-Google/SSO/SMTP/storage integration. CI installs bundled Chromium. Local execution can use
+Google/SMTP/storage integration. CI installs bundled Chromium. Local execution can use
 `PLAYWRIGHT_CHROMIUM_EXECUTABLE` (default `/usr/bin/google-chrome`).
 
 ## Generated contracts

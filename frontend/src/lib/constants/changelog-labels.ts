@@ -3,14 +3,12 @@ import type { SectionKind } from '@/lib/utils/changelog'
 /**
  * Friendly names for conventional-commit scopes.
  *
- * The changelog is read by users, not developers, so a raw `oauth` or `sso`
+ * The changelog is read by users, not developers, so a raw `oauth`
  * scope means little to them. Anything missing here falls back to the raw
  * scope — add an entry when a new scope starts appearing in releases.
  */
 export const SCOPE_LABELS: Record<string, string> = {
   auth: 'Sign-in & Access',
-  sso: 'Single Sign-On',
-  oidc: 'Single Sign-On',
   oauth: 'OAuth Clients',
   users: 'Users',
   roles: 'Roles',

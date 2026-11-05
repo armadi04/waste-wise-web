@@ -10,7 +10,7 @@ beforeEach(() => {
   vi.resetModules()
   localStorage.clear()
   document.documentElement.className = ''
-  document.head.innerHTML = '<meta name="theme-color" content="#F8FAFC" />'
+  document.head.innerHTML = '<meta name="theme-color" content="#FFFFFF" />'
 })
 afterEach(() => vi.restoreAllMocks())
 
@@ -28,7 +28,7 @@ function checkRoot(dark: boolean) {
   )
   expect(
     document.querySelector('meta[name="theme-color"]')?.getAttribute('content'),
-  ).toBe(dark ? '#0F172A' : '#F8FAFC')
+  ).toBe(dark ? '#000000' : '#ffffff')
 }
 
 describe('theme preference and pre-paint bootstrap', () => {

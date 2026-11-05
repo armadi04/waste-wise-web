@@ -3,11 +3,14 @@ import { motion, useReducedMotion } from 'framer-motion'
 import loginDayBg from '@/assets/images/login-day.webp'
 import loginNightBg from '@/assets/images/login-night.webp'
 import { useTheme } from '@/hooks/global'
-import { useTimeZone } from '@/lib/stores/time-zone'
-import { formatBusinessDate } from '@/lib/utils/format'
 
 interface AuthPageShellProps {
   children: React.ReactNode
+  /**
+   * Content pinned to the footer's start (bottom-left on desktop, stacked
+   * under the card on phones) — used by login for the Turnstile widget.
+   */
+  footerStart?: React.ReactNode
   /**
    * Shares the layout animation with the other auth cards so navigating
    * between them morphs the card. Disable for standalone screens such as the
@@ -21,11 +24,15 @@ interface AuthPageShellProps {
  * forgot/reset password, verify email, accept invite) and the gates.
  *
  * The illustration follows the theme — `login-night` in dark mode — and the
- * footer carries the copyright/developer line that used to sit in the split
- * layout's left column.
+ * footer renders only when the optional `footerStart` slot is given. The
+ * slot lives outside the transformed card so its content stays anchored to
+ * the viewport corner.
  */
-export function AuthPageShell({ children, morph = true }: AuthPageShellProps) {
-  useTimeZone((s) => s.timeZone)
+export function AuthPageShell({
+  children,
+  footerStart,
+  morph = true,
+}: AuthPageShellProps) {
   const { isDark } = useTheme()
   const reducedMotion = useReducedMotion()
   const background = isDark ? loginNightBg : loginDayBg
@@ -57,17 +64,11 @@ export function AuthPageShell({ children, morph = true }: AuthPageShellProps) {
         </motion.div>
       </main>
 
-      <footer className="relative z-10 flex items-center justify-between px-6 pb-6 pt-4 text-xs text-white drop-shadow-[0_1px_2px_rgba(0,0,0,0.9)]">
-        <p>© {formatBusinessDate(new Date(), 'yyyy')} Nestplate Starter.</p>
-        <a
-          href="https://armadii.my.id"
-          target="_blank"
-          rel="noopener noreferrer"
-          className="uppercase tracking-wide underline-offset-4 hover:underline focus-visible:rounded-small focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-white"
-        >
-          developer
-        </a>
-      </footer>
+      {footerStart && (
+        <footer className="relative z-10 flex px-4 pb-6 pt-4 sm:px-6">
+          {footerStart}
+        </footer>
+      )}
     </div>
   )
 }

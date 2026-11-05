@@ -34,6 +34,10 @@ export const updateUser = (id: number, data: Partial<CreateUserData>) => {
   return apiPatch<UserProfile>(`/users/${id}`, data)
 }
 
+export const updateUserStatus = (id: number, isActive: boolean) => {
+  return apiPatch<UserProfile>(`/users/${id}/status`, { isActive })
+}
+
 export const deleteUser = (id: number) => {
   return apiDelete<void>(`/users/${id}`)
 }

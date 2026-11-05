@@ -9,8 +9,7 @@ Public Vite values must be supplied at build time; backend secrets never enter b
 docker build -t nestplate-frontend \
   --build-arg VITE_API_URL="" \
   --build-arg VITE_GOOGLE_CLIENT_ID="${GOOGLE_CLIENT_ID}" \
-  --build-arg VITE_TURNSTILE_SITE_KEY="${TURNSTILE_SITE_KEY}" \
-  --build-arg VITE_SSO_SILENT="false" .
+  --build-arg VITE_TURNSTILE_SITE_KEY="${TURNSTILE_SITE_KEY}" .
 
 docker run --rm -p 3001:3000 \
   -e BACKEND_URL=http://backend:3000 \
@@ -42,7 +41,7 @@ Rollback static image and its build configuration together; coordinate backend c
 | API returns HTML                | Caddy backend matcher, path and service-worker version            |
 | Backend returns 502             | BACKEND_URL, container network and backend health                 |
 | Logged out after reload         | Session cookies, exact origin, HTTPS and backend validity         |
-| Refresh loop                    | CSRF/cookie match, auth guard response and SSO one-attempt flag   |
+| Refresh loop                    | CSRF/cookie match, auth guard response                            |
 | Invisible menu or 403           | Active role, verified email, API and menu permissions             |
 | Stale data after account switch | Query cache reset; do not persist auth/server lists               |
 | Missing Google/CAPTCHA          | Public build values and matching backend provider config          |
@@ -51,7 +50,7 @@ Rollback static image and its build configuration together; coordinate backend c
 
 Integration diagnostics: [backend operations](../../backend/docs/OPERATIONS.md).
 
-REST consumers use `/api/v1/*`, including health and SSO. Existing `/api/*` proxy
+REST consumers use `/api/v1/*`, including health. Existing `/api/*` proxy
 matching covers these paths without rewriting. `VITE_API_URL` is an origin only;
 never append `/api/v1` there because the shared URL builder adds it. Rebuild the
 frontend alongside the backend migration. External probe and IdP changes are listed

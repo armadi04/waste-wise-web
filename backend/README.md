@@ -1,8 +1,8 @@
-# Nestplate backend
+# WasteWise backend
 
 NestJS 12.1.2 with Fastify 5 on Bun, PostgreSQL and TypeORM. Owns auth/RBAC, users, invitations, 2FA,
-sessions, media (Depot/direct S3), SMTP outbox, notifications, audit, health, generic
-dashboard statistics and optional GraphQL.
+sessions, media (S3-compatible storage), waste reports with ML-assisted classification,
+SMTP outbox, notifications, audit, health, dashboard statistics and optional GraphQL.
 
 ## Quick start
 
@@ -21,7 +21,7 @@ GitHub Packages authentication is required for the SDK dependencies. API:
 `GET /api/v1` is public and returns only API identity:
 
 ```json
-{ "name": "Nestplate API", "apiVersion": "1", "docs": "/api/docs" }
+{ "name": "WasteWise API", "apiVersion": "1", "docs": "/api/docs" }
 ```
 
 `apiVersion` follows the shared REST URI version configuration, independently of the
@@ -40,8 +40,35 @@ curl http://localhost:3000/api/v1/health
 
 Keep `DB_SYNCHRONIZE=false`. Baseline supports new databases only.
 
-`MEDIA_PROVIDER=depot` is default; use `s3` for direct S3-compatible storage. Required env
-and optional integrations are listed in [Development](docs/DEVELOPMENT.md#environment).
+Media uses S3-compatible storage (`MEDIA_PROVIDER=s3`). Reports call
+the internal ML service at `ML_SERVICE_URL` (`POST /api/v1/predict`) and still save with
+`classificationStatus=FAILED` when it is unavailable. Required env and optional integrations
+are listed in [Development](docs/DEVELOPMENT.md#environment).
+
+Development/test seeding creates a verified User demo account
+(`user@smart-waste.local` / `DemoUser123!` by default). Report mutations write `report.created`,
+`report.updated`, `report.status_updated`, and `report.deleted` into the audit trail. Status
+changes by staff also send the reporter an in-app notification linking to the report.
+
+User accounts can be deactivated with `PATCH /api/v1/users/:id/status` (`users.manage_status`).
+Inactive users cannot sign in, refresh, switch roles or use existing access tokens; all sessions
+are revoked. Self-deactivation is rejected and superadmin accounts remain superadmin-only.
+
+Report resources:
+
+```text
+GET    /api/v1/reports                 list (own or all by permission)
+GET    /api/v1/reports/:id             detail
+POST   /api/v1/reports                 create (mediaId from Media Module upload)
+PATCH  /api/v1/reports/:id             update; new mediaId re-runs classification
+PATCH  /api/v1/reports/:id/status      admin status transition
+DELETE /api/v1/reports/:id             soft delete
+GET    /api/v1/stats/reports           role-scoped dashboard aggregation
+```
+
+Photo flow: upload through `POST /api/v1/media/upload`, then pass `mediaId` to Reports.
+The backend fetches the stored image from media storage and forwards it to the ML service;
+the browser never calls the ML service directly.
 Run `bun run build` before `start:prod` so imports are rewritten by tsc-alias.
 Default tests are unit-only; requested integration/E2E work uses `nestplate_test`.
 `bun run test:http` tests HTTP/GraphQL with Fastify injection and mocked dependencies,

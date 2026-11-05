@@ -1,5 +1,6 @@
 import { useRouterState } from '@tanstack/react-router'
 import { motion } from 'framer-motion'
+import { BRAND_NAME_LEADING, BRAND_NAME_TRAILING } from '@/lib/constants/brand'
 
 /**
  * Keeps the router's `defaultPendingComponent` slot filled so `pendingMs` /
@@ -40,8 +41,8 @@ export function RouterPendingOverlay() {
           }}
         >
           <div className="font-semibold text-7xl tracking-tight italic select-none">
-            <span className="text-foreground">Nest</span>
-            <span className="text-[var(--app-link)]">plate</span>
+            <span className="text-[var(--app-link)]">{BRAND_NAME_LEADING}</span>
+            <span className="text-foreground">{BRAND_NAME_TRAILING}</span>
           </div>
         </motion.div>
 

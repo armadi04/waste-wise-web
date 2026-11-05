@@ -8,10 +8,8 @@ describe('test environment isolation', () => {
         DB_HOST: 'production.example.test',
         DB_PASSWORD: 'developer-password',
         JWT_SECRET: 'developer-secret',
-        DEPOT_API_KEY: 'developer-key',
         S3_SECRET_ACCESS_KEY: 'developer-s3',
         SMTP_PASS: 'developer-mail',
-        SSO_CLIENT_SECRET: 'developer-sso',
         MEDIA_STORAGE_PROFILES: '{"real":"credentials"}',
         PATH: '/bin',
       },
@@ -19,14 +17,9 @@ describe('test environment isolation', () => {
     );
     expect(environment.DB_HOST).toBe('127.0.0.1');
     expect(environment.DB_PORT).toBe('9');
-    expect(environment.DEPOT_API_KEY).toBe('unit-only-key');
+    expect(environment.S3_SECRET_ACCESS_KEY).toBe('unit-only-key');
     expect(environment.JWT_SECRET).toBe('unit-only-secret-not-for-deployment');
-    for (const key of [
-      'S3_SECRET_ACCESS_KEY',
-      'SMTP_PASS',
-      'SSO_CLIENT_SECRET',
-      'MEDIA_STORAGE_PROFILES',
-    ])
+    for (const key of ['SMTP_PASS', 'MEDIA_STORAGE_PROFILES'])
       expect(environment[key]).toBeUndefined();
   });
   it('refuses integration tests without explicit TEST_DB credentials', () => {

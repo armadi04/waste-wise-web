@@ -10,9 +10,6 @@ export interface JwtPayload {
   // permissions JwtStrategy loads) are scoped to it; absent means no role chosen yet (multi-role
   // users must pick one before any role permission is granted).
   activeRole?: string;
-  // OIDC session id — present only for sessions minted via SSO login. Used to
-  // revoke the session on back-channel logout (see RevokedSsoSession).
-  sid?: string;
   // Set while an administrator is signed in as this user: the id of the real
   // account behind the session, so it can be handed back.
   impersonatorId?: number;

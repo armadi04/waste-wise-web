@@ -47,7 +47,6 @@ export class SessionsService extends BaseService<UserSession> {
     context: SessionContext = {},
     opts: {
       audience?: SessionAudience;
-      isSso?: boolean;
       impersonatedById?: number;
     } = {},
   ): Promise<StartedSession> {
@@ -59,7 +58,6 @@ export class SessionsService extends BaseService<UserSession> {
       userId,
       ipAddress: context.ipAddress ?? null,
       userAgent: context.userAgent ?? null,
-      isSso: !!opts.isSso,
       impersonatedById: opts.impersonatedById ?? null,
       audience,
       lastActiveAt: now,
@@ -132,6 +130,15 @@ export class SessionsService extends BaseService<UserSession> {
     );
     if (!result.affected) return null;
     return Object.assign(session, { lastActiveAt: now, expiresAt });
+  }
+
+  /** Revoke every live session for an account, including impersonation sessions. */
+  async revokeAllForUser(userId: number): Promise<{ revoked: number }> {
+    const result = await this.sessionRepository.update(
+      { userId, revokedAt: IsNull() },
+      { revokedAt: new Date() },
+    );
+    return { revoked: result.affected ?? 0 };
   }
 
   /**

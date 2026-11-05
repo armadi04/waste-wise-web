@@ -3,6 +3,11 @@ import { OnEvent } from '@nestjs/event-emitter';
 import { NotificationsService } from './notifications.service';
 import { NotificationsGateway } from './notifications.gateway';
 import { NotificationType } from './entities/notification.entity';
+import {
+  REPORT_STATUS_CHANGED,
+  reportStatusNotification,
+  type ReportStatusChangedEvent,
+} from '../reports/report-events';
 
 const ADMIN_ROLES = ['superadmin', 'admin'] as const;
 
@@ -109,6 +114,44 @@ export class NotificationsListener {
       payload.actorId,
       payload.eventId,
     );
+  }
+
+  // ─── Report Events ───────────────────────────────────────────────────────────
+
+  /**
+   * Tells the reporter their report moved on. Skipped when reporters change
+   * their own report (they already know). The event id makes redelivery
+   * idempotent; status transitions never revisit a status.
+   */
+  @OnEvent(REPORT_STATUS_CHANGED)
+  async handleReportStatusChanged(payload: ReportStatusChangedEvent) {
+    if (payload.reporterId === payload.actorId) return;
+    const copy = reportStatusNotification(payload.reportId, payload.to);
+    const type =
+      copy.tone === 'success'
+        ? NotificationType.SUCCESS
+        : copy.tone === 'warning'
+          ? NotificationType.WARNING
+          : NotificationType.INFO;
+    try {
+      await this.notifyUser(
+        payload.reporterId,
+        {
+          title: copy.title,
+          message: copy.message,
+          type,
+          link: `/reports/${payload.reportId}`,
+        },
+        payload.actorId,
+        `report:${payload.reportId}:status:${payload.to}`,
+      );
+    } catch (error) {
+      // A failed notification must never surface as a failed status update.
+      this.logger.error(
+        `Could not notify reporter of report #${payload.reportId}`,
+        error instanceof Error ? error.stack : String(error),
+      );
+    }
   }
 
   // ─── User Events ─────────────────────────────────────────────────────────────

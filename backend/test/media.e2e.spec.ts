@@ -122,14 +122,14 @@ describe('Media (e2e)', () => {
   });
 
   describe('GET /media/:id/view (public)', () => {
-    it('redirects to a Depot signed URL without authentication', async () => {
+    it('redirects to a signed storage URL without authentication', async () => {
       const id = await uploadAs(admin);
 
       const res = await request(server)
         .get(`/api/v1/media/${id}/view`)
         .expect(302);
 
-      expect(res.headers['location']).toContain('depot.test/signed/');
+      expect(res.headers['location']).toContain('storage.test/signed/');
     });
   });
 

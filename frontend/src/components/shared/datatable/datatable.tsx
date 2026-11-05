@@ -105,7 +105,7 @@ export function DataTable<T extends { id: string | number }>({
         createLabel={createLabel}
         trailingActions={trailingActions}
       />
-      <CardBody className="p-0">
+      <CardBody className="p-0 overflow-x-auto">
         {/* Table */}
         {isLoading ? (
           <Table

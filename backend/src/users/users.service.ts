@@ -3,9 +3,18 @@ import {
   NotFoundException,
   ConflictException,
   ForbiddenException,
+  ServiceUnavailableException,
 } from '@nestjs/common';
+import crypto from 'node:crypto';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository, In, Raw, type FindOptionsWhere } from 'typeorm';
+import {
+  Repository,
+  In,
+  Raw,
+  IsNull,
+  Not,
+  type FindOptionsWhere,
+} from 'typeorm';
 import { RegisterMethodEnum } from './register-method.enum';
 import type { UsersQueryDto } from './dto/users-query.dto';
 import { createdInRange } from '@/common/helpers/created-in-range';
@@ -19,6 +28,10 @@ import { UpdateUserDto } from './dto/update-user.dto';
 import { BaseService } from '../common/services/base.service';
 import { GrantPolicyService } from '../roles/grant-policy.service';
 import type { AuthenticatedUser } from '../auth/interfaces/auth-request.interface';
+import { SessionsService } from '../sessions/sessions.service';
+import type { AccountStatus } from './account-status';
+import { presentUser, presentUsers } from './user.presenter';
+import type { UserStatusUpdatedEvent } from './user-events';
 
 const normalizeEmail = (email: string) => email.trim().toLowerCase();
 
@@ -34,6 +47,7 @@ export class UsersService extends BaseService<User> {
     @InjectRepository(Media)
     private mediaRepository: Repository<Media>,
     private readonly grantPolicy: GrantPolicyService,
+    private readonly sessionsService: SessionsService,
   ) {
     super(usersRepository, 'User', ['email', 'fullname']);
   }
@@ -111,6 +125,46 @@ export class UsersService extends BaseService<User> {
     }
   }
 
+  /**
+   * Resolve a verified Google identity to a local account. Unknown Google
+   * accounts become active, verified `user` accounts so mobile sign-in does not
+   * depend on a separate registration screen. A unique-email conflict means a
+   * concurrent sign-in won the race, so re-read and return that account.
+   */
+  async findOrCreateGoogleUser(input: {
+    email: string;
+    fullname?: string | null;
+  }): Promise<User> {
+    const existing = await this.findOneByEmail(input.email);
+    if (existing) return existing;
+
+    const userRole = await this.rolesRepository.findOneBy({ name: 'user' });
+    if (!userRole) {
+      throw new ServiceUnavailableException(
+        'The default user role is not configured',
+      );
+    }
+
+    try {
+      const created = await this.create(
+        {
+          email: input.email,
+          password: crypto.randomBytes(32).toString('hex'),
+          fullname: input.fullname?.trim() || undefined,
+          roleIds: [userRole.id],
+        },
+        { autoVerify: true, registerMethod: RegisterMethodEnum.GOOGLE },
+      );
+      return await this.findOne(created.id);
+    } catch (error) {
+      if (error instanceof ConflictException) {
+        const raced = await this.findOneByEmail(input.email);
+        if (raced) return raced;
+      }
+      throw error;
+    }
+  }
+
   override async findAllPaginated(
     page: number,
     limit: number,
@@ -120,7 +174,7 @@ export class UsersService extends BaseService<User> {
     relations: string[] = ['roles', 'permissions', 'avatar'],
     filters: FindOptionsWhere<User> = {},
   ) {
-    return super.findAllPaginated(
+    const result = await super.findAllPaginated(
       page,
       limit,
       search,
@@ -129,11 +183,15 @@ export class UsersService extends BaseService<User> {
       relations,
       filters,
     );
+    result.data = presentUsers(result.data);
+    return result;
   }
 
   async listUsers(params: UsersQueryDto) {
-    const range = createdInRange(params.createdIn, new Date(), params.timeZone);
+    const now = new Date();
+    const range = createdInRange(params.createdIn, now, params.timeZone);
     const filters: FindOptionsWhere<User> = {
+      ...this.accountStatusWhere(params.accountStatus, now),
       ...(params.registerMethod
         ? { registerMethod: params.registerMethod }
         : {}),
@@ -157,25 +215,63 @@ export class UsersService extends BaseService<User> {
         filters,
       );
     }
-    return super.findAll(
-      ['roles', 'roles.permissions', 'permissions', 'avatar'],
-      {
-        where: this.listWhere(params.search, filters),
-        order: {
-          [this.safeSort(params.sort ?? 'createdAt')]:
-            params.direction?.toUpperCase() === 'ASC' ? 'ASC' : 'DESC',
+    const users =
+      (await super.findAll(
+        ['roles', 'roles.permissions', 'permissions', 'avatar'],
+        {
+          where: this.listWhere(params.search, filters),
+          order: {
+            [this.safeSort(params.sort ?? 'createdAt')]:
+              params.direction?.toUpperCase() === 'ASC' ? 'ASC' : 'DESC',
+          },
         },
-      },
+      )) ?? [];
+    return presentUsers(users);
+  }
+
+  private accountStatusWhere(
+    status: AccountStatus | undefined,
+    now: Date,
+  ): FindOptionsWhere<User> {
+    if (!status) return {};
+    const unlocked = Raw(
+      (column) => `(${column} IS NULL OR ${column} <= :statusNow)`,
+      { statusNow: now },
     );
+    switch (status) {
+      case 'INACTIVE':
+        return { isActive: false };
+      case 'LOCKED':
+        return {
+          isActive: true,
+          lockedUntil: Raw((column) => `${column} > :statusNow`, {
+            statusNow: now,
+          }),
+        };
+      case 'UNVERIFIED':
+        return {
+          isActive: true,
+          emailVerifiedAt: IsNull(),
+          lockedUntil: unlocked,
+        };
+      case 'ACTIVE':
+        return {
+          isActive: true,
+          emailVerifiedAt: Not(IsNull()),
+          lockedUntil: unlocked,
+        };
+    }
   }
 
   override async findAll(): Promise<User[]> {
-    return super.findAll([
-      'roles',
-      'roles.permissions',
-      'permissions',
-      'avatar',
-    ]);
+    const users =
+      (await super.findAll([
+        'roles',
+        'roles.permissions',
+        'permissions',
+        'avatar',
+      ])) ?? [];
+    return presentUsers(users);
   }
 
   /**
@@ -245,6 +341,35 @@ export class UsersService extends BaseService<User> {
       changes,
       emailChanged ? { emailVerifiedAt: null } : {},
     );
+  }
+
+  /** Admin-only activation switch; self-deactivation is never allowed. */
+  async setActiveAs(
+    actor: AuthenticatedUser,
+    id: number,
+    isActive: boolean,
+    ipAddress: string | null = null,
+  ): Promise<User> {
+    const target = await this.findOne(id);
+    if (actor.userId === id && !isActive)
+      throw new ForbiddenException('You cannot deactivate your own account');
+    this.grantPolicy.assertCanManageAccount(actor, target);
+
+    const user = await this.usersRepository.preload({ id, isActive });
+    if (!user) throw new NotFoundException(`User #${id} not found`);
+    await this.usersRepository.save(user);
+    if (!isActive) await this.sessionsService.revokeAllForUser(id);
+    const updated = await this.findOne(id);
+    const event: UserStatusUpdatedEvent = {
+      actorId: actor.userId,
+      actorEmail: actor.email,
+      targetId: id,
+      targetEmail: updated.email,
+      isActive,
+      ipAddress,
+    };
+    this.eventEmitter.emit('user.status_updated', event);
+    return updated;
   }
 
   /**
@@ -343,12 +468,13 @@ export class UsersService extends BaseService<User> {
   }
 
   override async findOne(id: number): Promise<User> {
-    return super.findOne(id, [
+    const user = await super.findOne(id, [
       'roles',
       'roles.permissions',
       'permissions',
       'avatar',
     ]);
+    return presentUser(user);
   }
 
   override async remove(id: number): Promise<void> {

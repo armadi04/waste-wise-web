@@ -21,8 +21,11 @@ import {
   tokenFor,
 } from './utils/auth';
 import { cleanDatabase } from './utils/db-clean';
+import { generate } from 'otplib';
+import { AuthService } from '@/auth/auth.service';
 import { PasswordResetToken } from '@/auth/entities/password-reset-token.entity';
 import { EmailVerificationToken } from '@/auth/entities/email-verification-token.entity';
+import { TwoFactorService } from '@/auth/two-factor.service';
 import { User } from '@/users/entities/user.entity';
 
 describe('Auth (e2e)', () => {
@@ -366,6 +369,91 @@ describe('Auth (e2e)', () => {
       await request(server)
         .get('/api/v1/auth/verify-email?token=does-not-exist')
         .expect(404);
+    });
+  });
+
+  describe('POST /auth/mobile/2fa/verify', () => {
+    const enableTwoFactor = async (email: string) => {
+      const user = await createUser(ctx, { email });
+      const twoFactor = ctx.app.get(TwoFactorService);
+      const authService = ctx.app.get(AuthService);
+
+      const enrollment = await twoFactor.startEnrollment(user.id);
+      const code = await generate({ secret: enrollment.secret });
+      const recoveryCodes = await twoFactor.confirm(user.id, code);
+
+      return {
+        user,
+        recoveryCodes,
+        challengeToken: authService.issueTwoFactorChallenge(user),
+      };
+    };
+
+    it('returns a mobile token pair for a valid challenge and code', async () => {
+      const { challengeToken, recoveryCodes } =
+        await enableTwoFactor('mobile-2fa@b.com');
+
+      const res = await request(server)
+        .post('/api/v1/auth/mobile/2fa/verify')
+        .send({ challengeToken, code: recoveryCodes[0] })
+        .expect(200);
+
+      expect(res.body.accessToken).toBeTruthy();
+      expect(res.body.refreshToken).toBeTruthy();
+      expect(res.body.sessionExpiresAt).toBeTruthy();
+    });
+
+    it('rejects a wrong code with a structured error', async () => {
+      const { challengeToken } = await enableTwoFactor('mobile-bad-code@b.com');
+
+      const res = await request(server)
+        .post('/api/v1/auth/mobile/2fa/verify')
+        .send({ challengeToken, code: '000000' })
+        .expect(401);
+
+      expect(res.body.code).toBe('TWO_FACTOR_INVALID_CODE');
+    });
+
+    it('rejects an expired challenge with a structured error', async () => {
+      const res = await request(server)
+        .post('/api/v1/auth/mobile/2fa/verify')
+        .send({ challengeToken: 'not-a-challenge', code: '000000' })
+        .expect(401);
+
+      expect(res.body.code).toBe('TWO_FACTOR_CHALLENGE_EXPIRED');
+    });
+
+    it('rejects a locked account with a structured error', async () => {
+      const { challengeToken } = await enableTwoFactor('mobile-locked@b.com');
+
+      for (let attempt = 0; attempt < 5; attempt += 1) {
+        await request(server)
+          .post('/api/v1/auth/mobile/2fa/verify')
+          .send({ challengeToken, code: '000000' })
+          .expect(401);
+      }
+
+      const res = await request(server)
+        .post('/api/v1/auth/mobile/2fa/verify')
+        .send({ challengeToken, code: '000000' })
+        .expect(403);
+
+      expect(res.body.code).toBe('ACCOUNT_LOCKED');
+    });
+
+    it('rejects an inactive account with a structured error', async () => {
+      const { user, challengeToken, recoveryCodes } = await enableTwoFactor(
+        'mobile-inactive@b.com',
+      );
+      const userRepo = ctx.app.get<Repository<User>>(getRepositoryToken(User));
+      await userRepo.update(user.id, { isActive: false });
+
+      const res = await request(server)
+        .post('/api/v1/auth/mobile/2fa/verify')
+        .send({ challengeToken, code: recoveryCodes[0] })
+        .expect(403);
+
+      expect(res.body.code).toBe('ACCOUNT_INACTIVE');
     });
   });
 

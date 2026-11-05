@@ -17,7 +17,7 @@ describe('durable media cleanup', () => {
     row = {
       id: 1,
       state: 'ready',
-      storageProfile: 'depot-default',
+      storageProfile: 's3-default',
       cleanupAttempts: 0,
       cleanupLeaseToken: null,
       deletedAt: null,

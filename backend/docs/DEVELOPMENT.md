@@ -3,10 +3,7 @@
 ## Setup
 
 Use Bun 1.3.14+, PostgreSQL 14+ and a new database (suggested name `nestplate`). Redis is
-optional. SDK packages are served through the checked-in `@univstekom` GitHub Packages registry.
-Configure a package-read token through your user-level npm/Bun authentication or CI secret;
-never commit it. Docker accepts the raw token through BuildKit `node_auth`.
-Backend CI accepts `NODE_AUTH_TOKEN`; forks need a package-read token with access to both SDKs.
+optional. All dependencies come from the public npm registry; no registry token is needed.
 
 From `backend/`:
 
@@ -31,20 +28,20 @@ Source of truth: `src/config/env.ts`; template: `.env.example`. Invalid/missing 
 |---|---|
 | Database (required) | DB_HOST, DB_USERNAME, DB_PASSWORD, DB_NAME; DB_PORT=5432 |
 | Identity (required) | JWT_SECRET (min 16 chars), ADMIN_EMAIL, ADMIN_PASSWORD (min 8 chars) |
-| Storage | MEDIA_PROVIDER=depot; selected provider credentials required (see below) |
+| Demo user | DEMO_USER_EMAIL/DEMO_USER_PASSWORD (min 8 chars); development/test defaults are `user@smart-waste.local` / `DemoUser123!`, deployed environments require explicit values |
+| Reports / ML | ML_SERVICE_URL (optional), ML_SERVICE_TIMEOUT_MS=15000; without the URL reports still save with classification FAILED |
+| Storage | MEDIA_PROVIDER=s3; S3 credentials required (see below) |
 | Storage profiles | MEDIA_STORAGE_PROFILE optional; MEDIA_STORAGE_PROFILES JSON map of named locations/credentials |
 | Upload limits | MEDIA_MAX_FILE_SIZE=20971520 bytes (max 100 MiB); MEDIA_MAX_CONCURRENT_UPLOADS=4 (1–16); MEDIA_ALLOWED_MIME_TYPES signature allowlist |
-| Server | NODE_ENV=development, PORT=3000, APP_NAME=Nestplate, APP_URL; ALLOWED_ORIGINS, LOG_LEVEL=info |
+| Server | NODE_ENV=development, PORT=3000, APP_NAME=WasteWise, APP_URL; ALLOWED_ORIGINS, LOG_LEVEL=info |
 | Database policy | DB_SYNCHRONIZE=false, DB_SEED=true; DB_SKIP_MIGRATIONS only bypasses app boot migrations |
 | Sessions | SESSION_ADMIN_IDLE_MINUTES=120, SESSION_ADMIN_ABSOLUTE_HOURS=8 |
 | Timezone | APP_DEFAULT_TIME_ZONE=Asia/Jakarta; reports also support Makassar/Jayapura |
 | Proxy | TRUST_PROXY: unset/false, or verified proxy addresses/subnets; true/hop counts are rejected |
-| Depot | DEPOT_BASE_URL (origin), DEPOT_API_KEY (write scope) |
-| Direct S3 | S3_REGION, S3_BUCKET, S3_ACCESS_KEY_ID, S3_SECRET_ACCESS_KEY; optional S3_ENDPOINT, S3_FORCE_PATH_STYLE=false |
+| S3 | S3_REGION, S3_BUCKET, S3_ACCESS_KEY_ID, S3_SECRET_ACCESS_KEY; optional S3_ENDPOINT, S3_FORCE_PATH_STYLE=false |
 | Redis | REDIS_HOST optional; REDIS_PORT=6379, REDIS_TTL=3600 seconds, REDIS_USERNAME/PASSWORD |
 | Google | GOOGLE_CLIENT_ID optional |
 | CAPTCHA | TURNSTILE_ENABLED, TURNSTILE_SECRET, TURNSTILE_ALLOWED_HOSTNAMES; legacy TURNSTILE_SECRET_KEY alias |
-| SSO | SSO_ISSUER, SSO_CLIENT_ID/SECRET, SSO_REDIRECT_URI, SSO_POST_LOGOUT_URI, SSO_SUCCESS_REDIRECT=/, SSO_DEFAULT_ROLE=user |
 | SMTP | SMTP_HOST optional, SMTP_PORT=587, SMTP_SECURE=false, SMTP_USER/PASS, MAIL_FROM/NAME |
 | Rate limits | THROTTLE_TTL=60000 ms, THROTTLE_LIMIT=100 |
 | GraphQL | GRAPHQL_ENABLED=false; limits and flags in [GraphQL](GRAPHQL.md#enabling-it) |
@@ -68,8 +65,10 @@ bun run schema:check
 ```
 
 Review generated SQL. Keep `DB_SYNCHRONIZE=false`. Seeder is idempotent, non-production and
-creates permissions, `superadmin`/`user` roles and the env-configured verified admin, without
-business/demo data. Automatic boot seeding is gated by `DB_SEED`; explicit `seed` controls its
+creates permissions, `superadmin`/`user` roles and the env-configured verified admin. It also
+creates a verified `user` account for role-scoped testing. Admin account deactivation uses
+`users.manage_status`, revokes every session and is audited as `user.status_updated`. Development/test use safe defaults;
+staging/production must set `DEMO_USER_EMAIL` and `DEMO_USER_PASSWORD` explicitly. Automatic boot seeding is gated by `DB_SEED`; explicit `seed` controls its
 own run. `migrate:fresh[:seed]` drops schema and is only for explicitly authorized disposable DBs.
 
 ## Commands and generated output
@@ -111,7 +110,7 @@ it verifies the baseline, entity columns and live indexes without resetting an e
 ## REST URI versioning
 
 The global prefix remains `api`. NestJS URI versioning uses default version `1`,
-so REST operations are under `/api/v1`, including health and SSO. Do not put `v1`
+so REST operations are under `/api/v1`, including health. Do not put `v1`
 in controller paths. Old `/api/*` and unsupported `/api/v2/*` REST URLs return 404.
 URI API version and application release version are independent.
 `DocumentBuilder.setVersion()` sets OpenAPI metadata only; routing versioning

@@ -102,7 +102,7 @@ export function RolePermissionsModal({
                         flex items-start gap-2 p-3 rounded-large border-2 cursor-pointer transition-colors
                         ${
                           selectedPermissions.has(permission.id)
-                            ? 'border-primary border-1 bg-[var(--app-selected-background)]'
+                            ? 'border-transparent bg-[var(--app-selected-background)]'
                             : 'border-transparent bg-default-100 hover:bg-default-200'
                         }
                       `}

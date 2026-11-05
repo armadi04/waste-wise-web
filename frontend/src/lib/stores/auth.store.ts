@@ -211,10 +211,9 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
   },
 
   logout: () => {
-    const { sid } = get().user ?? {}
     set({ isAuthenticated: false, user: null })
     clearAuthQueryCache()
-    void authLogout(sid)
+    void authLogout()
   },
 
   clearError: () => set({ error: null }),
@@ -229,8 +228,7 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
 }))
 
 // Hydrate identity from the server on app load when the flag cookie says we are
-// logged in (e.g. a returning user, or after an SSO redirect that set cookies
-// server-side). The httpOnly token is sent automatically with the /me request.
+// logged in (e.g. a returning user). The httpOnly token is sent automatically with the /me request.
 if (checkAuthenticated()) {
   void useAuthStore
     .getState()

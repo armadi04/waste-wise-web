@@ -1,6 +1,38 @@
 {
   "openapi": "3.0.0",
   "paths": {
+    "/api/v1/app/force-refresh": {
+      "post": {
+        "operationId": "AppRefreshController_forceRefresh_v1",
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "issuedAt": {
+                      "type": "string",
+                      "format": "date-time"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Tell every connected client to drop its cache and reload",
+        "tags": [
+          "App"
+        ]
+      }
+    },
     "/api/v1": {
       "get": {
         "operationId": "AppController_getApiInfo_v1",
@@ -23,9 +55,9 @@
         ]
       }
     },
-    "/api/v1/users": {
+    "/api/v1/audit-logs": {
       "get": {
-        "operationId": "UsersController_findAll_v1",
+        "operationId": "AuditController_findAll_v1",
         "parameters": [
           {
             "name": "page",
@@ -85,104 +117,22 @@
             }
           },
           {
-            "name": "timeZone",
+            "name": "action",
             "required": false,
             "in": "query",
-            "schema": {
-              "type": "string",
-              "enum": [
-                "Asia/Jakarta",
-                "Asia/Makassar",
-                "Asia/Jayapura"
-              ]
-            }
-          },
-          {
-            "name": "createdIn",
-            "required": false,
-            "in": "query",
-            "description": "Creation window in the selected report timezone, default Asia/Jakarta; 1m and 3m use 30 and 90 days.",
-            "schema": {
-              "type": "string",
-              "enum": [
-                "today",
-                "7d",
-                "1m",
-                "3m"
-              ]
-            }
-          },
-          {
-            "name": "registerMethod",
-            "required": false,
-            "in": "query",
-            "description": "Method used to first create the account.",
-            "schema": {
-              "type": "string",
-              "enum": [
-                "EMAIL_OTP",
-                "GOOGLE",
-                "INVITATION",
-                "SSO",
-                "SEEDER",
-                "UNKNOWN"
-              ]
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/PaginatedUserResponse"
-                }
-              }
-            }
-          }
-        },
-        "security": [
-          {
-            "bearer": []
-          }
-        ],
-        "summary": "Get all users",
-        "tags": [
-          "Users"
-        ]
-      }
-    },
-    "/api/v1/users/{id}": {
-      "patch": {
-        "operationId": "UsersController_update_v1",
-        "parameters": [
-          {
-            "name": "id",
-            "required": true,
-            "in": "path",
+            "description": "Restrict to a single action",
             "schema": {
               "type": "string"
             }
           }
         ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "multipart/form-data": {
-              "schema": {
-                "$ref": "#/components/schemas/UpdateUserDto"
-              }
-            }
-          }
-        },
         "responses": {
           "200": {
             "description": "",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/User"
+                  "$ref": "#/components/schemas/PaginatedAuditResponse"
                 }
               }
             }
@@ -193,1157 +143,16 @@
             "bearer": []
           }
         ],
-        "summary": "Update a user",
+        "summary": "Read the audit trail",
         "tags": [
-          "Users"
+          "Audit"
         ]
-      },
+      }
+    },
+    "/api/v1/audit-logs/actions": {
       "get": {
-        "operationId": "UsersController_findOne_v1",
-        "parameters": [
-          {
-            "name": "id",
-            "required": true,
-            "in": "path",
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/User"
-                }
-              }
-            }
-          }
-        },
-        "security": [
-          {
-            "bearer": []
-          }
-        ],
-        "summary": "Get a user by ID",
-        "tags": [
-          "Users"
-        ]
-      },
-      "delete": {
-        "operationId": "UsersController_remove_v1",
-        "parameters": [
-          {
-            "name": "id",
-            "required": true,
-            "in": "path",
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": ""
-          }
-        },
-        "security": [
-          {
-            "bearer": []
-          }
-        ],
-        "summary": "Delete a user",
-        "tags": [
-          "Users"
-        ]
-      }
-    },
-    "/api/v1/users/bulk-delete": {
-      "post": {
-        "operationId": "UsersController_bulkRemove_v1",
+        "operationId": "AuditController_findActions_v1",
         "parameters": [],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/BulkDeleteDto"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": ""
-          }
-        },
-        "security": [
-          {
-            "bearer": []
-          }
-        ],
-        "summary": "Delete multiple users",
-        "tags": [
-          "Users"
-        ]
-      }
-    },
-    "/api/v1/users/{id}/roles/sync": {
-      "post": {
-        "operationId": "UsersController_syncRoles_v1",
-        "parameters": [
-          {
-            "name": "id",
-            "required": true,
-            "in": "path",
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/ManageRolesDto"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/User"
-                }
-              }
-            }
-          }
-        },
-        "security": [
-          {
-            "bearer": []
-          }
-        ],
-        "summary": "Sync user roles",
-        "tags": [
-          "Users"
-        ]
-      }
-    },
-    "/api/v1/users/{id}/roles/attach": {
-      "post": {
-        "operationId": "UsersController_attachRoles_v1",
-        "parameters": [
-          {
-            "name": "id",
-            "required": true,
-            "in": "path",
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/ManageRolesDto"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/User"
-                }
-              }
-            }
-          }
-        },
-        "security": [
-          {
-            "bearer": []
-          }
-        ],
-        "summary": "Attach roles to user",
-        "tags": [
-          "Users"
-        ]
-      }
-    },
-    "/api/v1/users/{id}/roles/detach": {
-      "post": {
-        "operationId": "UsersController_detachRoles_v1",
-        "parameters": [
-          {
-            "name": "id",
-            "required": true,
-            "in": "path",
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/ManageRolesDto"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/User"
-                }
-              }
-            }
-          }
-        },
-        "security": [
-          {
-            "bearer": []
-          }
-        ],
-        "summary": "Detach roles from user",
-        "tags": [
-          "Users"
-        ]
-      }
-    },
-    "/api/v1/users/{id}/permissions/sync": {
-      "post": {
-        "operationId": "UsersController_syncPermissions_v1",
-        "parameters": [
-          {
-            "name": "id",
-            "required": true,
-            "in": "path",
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/ManageUserPermissionsDto"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/User"
-                }
-              }
-            }
-          }
-        },
-        "security": [
-          {
-            "bearer": []
-          }
-        ],
-        "summary": "Sync user permissions",
-        "tags": [
-          "Users"
-        ]
-      }
-    },
-    "/api/v1/users/{id}/permissions/attach": {
-      "post": {
-        "operationId": "UsersController_attachPermissions_v1",
-        "parameters": [
-          {
-            "name": "id",
-            "required": true,
-            "in": "path",
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/ManageUserPermissionsDto"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/User"
-                }
-              }
-            }
-          }
-        },
-        "security": [
-          {
-            "bearer": []
-          }
-        ],
-        "summary": "Attach permissions to user",
-        "tags": [
-          "Users"
-        ]
-      }
-    },
-    "/api/v1/users/{id}/permissions/detach": {
-      "post": {
-        "operationId": "UsersController_detachPermissions_v1",
-        "parameters": [
-          {
-            "name": "id",
-            "required": true,
-            "in": "path",
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/ManageUserPermissionsDto"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/User"
-                }
-              }
-            }
-          }
-        },
-        "security": [
-          {
-            "bearer": []
-          }
-        ],
-        "summary": "Detach permissions from user",
-        "tags": [
-          "Users"
-        ]
-      }
-    },
-    "/api/v1/media/upload": {
-      "post": {
-        "operationId": "MediaController_uploadFile_v1",
-        "parameters": [],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "multipart/form-data": {
-              "schema": {
-                "type": "object",
-                "properties": {
-                  "file": {
-                    "type": "string",
-                    "format": "binary"
-                  }
-                }
-              }
-            }
-          }
-        },
-        "responses": {
-          "201": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Media"
-                }
-              }
-            }
-          }
-        },
-        "security": [
-          {
-            "bearer": []
-          }
-        ],
-        "summary": "Upload a new media file",
-        "tags": [
-          "Media"
-        ]
-      }
-    },
-    "/api/v1/media": {
-      "get": {
-        "operationId": "MediaController_findAll_v1",
-        "parameters": [
-          {
-            "name": "page",
-            "required": false,
-            "in": "query",
-            "schema": {
-              "default": 1,
-              "type": "number"
-            }
-          },
-          {
-            "name": "limit",
-            "required": false,
-            "in": "query",
-            "schema": {
-              "maximum": 100,
-              "default": 10,
-              "type": "number"
-            }
-          },
-          {
-            "name": "search",
-            "required": false,
-            "in": "query",
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "sort",
-            "required": false,
-            "in": "query",
-            "schema": {
-              "default": "createdAt",
-              "type": "string"
-            }
-          },
-          {
-            "name": "direction",
-            "required": false,
-            "in": "query",
-            "schema": {
-              "default": "DESC",
-              "type": "string",
-              "enum": [
-                "ASC",
-                "DESC"
-              ]
-            }
-          },
-          {
-            "name": "paginated",
-            "required": false,
-            "in": "query",
-            "schema": {
-              "type": "boolean"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/PaginatedMediaResponse"
-                }
-              }
-            }
-          }
-        },
-        "security": [
-          {
-            "bearer": []
-          }
-        ],
-        "summary": "Get all media",
-        "tags": [
-          "Media"
-        ]
-      }
-    },
-    "/api/v1/media/{id}": {
-      "get": {
-        "operationId": "MediaController_findOne_v1",
-        "parameters": [
-          {
-            "name": "id",
-            "required": true,
-            "in": "path",
-            "schema": {
-              "type": "number"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Media"
-                }
-              }
-            }
-          }
-        },
-        "security": [
-          {
-            "bearer": []
-          }
-        ],
-        "summary": "Get a media by ID",
-        "tags": [
-          "Media"
-        ]
-      },
-      "delete": {
-        "operationId": "MediaController_remove_v1",
-        "parameters": [
-          {
-            "name": "id",
-            "required": true,
-            "in": "path",
-            "schema": {
-              "type": "number"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/MediaDeletionResultDto"
-                }
-              }
-            }
-          }
-        },
-        "security": [
-          {
-            "bearer": []
-          }
-        ],
-        "summary": "Delete a media",
-        "tags": [
-          "Media"
-        ]
-      }
-    },
-    "/api/v1/media/{id}/view": {
-      "get": {
-        "operationId": "MediaController_viewFile_v1",
-        "parameters": [
-          {
-            "name": "id",
-            "required": true,
-            "in": "path",
-            "schema": {
-              "type": "number"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": ""
-          }
-        },
-        "security": [
-          {
-            "bearer": []
-          }
-        ],
-        "summary": "View a public (non-private) media file",
-        "tags": [
-          "Media"
-        ]
-      }
-    },
-    "/api/v1/media/{id}/stream": {
-      "get": {
-        "operationId": "MediaController_streamFile_v1",
-        "parameters": [
-          {
-            "name": "id",
-            "required": true,
-            "in": "path",
-            "schema": {
-              "type": "number"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": ""
-          }
-        },
-        "security": [
-          {
-            "bearer": []
-          }
-        ],
-        "summary": "Stream a media file",
-        "tags": [
-          "Media"
-        ]
-      }
-    },
-    "/api/v1/media/bulk-delete": {
-      "post": {
-        "operationId": "MediaController_bulkRemove_v1",
-        "parameters": [],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/MediaBulkDeleteDto"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/MediaBulkDeleteResultDto"
-                }
-              }
-            }
-          }
-        },
-        "security": [
-          {
-            "bearer": []
-          }
-        ],
-        "summary": "Delete multiple media",
-        "tags": [
-          "Media"
-        ]
-      }
-    },
-    "/api/v1/roles": {
-      "post": {
-        "operationId": "RolesController_create_v1",
-        "parameters": [],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/CreateRoleDto"
-              }
-            }
-          }
-        },
-        "responses": {
-          "201": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Role"
-                }
-              }
-            }
-          }
-        },
-        "security": [
-          {
-            "bearer": []
-          }
-        ],
-        "summary": "Create a new role",
-        "tags": [
-          "Roles"
-        ]
-      },
-      "get": {
-        "operationId": "RolesController_findAll_v1",
-        "parameters": [
-          {
-            "name": "page",
-            "required": false,
-            "in": "query",
-            "schema": {
-              "default": 1,
-              "type": "number"
-            }
-          },
-          {
-            "name": "limit",
-            "required": false,
-            "in": "query",
-            "schema": {
-              "maximum": 100,
-              "default": 10,
-              "type": "number"
-            }
-          },
-          {
-            "name": "search",
-            "required": false,
-            "in": "query",
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "sort",
-            "required": false,
-            "in": "query",
-            "schema": {
-              "default": "createdAt",
-              "type": "string"
-            }
-          },
-          {
-            "name": "direction",
-            "required": false,
-            "in": "query",
-            "schema": {
-              "default": "DESC",
-              "type": "string",
-              "enum": [
-                "ASC",
-                "DESC"
-              ]
-            }
-          },
-          {
-            "name": "paginated",
-            "required": false,
-            "in": "query",
-            "schema": {
-              "type": "boolean"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/PaginatedRoleResponse"
-                }
-              }
-            }
-          }
-        },
-        "security": [
-          {
-            "bearer": []
-          }
-        ],
-        "summary": "Get all roles",
-        "tags": [
-          "Roles"
-        ]
-      }
-    },
-    "/api/v1/roles/{id}": {
-      "get": {
-        "operationId": "RolesController_findOne_v1",
-        "parameters": [
-          {
-            "name": "id",
-            "required": true,
-            "in": "path",
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Role"
-                }
-              }
-            }
-          }
-        },
-        "security": [
-          {
-            "bearer": []
-          }
-        ],
-        "summary": "Get a role by ID",
-        "tags": [
-          "Roles"
-        ]
-      },
-      "patch": {
-        "operationId": "RolesController_update_v1",
-        "parameters": [
-          {
-            "name": "id",
-            "required": true,
-            "in": "path",
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/UpdateRoleDto"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Role"
-                }
-              }
-            }
-          }
-        },
-        "security": [
-          {
-            "bearer": []
-          }
-        ],
-        "summary": "Update a role",
-        "tags": [
-          "Roles"
-        ]
-      },
-      "delete": {
-        "operationId": "RolesController_remove_v1",
-        "parameters": [
-          {
-            "name": "id",
-            "required": true,
-            "in": "path",
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": ""
-          }
-        },
-        "security": [
-          {
-            "bearer": []
-          }
-        ],
-        "summary": "Delete a role",
-        "tags": [
-          "Roles"
-        ]
-      }
-    },
-    "/api/v1/roles/bulk-delete": {
-      "post": {
-        "operationId": "RolesController_bulkRemove_v1",
-        "parameters": [],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/BulkDeleteDto"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": ""
-          }
-        },
-        "security": [
-          {
-            "bearer": []
-          }
-        ],
-        "summary": "Delete multiple roles",
-        "tags": [
-          "Roles"
-        ]
-      }
-    },
-    "/api/v1/roles/{id}/permissions/sync": {
-      "post": {
-        "operationId": "RolesController_syncPermissions_v1",
-        "parameters": [
-          {
-            "name": "id",
-            "required": true,
-            "in": "path",
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/ManagePermissionsDto"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Role"
-                }
-              }
-            }
-          }
-        },
-        "security": [
-          {
-            "bearer": []
-          }
-        ],
-        "summary": "Sync role permissions",
-        "tags": [
-          "Roles"
-        ]
-      }
-    },
-    "/api/v1/roles/{id}/permissions/attach": {
-      "post": {
-        "operationId": "RolesController_attachPermissions_v1",
-        "parameters": [
-          {
-            "name": "id",
-            "required": true,
-            "in": "path",
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/ManagePermissionsDto"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Role"
-                }
-              }
-            }
-          }
-        },
-        "security": [
-          {
-            "bearer": []
-          }
-        ],
-        "summary": "Attach permissions to role",
-        "tags": [
-          "Roles"
-        ]
-      }
-    },
-    "/api/v1/roles/{id}/permissions/detach": {
-      "post": {
-        "operationId": "RolesController_detachPermissions_v1",
-        "parameters": [
-          {
-            "name": "id",
-            "required": true,
-            "in": "path",
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/ManagePermissionsDto"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Role"
-                }
-              }
-            }
-          }
-        },
-        "security": [
-          {
-            "bearer": []
-          }
-        ],
-        "summary": "Detach permissions from role",
-        "tags": [
-          "Roles"
-        ]
-      }
-    },
-    "/api/v1/invitations": {
-      "post": {
-        "operationId": "InvitationsController_create_v1",
-        "parameters": [],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/CreateInvitationDto"
-              }
-            }
-          }
-        },
-        "responses": {
-          "201": {
-            "description": ""
-          }
-        },
-        "security": [
-          {
-            "bearer": []
-          }
-        ],
-        "summary": "Generate and send an invite link",
-        "tags": [
-          "Invitations"
-        ]
-      },
-      "get": {
-        "operationId": "InvitationsController_findAll_v1",
-        "parameters": [
-          {
-            "name": "page",
-            "required": false,
-            "in": "query",
-            "schema": {
-              "default": 1,
-              "type": "number"
-            }
-          },
-          {
-            "name": "limit",
-            "required": false,
-            "in": "query",
-            "schema": {
-              "maximum": 100,
-              "default": 10,
-              "type": "number"
-            }
-          },
-          {
-            "name": "search",
-            "required": false,
-            "in": "query",
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "sort",
-            "required": false,
-            "in": "query",
-            "schema": {
-              "default": "createdAt",
-              "type": "string"
-            }
-          },
-          {
-            "name": "direction",
-            "required": false,
-            "in": "query",
-            "schema": {
-              "default": "DESC",
-              "type": "string",
-              "enum": [
-                "ASC",
-                "DESC"
-              ]
-            }
-          },
-          {
-            "name": "paginated",
-            "required": false,
-            "in": "query",
-            "schema": {
-              "type": "boolean"
-            }
-          }
-        ],
         "responses": {
           "200": {
             "description": "",
@@ -1352,7 +161,7 @@
                 "schema": {
                   "type": "array",
                   "items": {
-                    "$ref": "#/components/schemas/Invitation"
+                    "type": "string"
                   }
                 }
               }
@@ -1364,173 +173,9 @@
             "bearer": []
           }
         ],
-        "summary": "List invitations",
+        "summary": "The distinct actions recorded so far",
         "tags": [
-          "Invitations"
-        ]
-      }
-    },
-    "/api/v1/invitations/{id}/resend": {
-      "post": {
-        "operationId": "InvitationsController_resend_v1",
-        "parameters": [
-          {
-            "name": "id",
-            "required": true,
-            "in": "path",
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Invitation"
-                }
-              }
-            }
-          }
-        },
-        "security": [
-          {
-            "bearer": []
-          }
-        ],
-        "summary": "Resend an invitation email",
-        "tags": [
-          "Invitations"
-        ]
-      }
-    },
-    "/api/v1/invitations/bulk-delete": {
-      "post": {
-        "operationId": "InvitationsController_bulkRemove_v1",
-        "parameters": [],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/BulkDeleteDto"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": ""
-          }
-        },
-        "security": [
-          {
-            "bearer": []
-          }
-        ],
-        "summary": "Revoke multiple invitations",
-        "tags": [
-          "Invitations"
-        ]
-      }
-    },
-    "/api/v1/invitations/{id}": {
-      "delete": {
-        "operationId": "InvitationsController_remove_v1",
-        "parameters": [
-          {
-            "name": "id",
-            "required": true,
-            "in": "path",
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": ""
-          }
-        },
-        "security": [
-          {
-            "bearer": []
-          }
-        ],
-        "summary": "Revoke an invitation",
-        "tags": [
-          "Invitations"
-        ]
-      }
-    },
-    "/api/v1/invitations/accept": {
-      "get": {
-        "operationId": "InvitationsController_getByToken_v1",
-        "parameters": [
-          {
-            "name": "token",
-            "required": true,
-            "in": "query",
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "properties": {
-                    "email": {
-                      "type": "string"
-                    }
-                  }
-                }
-              }
-            }
-          }
-        },
-        "summary": "Resolve an invitation by token (prefill)",
-        "tags": [
-          "Invitations"
-        ]
-      },
-      "post": {
-        "operationId": "InvitationsController_accept_v1",
-        "parameters": [],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/AcceptInvitationDto"
-              }
-            }
-          }
-        },
-        "responses": {
-          "201": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "properties": {
-                    "message": {
-                      "type": "string"
-                    }
-                  }
-                }
-              }
-            }
-          }
-        },
-        "summary": "Accept an invitation and create the account",
-        "tags": [
-          "Invitations"
+          "Audit"
         ]
       }
     },
@@ -1630,6 +275,181 @@
         ]
       }
     },
+    "/api/v1/auth/mobile/google": {
+      "post": {
+        "operationId": "AuthController_mobileGoogleLogin_v1",
+        "parameters": [
+          {
+            "name": "user-agent",
+            "required": true,
+            "in": "header",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/GoogleLoginDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/MobileAuthSessionDto"
+                    },
+                    {
+                      "$ref": "#/components/schemas/MobileTwoFactorChallengeDto"
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        },
+        "summary": "Login with Google for a native mobile client",
+        "tags": [
+          "Auth"
+        ]
+      }
+    },
+    "/api/v1/auth/mobile/2fa/verify": {
+      "post": {
+        "operationId": "AuthController_mobileVerifyTwoFactor_v1",
+        "parameters": [
+          {
+            "name": "user-agent",
+            "required": true,
+            "in": "header",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TwoFactorVerifyDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MobileAuthSessionDto"
+                }
+              }
+            }
+          }
+        },
+        "summary": "Finish a mobile login with two-factor verification",
+        "tags": [
+          "Auth"
+        ]
+      }
+    },
+    "/api/v1/auth/mobile/refresh": {
+      "post": {
+        "operationId": "AuthController_mobileRefresh_v1",
+        "parameters": [
+          {
+            "name": "user-agent",
+            "required": true,
+            "in": "header",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/MobileRefreshTokenDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MobileAuthSessionDto"
+                }
+              }
+            }
+          }
+        },
+        "summary": "Rotate a mobile refresh token",
+        "tags": [
+          "Auth"
+        ]
+      }
+    },
+    "/api/v1/auth/mobile/logout": {
+      "post": {
+        "operationId": "AuthController_mobileLogout_v1",
+        "parameters": [
+          {
+            "name": "authorization",
+            "required": true,
+            "in": "header",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/MobileRefreshTokenDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "summary": "Revoke a mobile refresh token and device session",
+        "tags": [
+          "Auth"
+        ]
+      }
+    },
     "/api/v1/auth/2fa/verify": {
       "post": {
         "operationId": "AuthController_verifyTwoFactor_v1",
@@ -1685,14 +505,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "properties": {
-                    "enabled": {
-                      "type": "boolean"
-                    },
-                    "recoveryCodesRemaining": {
-                      "type": "number"
-                    }
-                  }
+                  "$ref": "#/components/schemas/TwoFactorStatusDto"
                 }
               }
             }
@@ -1719,17 +532,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "properties": {
-                    "secret": {
-                      "type": "string"
-                    },
-                    "otpauthUrl": {
-                      "type": "string"
-                    },
-                    "qrDataUrl": {
-                      "type": "string"
-                    }
-                  }
+                  "$ref": "#/components/schemas/TwoFactorEnrollmentDto"
                 }
               }
             }
@@ -1766,14 +569,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "properties": {
-                    "recoveryCodes": {
-                      "type": "array",
-                      "items": {
-                        "type": "string"
-                      }
-                    }
-                  }
+                  "$ref": "#/components/schemas/RecoveryCodesDto"
                 }
               }
             }
@@ -1810,11 +606,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "properties": {
-                    "message": {
-                      "type": "string"
-                    }
-                  }
+                  "$ref": "#/components/schemas/MessageResponseDto"
                 }
               }
             }
@@ -1851,14 +643,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "properties": {
-                    "recoveryCodes": {
-                      "type": "array",
-                      "items": {
-                        "type": "string"
-                      }
-                    }
-                  }
+                  "$ref": "#/components/schemas/RecoveryCodesDto"
                 }
               }
             }
@@ -2292,6 +1077,1008 @@
         ]
       }
     },
+    "/api/v1/changelog": {
+      "get": {
+        "operationId": "ChangelogController_findAll_v1",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ReleaseNotesDto"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Published release notes, newest first",
+        "tags": [
+          "Changelog"
+        ]
+      }
+    },
+    "/api/v1/health": {
+      "get": {
+        "description": "Checks PostgreSQL connectivity with a dedicated pool (1 second acquisition timeout, 1 second server statement timeout, 1.5 second transport fallback) and a 300 MiB heap limit. This does not validate schema or business operations. Returns HTTP 200 when both checks succeed, otherwise HTTP 503 with sanitized dependency status.",
+        "operationId": "HealthController_check_v1",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "The Health Check is successful",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "string",
+                      "enum": [
+                        "ok",
+                        "degraded"
+                      ],
+                      "example": "ok"
+                    },
+                    "info": {
+                      "type": "object",
+                      "example": {
+                        "database": {
+                          "status": "up",
+                          "responseTime": 12
+                        }
+                      },
+                      "additionalProperties": {
+                        "type": "object",
+                        "required": [
+                          "status"
+                        ],
+                        "properties": {
+                          "status": {
+                            "type": "string",
+                            "enum": [
+                              "up",
+                              "degraded",
+                              "down"
+                            ]
+                          },
+                          "responseTime": {
+                            "type": "number",
+                            "description": "Time the health indicator took to respond, in ms"
+                          }
+                        },
+                        "additionalProperties": true
+                      },
+                      "nullable": true
+                    },
+                    "error": {
+                      "type": "object",
+                      "example": {},
+                      "additionalProperties": {
+                        "type": "object",
+                        "required": [
+                          "status"
+                        ],
+                        "properties": {
+                          "status": {
+                            "type": "string",
+                            "enum": [
+                              "up",
+                              "degraded",
+                              "down"
+                            ]
+                          },
+                          "responseTime": {
+                            "type": "number",
+                            "description": "Time the health indicator took to respond, in ms"
+                          }
+                        },
+                        "additionalProperties": true
+                      },
+                      "nullable": true
+                    },
+                    "details": {
+                      "type": "object",
+                      "example": {
+                        "database": {
+                          "status": "up",
+                          "responseTime": 12
+                        }
+                      },
+                      "additionalProperties": {
+                        "type": "object",
+                        "required": [
+                          "status"
+                        ],
+                        "properties": {
+                          "status": {
+                            "type": "string",
+                            "enum": [
+                              "up",
+                              "degraded",
+                              "down"
+                            ]
+                          },
+                          "responseTime": {
+                            "type": "number",
+                            "description": "Time the health indicator took to respond, in ms"
+                          }
+                        },
+                        "additionalProperties": true
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "The Health Check is not successful",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "string",
+                      "enum": [
+                        "error",
+                        "shutting_down"
+                      ],
+                      "example": "error"
+                    },
+                    "info": {
+                      "type": "object",
+                      "example": {
+                        "database": {
+                          "status": "up",
+                          "responseTime": 12
+                        }
+                      },
+                      "additionalProperties": {
+                        "type": "object",
+                        "required": [
+                          "status"
+                        ],
+                        "properties": {
+                          "status": {
+                            "type": "string",
+                            "enum": [
+                              "up",
+                              "degraded",
+                              "down"
+                            ]
+                          },
+                          "responseTime": {
+                            "type": "number",
+                            "description": "Time the health indicator took to respond, in ms"
+                          }
+                        },
+                        "additionalProperties": true
+                      },
+                      "nullable": true
+                    },
+                    "error": {
+                      "type": "object",
+                      "example": {
+                        "redis": {
+                          "status": "down",
+                          "message": "Could not connect",
+                          "responseTime": 3005
+                        }
+                      },
+                      "additionalProperties": {
+                        "type": "object",
+                        "required": [
+                          "status"
+                        ],
+                        "properties": {
+                          "status": {
+                            "type": "string",
+                            "enum": [
+                              "up",
+                              "degraded",
+                              "down"
+                            ]
+                          },
+                          "responseTime": {
+                            "type": "number",
+                            "description": "Time the health indicator took to respond, in ms"
+                          }
+                        },
+                        "additionalProperties": true
+                      },
+                      "nullable": true
+                    },
+                    "details": {
+                      "type": "object",
+                      "example": {
+                        "database": {
+                          "status": "up",
+                          "responseTime": 12
+                        },
+                        "redis": {
+                          "status": "down",
+                          "message": "Could not connect",
+                          "responseTime": 3005
+                        }
+                      },
+                      "additionalProperties": {
+                        "type": "object",
+                        "required": [
+                          "status"
+                        ],
+                        "properties": {
+                          "status": {
+                            "type": "string",
+                            "enum": [
+                              "up",
+                              "degraded",
+                              "down"
+                            ]
+                          },
+                          "responseTime": {
+                            "type": "number",
+                            "description": "Time the health indicator took to respond, in ms"
+                          }
+                        },
+                        "additionalProperties": true
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "summary": "Service health and PostgreSQL connectivity",
+        "tags": [
+          "Health"
+        ]
+      }
+    },
+    "/api/v1/invitations": {
+      "post": {
+        "operationId": "InvitationsController_create_v1",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateInvitationDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Generate and send an invite link",
+        "tags": [
+          "Invitations"
+        ]
+      },
+      "get": {
+        "operationId": "InvitationsController_findAll_v1",
+        "parameters": [
+          {
+            "name": "page",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "default": 1,
+              "type": "number"
+            }
+          },
+          {
+            "name": "limit",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "maximum": 100,
+              "default": 10,
+              "type": "number"
+            }
+          },
+          {
+            "name": "search",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "sort",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "default": "createdAt",
+              "type": "string"
+            }
+          },
+          {
+            "name": "direction",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "default": "DESC",
+              "type": "string",
+              "enum": [
+                "ASC",
+                "DESC"
+              ]
+            }
+          },
+          {
+            "name": "paginated",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "boolean"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Invitation"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "List invitations",
+        "tags": [
+          "Invitations"
+        ]
+      }
+    },
+    "/api/v1/invitations/{id}/resend": {
+      "post": {
+        "operationId": "InvitationsController_resend_v1",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Invitation"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Resend an invitation email",
+        "tags": [
+          "Invitations"
+        ]
+      }
+    },
+    "/api/v1/invitations/bulk-delete": {
+      "post": {
+        "operationId": "InvitationsController_bulkRemove_v1",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/BulkDeleteDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Revoke multiple invitations",
+        "tags": [
+          "Invitations"
+        ]
+      }
+    },
+    "/api/v1/invitations/{id}": {
+      "delete": {
+        "operationId": "InvitationsController_remove_v1",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Revoke an invitation",
+        "tags": [
+          "Invitations"
+        ]
+      }
+    },
+    "/api/v1/invitations/accept": {
+      "get": {
+        "operationId": "InvitationsController_getByToken_v1",
+        "parameters": [
+          {
+            "name": "token",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "email": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "summary": "Resolve an invitation by token (prefill)",
+        "tags": [
+          "Invitations"
+        ]
+      },
+      "post": {
+        "operationId": "InvitationsController_accept_v1",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AcceptInvitationDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "summary": "Accept an invitation and create the account",
+        "tags": [
+          "Invitations"
+        ]
+      }
+    },
+    "/api/v1/media/upload": {
+      "post": {
+        "operationId": "MediaController_uploadFile_v1",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "file": {
+                    "type": "string",
+                    "format": "binary"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Media"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Upload a new media file",
+        "tags": [
+          "Media"
+        ]
+      }
+    },
+    "/api/v1/media": {
+      "get": {
+        "operationId": "MediaController_findAll_v1",
+        "parameters": [
+          {
+            "name": "page",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "default": 1,
+              "type": "number"
+            }
+          },
+          {
+            "name": "limit",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "maximum": 100,
+              "default": 10,
+              "type": "number"
+            }
+          },
+          {
+            "name": "search",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "sort",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "default": "createdAt",
+              "type": "string"
+            }
+          },
+          {
+            "name": "direction",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "default": "DESC",
+              "type": "string",
+              "enum": [
+                "ASC",
+                "DESC"
+              ]
+            }
+          },
+          {
+            "name": "paginated",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "boolean"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PaginatedMediaResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Get all media",
+        "tags": [
+          "Media"
+        ]
+      }
+    },
+    "/api/v1/media/{id}": {
+      "get": {
+        "operationId": "MediaController_findOne_v1",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Media"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Get a media by ID",
+        "tags": [
+          "Media"
+        ]
+      },
+      "delete": {
+        "operationId": "MediaController_remove_v1",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MediaDeletionResultDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Delete a media",
+        "tags": [
+          "Media"
+        ]
+      }
+    },
+    "/api/v1/media/{id}/view": {
+      "get": {
+        "operationId": "MediaController_viewFile_v1",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "View a public (non-private) media file",
+        "tags": [
+          "Media"
+        ]
+      }
+    },
+    "/api/v1/media/{id}/stream": {
+      "get": {
+        "operationId": "MediaController_streamFile_v1",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Stream a media file",
+        "tags": [
+          "Media"
+        ]
+      }
+    },
+    "/api/v1/media/bulk-delete": {
+      "post": {
+        "operationId": "MediaController_bulkRemove_v1",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/MediaBulkDeleteDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MediaBulkDeleteResultDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Delete multiple media",
+        "tags": [
+          "Media"
+        ]
+      }
+    },
+    "/api/v1/notifications": {
+      "get": {
+        "operationId": "NotificationsController_findAll_v1",
+        "parameters": [
+          {
+            "name": "page",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "default": 1,
+              "type": "number"
+            }
+          },
+          {
+            "name": "limit",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "maximum": 100,
+              "default": 10,
+              "type": "number"
+            }
+          },
+          {
+            "name": "search",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "sort",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "default": "createdAt",
+              "type": "string"
+            }
+          },
+          {
+            "name": "direction",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "default": "DESC",
+              "type": "string",
+              "enum": [
+                "ASC",
+                "DESC"
+              ]
+            }
+          },
+          {
+            "name": "paginated",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "boolean"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PaginatedNotificationResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Get current user notifications",
+        "tags": [
+          "Notifications"
+        ]
+      }
+    },
+    "/api/v1/notifications/unread-count": {
+      "get": {
+        "operationId": "NotificationsController_getUnreadCount_v1",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "number"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Get unread notifications count",
+        "tags": [
+          "Notifications"
+        ]
+      }
+    },
+    "/api/v1/notifications/{id}/read": {
+      "patch": {
+        "operationId": "NotificationsController_markAsRead_v1",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Mark a notification as read",
+        "tags": [
+          "Notifications"
+        ]
+      }
+    },
+    "/api/v1/notifications/read-all": {
+      "post": {
+        "operationId": "NotificationsController_markAllAsRead_v1",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Mark all notifications as read",
+        "tags": [
+          "Notifications"
+        ]
+      }
+    },
     "/api/v1/oauth/token": {
       "post": {
         "operationId": "OAuthController_token_v1",
@@ -2543,224 +2330,6 @@
         "summary": "Revoke (soft-delete) multiple OAuth clients",
         "tags": [
           "OAuth"
-        ]
-      }
-    },
-    "/api/v1/sessions/me": {
-      "get": {
-        "operationId": "SessionsController_findMine_v1",
-        "parameters": [],
-        "responses": {
-          "200": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/OwnSessionResponse"
-                  }
-                }
-              }
-            }
-          }
-        },
-        "security": [
-          {
-            "bearer": []
-          }
-        ],
-        "summary": "List the current user's active sessions",
-        "tags": [
-          "Sessions"
-        ]
-      }
-    },
-    "/api/v1/sessions/me/revoke-others": {
-      "post": {
-        "operationId": "SessionsController_revokeOthers_v1",
-        "parameters": [],
-        "responses": {
-          "201": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "properties": {
-                    "revoked": {
-                      "type": "number"
-                    }
-                  }
-                }
-              }
-            }
-          }
-        },
-        "security": [
-          {
-            "bearer": []
-          }
-        ],
-        "summary": "Sign out of every other device",
-        "tags": [
-          "Sessions"
-        ]
-      }
-    },
-    "/api/v1/sessions/me/{id}": {
-      "delete": {
-        "operationId": "SessionsController_revokeMine_v1",
-        "parameters": [
-          {
-            "name": "id",
-            "required": true,
-            "in": "path",
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/UserSession"
-                }
-              }
-            }
-          }
-        },
-        "security": [
-          {
-            "bearer": []
-          }
-        ],
-        "summary": "Revoke one of the current user's sessions",
-        "tags": [
-          "Sessions"
-        ]
-      }
-    },
-    "/api/v1/sessions": {
-      "get": {
-        "operationId": "SessionsController_findAll_v1",
-        "parameters": [
-          {
-            "name": "page",
-            "required": false,
-            "in": "query",
-            "schema": {
-              "default": 1,
-              "type": "number"
-            }
-          },
-          {
-            "name": "limit",
-            "required": false,
-            "in": "query",
-            "schema": {
-              "maximum": 100,
-              "default": 10,
-              "type": "number"
-            }
-          },
-          {
-            "name": "search",
-            "required": false,
-            "in": "query",
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "sort",
-            "required": false,
-            "in": "query",
-            "schema": {
-              "default": "createdAt",
-              "type": "string"
-            }
-          },
-          {
-            "name": "direction",
-            "required": false,
-            "in": "query",
-            "schema": {
-              "default": "DESC",
-              "type": "string",
-              "enum": [
-                "ASC",
-                "DESC"
-              ]
-            }
-          },
-          {
-            "name": "paginated",
-            "required": false,
-            "in": "query",
-            "schema": {
-              "type": "boolean"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/PaginatedSessionResponse"
-                }
-              }
-            }
-          }
-        },
-        "security": [
-          {
-            "bearer": []
-          }
-        ],
-        "summary": "List every session (admin)",
-        "tags": [
-          "Sessions"
-        ]
-      }
-    },
-    "/api/v1/sessions/{id}": {
-      "delete": {
-        "operationId": "SessionsController_revoke_v1",
-        "parameters": [
-          {
-            "name": "id",
-            "required": true,
-            "in": "path",
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/UserSession"
-                }
-              }
-            }
-          }
-        },
-        "security": [
-          {
-            "bearer": []
-          }
-        ],
-        "summary": "Revoke any session (admin)",
-        "tags": [
-          "Sessions"
         ]
       }
     },
@@ -3021,9 +2590,398 @@
         ]
       }
     },
-    "/api/v1/notifications": {
+    "/api/v1/stats/reports": {
       "get": {
-        "operationId": "NotificationsController_findAll_v1",
+        "operationId": "ReportsStatsController_reports_v1",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ReportStatsDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Report statistics scoped to the current user",
+        "tags": [
+          "Stats"
+        ]
+      }
+    },
+    "/api/v1/reports": {
+      "get": {
+        "operationId": "ReportsController_findAll_v1",
+        "parameters": [
+          {
+            "name": "page",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "default": 1,
+              "type": "number"
+            }
+          },
+          {
+            "name": "limit",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "maximum": 100,
+              "default": 10,
+              "type": "number"
+            }
+          },
+          {
+            "name": "search",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "sort",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "default": "createdAt",
+              "type": "string"
+            }
+          },
+          {
+            "name": "direction",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "default": "DESC",
+              "type": "string",
+              "enum": [
+                "ASC",
+                "DESC"
+              ]
+            }
+          },
+          {
+            "name": "paginated",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "name": "status",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "PENDING",
+                "IN_PROGRESS",
+                "COMPLETED",
+                "REJECTED"
+              ]
+            }
+          },
+          {
+            "name": "category",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "ORGANIC_WASTE",
+                "PLASTIC_WASTE",
+                "PAPER_WASTE"
+              ]
+            }
+          },
+          {
+            "name": "from",
+            "required": false,
+            "in": "query",
+            "description": "Inclusive start date (YYYY-MM-DD)",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "to",
+            "required": false,
+            "in": "query",
+            "description": "Inclusive end date (YYYY-MM-DD)",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "reporterId",
+            "required": false,
+            "in": "query",
+            "description": "Reporter id (admin scope only)",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PaginatedReportResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "List reports visible to the current user",
+        "tags": [
+          "Reports"
+        ]
+      },
+      "post": {
+        "operationId": "ReportsController_create_v1",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateReportDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Report"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Create a report",
+        "tags": [
+          "Reports"
+        ]
+      }
+    },
+    "/api/v1/reports/{id}": {
+      "get": {
+        "operationId": "ReportsController_findOne_v1",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Report"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Get a report by ID",
+        "tags": [
+          "Reports"
+        ]
+      },
+      "patch": {
+        "operationId": "ReportsController_update_v1",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateReportDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Report"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Update a report",
+        "tags": [
+          "Reports"
+        ]
+      },
+      "delete": {
+        "operationId": "ReportsController_remove_v1",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Soft-delete a report",
+        "tags": [
+          "Reports"
+        ]
+      }
+    },
+    "/api/v1/reports/{id}/status": {
+      "patch": {
+        "operationId": "ReportsController_updateStatus_v1",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateReportStatusDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Report"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Update report handling status",
+        "tags": [
+          "Reports"
+        ]
+      }
+    },
+    "/api/v1/roles": {
+      "post": {
+        "operationId": "RolesController_create_v1",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateRoleDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Role"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Create a new role",
+        "tags": [
+          "Roles"
+        ]
+      },
+      "get": {
+        "operationId": "RolesController_findAll_v1",
         "parameters": [
           {
             "name": "page",
@@ -3089,10 +3047,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/Notification"
-                  }
+                  "$ref": "#/components/schemas/PaginatedRoleResponse"
                 }
               }
             }
@@ -3103,23 +3058,32 @@
             "bearer": []
           }
         ],
-        "summary": "Get current user notifications",
+        "summary": "Get all roles",
         "tags": [
-          "Notifications"
+          "Roles"
         ]
       }
     },
-    "/api/v1/notifications/unread-count": {
+    "/api/v1/roles/{id}": {
       "get": {
-        "operationId": "NotificationsController_getUnreadCount_v1",
-        "parameters": [],
+        "operationId": "RolesController_findOne_v1",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
         "responses": {
           "200": {
             "description": "",
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "number"
+                  "$ref": "#/components/schemas/Role"
                 }
               }
             }
@@ -3130,15 +3094,57 @@
             "bearer": []
           }
         ],
-        "summary": "Get unread notifications count",
+        "summary": "Get a role by ID",
         "tags": [
-          "Notifications"
+          "Roles"
         ]
-      }
-    },
-    "/api/v1/notifications/{id}/read": {
+      },
       "patch": {
-        "operationId": "NotificationsController_markAsRead_v1",
+        "operationId": "RolesController_update_v1",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateRoleDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Role"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Update a role",
+        "tags": [
+          "Roles"
+        ]
+      },
+      "delete": {
+        "operationId": "RolesController_remove_v1",
         "parameters": [
           {
             "name": "id",
@@ -3159,16 +3165,26 @@
             "bearer": []
           }
         ],
-        "summary": "Mark a notification as read",
+        "summary": "Delete a role",
         "tags": [
-          "Notifications"
+          "Roles"
         ]
       }
     },
-    "/api/v1/notifications/read-all": {
+    "/api/v1/roles/bulk-delete": {
       "post": {
-        "operationId": "NotificationsController_markAllAsRead_v1",
+        "operationId": "RolesController_bulkRemove_v1",
         "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/BulkDeleteDto"
+              }
+            }
+          }
+        },
         "responses": {
           "200": {
             "description": ""
@@ -3179,15 +3195,183 @@
             "bearer": []
           }
         ],
-        "summary": "Mark all notifications as read",
+        "summary": "Delete multiple roles",
         "tags": [
-          "Notifications"
+          "Roles"
         ]
       }
     },
-    "/api/v1/app/force-refresh": {
+    "/api/v1/roles/{id}/permissions/sync": {
       "post": {
-        "operationId": "AppRefreshController_forceRefresh_v1",
+        "operationId": "RolesController_syncPermissions_v1",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ManagePermissionsDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Role"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Sync role permissions",
+        "tags": [
+          "Roles"
+        ]
+      }
+    },
+    "/api/v1/roles/{id}/permissions/attach": {
+      "post": {
+        "operationId": "RolesController_attachPermissions_v1",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ManagePermissionsDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Role"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Attach permissions to role",
+        "tags": [
+          "Roles"
+        ]
+      }
+    },
+    "/api/v1/roles/{id}/permissions/detach": {
+      "post": {
+        "operationId": "RolesController_detachPermissions_v1",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ManagePermissionsDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Role"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Detach permissions from role",
+        "tags": [
+          "Roles"
+        ]
+      }
+    },
+    "/api/v1/sessions/me": {
+      "get": {
+        "operationId": "SessionsController_findMine_v1",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/OwnSessionResponse"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "List the current user's active sessions",
+        "tags": [
+          "Sessions"
+        ]
+      }
+    },
+    "/api/v1/sessions/me/revoke-others": {
+      "post": {
+        "operationId": "SessionsController_revokeOthers_v1",
         "parameters": [],
         "responses": {
           "201": {
@@ -3196,9 +3380,8 @@
               "application/json": {
                 "schema": {
                   "properties": {
-                    "issuedAt": {
-                      "type": "string",
-                      "format": "date-time"
+                    "revoked": {
+                      "type": "number"
                     }
                   }
                 }
@@ -3211,253 +3394,51 @@
             "bearer": []
           }
         ],
-        "summary": "Tell every connected client to drop its cache and reload",
+        "summary": "Sign out of every other device",
         "tags": [
-          "App"
+          "Sessions"
         ]
       }
     },
-    "/api/v1/health": {
-      "get": {
-        "description": "Checks PostgreSQL connectivity with a dedicated pool (1 second acquisition timeout, 1 second server statement timeout, 1.5 second transport fallback) and a 300 MiB heap limit. This does not validate schema or business operations. Returns HTTP 200 when both checks succeed, otherwise HTTP 503 with sanitized dependency status.",
-        "operationId": "HealthController_check_v1",
-        "parameters": [],
+    "/api/v1/sessions/me/{id}": {
+      "delete": {
+        "operationId": "SessionsController_revokeMine_v1",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
         "responses": {
           "200": {
-            "description": "The Health Check is successful",
+            "description": "",
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "object",
-                  "properties": {
-                    "status": {
-                      "type": "string",
-                      "enum": [
-                        "ok",
-                        "degraded"
-                      ],
-                      "example": "ok"
-                    },
-                    "info": {
-                      "type": "object",
-                      "example": {
-                        "database": {
-                          "status": "up",
-                          "responseTime": 12
-                        }
-                      },
-                      "additionalProperties": {
-                        "type": "object",
-                        "required": [
-                          "status"
-                        ],
-                        "properties": {
-                          "status": {
-                            "type": "string",
-                            "enum": [
-                              "up",
-                              "degraded",
-                              "down"
-                            ]
-                          },
-                          "responseTime": {
-                            "type": "number",
-                            "description": "Time the health indicator took to respond, in ms"
-                          }
-                        },
-                        "additionalProperties": true
-                      },
-                      "nullable": true
-                    },
-                    "error": {
-                      "type": "object",
-                      "example": {},
-                      "additionalProperties": {
-                        "type": "object",
-                        "required": [
-                          "status"
-                        ],
-                        "properties": {
-                          "status": {
-                            "type": "string",
-                            "enum": [
-                              "up",
-                              "degraded",
-                              "down"
-                            ]
-                          },
-                          "responseTime": {
-                            "type": "number",
-                            "description": "Time the health indicator took to respond, in ms"
-                          }
-                        },
-                        "additionalProperties": true
-                      },
-                      "nullable": true
-                    },
-                    "details": {
-                      "type": "object",
-                      "example": {
-                        "database": {
-                          "status": "up",
-                          "responseTime": 12
-                        }
-                      },
-                      "additionalProperties": {
-                        "type": "object",
-                        "required": [
-                          "status"
-                        ],
-                        "properties": {
-                          "status": {
-                            "type": "string",
-                            "enum": [
-                              "up",
-                              "degraded",
-                              "down"
-                            ]
-                          },
-                          "responseTime": {
-                            "type": "number",
-                            "description": "Time the health indicator took to respond, in ms"
-                          }
-                        },
-                        "additionalProperties": true
-                      }
-                    }
-                  }
-                }
-              }
-            }
-          },
-          "503": {
-            "description": "The Health Check is not successful",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "status": {
-                      "type": "string",
-                      "enum": [
-                        "error",
-                        "shutting_down"
-                      ],
-                      "example": "error"
-                    },
-                    "info": {
-                      "type": "object",
-                      "example": {
-                        "database": {
-                          "status": "up",
-                          "responseTime": 12
-                        }
-                      },
-                      "additionalProperties": {
-                        "type": "object",
-                        "required": [
-                          "status"
-                        ],
-                        "properties": {
-                          "status": {
-                            "type": "string",
-                            "enum": [
-                              "up",
-                              "degraded",
-                              "down"
-                            ]
-                          },
-                          "responseTime": {
-                            "type": "number",
-                            "description": "Time the health indicator took to respond, in ms"
-                          }
-                        },
-                        "additionalProperties": true
-                      },
-                      "nullable": true
-                    },
-                    "error": {
-                      "type": "object",
-                      "example": {
-                        "redis": {
-                          "status": "down",
-                          "message": "Could not connect",
-                          "responseTime": 3005
-                        }
-                      },
-                      "additionalProperties": {
-                        "type": "object",
-                        "required": [
-                          "status"
-                        ],
-                        "properties": {
-                          "status": {
-                            "type": "string",
-                            "enum": [
-                              "up",
-                              "degraded",
-                              "down"
-                            ]
-                          },
-                          "responseTime": {
-                            "type": "number",
-                            "description": "Time the health indicator took to respond, in ms"
-                          }
-                        },
-                        "additionalProperties": true
-                      },
-                      "nullable": true
-                    },
-                    "details": {
-                      "type": "object",
-                      "example": {
-                        "database": {
-                          "status": "up",
-                          "responseTime": 12
-                        },
-                        "redis": {
-                          "status": "down",
-                          "message": "Could not connect",
-                          "responseTime": 3005
-                        }
-                      },
-                      "additionalProperties": {
-                        "type": "object",
-                        "required": [
-                          "status"
-                        ],
-                        "properties": {
-                          "status": {
-                            "type": "string",
-                            "enum": [
-                              "up",
-                              "degraded",
-                              "down"
-                            ]
-                          },
-                          "responseTime": {
-                            "type": "number",
-                            "description": "Time the health indicator took to respond, in ms"
-                          }
-                        },
-                        "additionalProperties": true
-                      }
-                    }
-                  }
+                  "$ref": "#/components/schemas/UserSession"
                 }
               }
             }
           }
         },
-        "summary": "Service health and PostgreSQL connectivity",
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Revoke one of the current user's sessions",
         "tags": [
-          "Health"
+          "Sessions"
         ]
       }
     },
-    "/api/v1/audit-logs": {
+    "/api/v1/sessions": {
       "get": {
-        "operationId": "AuditController_findAll_v1",
+        "operationId": "SessionsController_findAll_v1",
         "parameters": [
           {
             "name": "page",
@@ -3515,12 +3496,39 @@
             "schema": {
               "type": "boolean"
             }
-          },
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PaginatedSessionResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
           {
-            "name": "action",
-            "required": false,
-            "in": "query",
-            "description": "Restrict to a single action",
+            "bearer": []
+          }
+        ],
+        "summary": "List every session (admin)",
+        "tags": [
+          "Sessions"
+        ]
+      }
+    },
+    "/api/v1/sessions/{id}": {
+      "delete": {
+        "operationId": "SessionsController_revoke_v1",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
             "schema": {
               "type": "string"
             }
@@ -3532,7 +3540,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/PaginatedAuditResponse"
+                  "$ref": "#/components/schemas/UserSession"
                 }
               }
             }
@@ -3543,39 +3551,9 @@
             "bearer": []
           }
         ],
-        "summary": "Read the audit trail",
+        "summary": "Revoke any session (admin)",
         "tags": [
-          "Audit"
-        ]
-      }
-    },
-    "/api/v1/audit-logs/actions": {
-      "get": {
-        "operationId": "AuditController_findActions_v1",
-        "parameters": [],
-        "responses": {
-          "200": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "type": "string"
-                  }
-                }
-              }
-            }
-          }
-        },
-        "security": [
-          {
-            "bearer": []
-          }
-        ],
-        "summary": "The distinct actions recorded so far",
-        "tags": [
-          "Audit"
+          "Sessions"
         ]
       }
     },
@@ -3634,26 +3612,6 @@
         "summary": "Accounts created per day",
         "tags": [
           "Stats"
-        ]
-      }
-    },
-    "/api/v1/changelog": {
-      "get": {
-        "operationId": "ChangelogController_findAll_v1",
-        "parameters": [],
-        "responses": {
-          "200": {
-            "description": ""
-          }
-        },
-        "security": [
-          {
-            "bearer": []
-          }
-        ],
-        "summary": "Published release notes, newest first",
-        "tags": [
-          "Changelog"
         ]
       }
     },
@@ -3773,11 +3731,613 @@
           "Time zones"
         ]
       }
+    },
+    "/api/v1/users": {
+      "get": {
+        "operationId": "UsersController_findAll_v1",
+        "parameters": [
+          {
+            "name": "page",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "default": 1,
+              "type": "number"
+            }
+          },
+          {
+            "name": "limit",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "maximum": 100,
+              "default": 10,
+              "type": "number"
+            }
+          },
+          {
+            "name": "search",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "sort",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "default": "createdAt",
+              "type": "string"
+            }
+          },
+          {
+            "name": "direction",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "default": "DESC",
+              "type": "string",
+              "enum": [
+                "ASC",
+                "DESC"
+              ]
+            }
+          },
+          {
+            "name": "paginated",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "name": "accountStatus",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "INACTIVE",
+                "ACTIVE",
+                "UNVERIFIED",
+                "LOCKED"
+              ]
+            }
+          },
+          {
+            "name": "timeZone",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "Asia/Jakarta",
+                "Asia/Makassar",
+                "Asia/Jayapura"
+              ]
+            }
+          },
+          {
+            "name": "createdIn",
+            "required": false,
+            "in": "query",
+            "description": "Creation window in the selected report timezone, default Asia/Jakarta; 1m and 3m use 30 and 90 days.",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "today",
+                "7d",
+                "1m",
+                "3m"
+              ]
+            }
+          },
+          {
+            "name": "registerMethod",
+            "required": false,
+            "in": "query",
+            "description": "Method used to first create the account.",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "EMAIL_OTP",
+                "GOOGLE",
+                "INVITATION",
+                "SEEDER",
+                "UNKNOWN"
+              ]
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PaginatedUserResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Get all users",
+        "tags": [
+          "Users"
+        ]
+      }
+    },
+    "/api/v1/users/{id}": {
+      "patch": {
+        "operationId": "UsersController_update_v1",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateUserDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/User"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Update a user",
+        "tags": [
+          "Users"
+        ]
+      },
+      "get": {
+        "operationId": "UsersController_findOne_v1",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/User"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Get a user by ID",
+        "tags": [
+          "Users"
+        ]
+      },
+      "delete": {
+        "operationId": "UsersController_remove_v1",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Delete a user",
+        "tags": [
+          "Users"
+        ]
+      }
+    },
+    "/api/v1/users/bulk-delete": {
+      "post": {
+        "operationId": "UsersController_bulkRemove_v1",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/BulkDeleteDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Delete multiple users",
+        "tags": [
+          "Users"
+        ]
+      }
+    },
+    "/api/v1/users/{id}/status": {
+      "patch": {
+        "operationId": "UsersController_updateStatus_v1",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateUserStatusDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/User"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Activate or deactivate a user account",
+        "tags": [
+          "Users"
+        ]
+      }
+    },
+    "/api/v1/users/{id}/roles/sync": {
+      "post": {
+        "operationId": "UsersController_syncRoles_v1",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ManageRolesDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/User"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Sync user roles",
+        "tags": [
+          "Users"
+        ]
+      }
+    },
+    "/api/v1/users/{id}/roles/attach": {
+      "post": {
+        "operationId": "UsersController_attachRoles_v1",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ManageRolesDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/User"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Attach roles to user",
+        "tags": [
+          "Users"
+        ]
+      }
+    },
+    "/api/v1/users/{id}/roles/detach": {
+      "post": {
+        "operationId": "UsersController_detachRoles_v1",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ManageRolesDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/User"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Detach roles from user",
+        "tags": [
+          "Users"
+        ]
+      }
+    },
+    "/api/v1/users/{id}/permissions/sync": {
+      "post": {
+        "operationId": "UsersController_syncPermissions_v1",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ManageUserPermissionsDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/User"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Sync user permissions",
+        "tags": [
+          "Users"
+        ]
+      }
+    },
+    "/api/v1/users/{id}/permissions/attach": {
+      "post": {
+        "operationId": "UsersController_attachPermissions_v1",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ManageUserPermissionsDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/User"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Attach permissions to user",
+        "tags": [
+          "Users"
+        ]
+      }
+    },
+    "/api/v1/users/{id}/permissions/detach": {
+      "post": {
+        "operationId": "UsersController_detachPermissions_v1",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ManageUserPermissionsDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/User"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Detach permissions from user",
+        "tags": [
+          "Users"
+        ]
+      }
     }
   },
   "info": {
-    "title": "Nestplate API",
-    "description": "Nestplate Starter API. REST URI version: v1; application releases are versioned independently.",
+    "title": "WasteWise API",
+    "description": "Smart Waste Management Platform API. REST URI version: v1; application releases are versioned independently.",
     "version": "1.0",
     "contact": {}
   },
@@ -3797,7 +4357,7 @@
         "properties": {
           "name": {
             "type": "string",
-            "example": "Nestplate API"
+            "example": "WasteWise API"
           },
           "apiVersion": {
             "type": "string",
@@ -3833,6 +4393,294 @@
           "lastPage"
         ]
       },
+      "AuditLog": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "number"
+          },
+          "action": {
+            "type": "string"
+          },
+          "actorId": {
+            "type": "number",
+            "nullable": true
+          },
+          "actorEmail": {
+            "type": "string",
+            "nullable": true
+          },
+          "subjectType": {
+            "type": "string",
+            "nullable": true
+          },
+          "subjectId": {
+            "type": "string",
+            "nullable": true
+          },
+          "summary": {
+            "type": "string",
+            "nullable": true
+          },
+          "metadata": {
+            "type": "object",
+            "nullable": true
+          },
+          "ipAddress": {
+            "type": "string",
+            "nullable": true
+          },
+          "createdAt": {
+            "format": "date-time",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "action",
+          "actorId",
+          "actorEmail",
+          "subjectType",
+          "subjectId",
+          "summary",
+          "metadata",
+          "ipAddress",
+          "createdAt"
+        ]
+      },
+      "PaginatedAuditResponse": {
+        "type": "object",
+        "properties": {
+          "meta": {
+            "$ref": "#/components/schemas/PaginationMetaDto"
+          },
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/AuditLog"
+            }
+          }
+        },
+        "required": [
+          "meta",
+          "data"
+        ]
+      },
+      "MobileAuthSessionDto": {
+        "type": "object",
+        "properties": {
+          "accessToken": {
+            "type": "string"
+          },
+          "refreshToken": {
+            "type": "string"
+          },
+          "sessionExpiresAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        },
+        "required": [
+          "accessToken",
+          "refreshToken",
+          "sessionExpiresAt"
+        ]
+      },
+      "MobileTwoFactorChallengeDto": {
+        "type": "object",
+        "properties": {
+          "twoFactorRequired": {
+            "type": "boolean",
+            "example": true
+          },
+          "challengeToken": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "twoFactorRequired",
+          "challengeToken"
+        ]
+      },
+      "LoginDto": {
+        "type": "object",
+        "properties": {
+          "email": {
+            "type": "string",
+            "example": "admin@example.com"
+          },
+          "password": {
+            "type": "string",
+            "example": "password123"
+          },
+          "turnstileToken": {
+            "type": "string",
+            "description": "Cloudflare Turnstile verification token"
+          }
+        },
+        "required": [
+          "email",
+          "password"
+        ]
+      },
+      "GoogleLoginDto": {
+        "type": "object",
+        "properties": {
+          "token": {
+            "type": "string",
+            "description": "Google ID Token"
+          }
+        },
+        "required": [
+          "token"
+        ]
+      },
+      "TwoFactorVerifyDto": {
+        "type": "object",
+        "properties": {
+          "challengeToken": {
+            "type": "string",
+            "description": "The challenge token returned by /auth/login"
+          },
+          "code": {
+            "type": "string",
+            "description": "A 6-digit code from the authenticator app, or a recovery code"
+          }
+        },
+        "required": [
+          "challengeToken",
+          "code"
+        ]
+      },
+      "MobileRefreshTokenDto": {
+        "type": "object",
+        "properties": {
+          "refreshToken": {
+            "type": "string",
+            "description": "WasteWise refresh token issued to a mobile client"
+          }
+        },
+        "required": [
+          "refreshToken"
+        ]
+      },
+      "TwoFactorStatusDto": {
+        "type": "object",
+        "properties": {
+          "enabled": {
+            "type": "boolean"
+          },
+          "recoveryCodesRemaining": {
+            "type": "number",
+            "description": "Unused recovery codes left"
+          }
+        },
+        "required": [
+          "enabled",
+          "recoveryCodesRemaining"
+        ]
+      },
+      "TwoFactorEnrollmentDto": {
+        "type": "object",
+        "properties": {
+          "secret": {
+            "type": "string",
+            "description": "Base32 TOTP secret for manual entry"
+          },
+          "otpauthUrl": {
+            "type": "string",
+            "description": "otpauth:// URI for authenticator apps"
+          },
+          "qrDataUrl": {
+            "type": "string",
+            "description": "PNG data URL of the otpauth QR code"
+          }
+        },
+        "required": [
+          "secret",
+          "otpauthUrl",
+          "qrDataUrl"
+        ]
+      },
+      "TwoFactorCodeDto": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "string",
+            "description": "A 6-digit code from the authenticator app, or a recovery code"
+          }
+        },
+        "required": [
+          "code"
+        ]
+      },
+      "RecoveryCodesDto": {
+        "type": "object",
+        "properties": {
+          "recoveryCodes": {
+            "description": "One-time recovery codes; shown only once",
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        },
+        "required": [
+          "recoveryCodes"
+        ]
+      },
+      "MessageResponseDto": {
+        "type": "object",
+        "properties": {
+          "message": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "message"
+        ]
+      },
+      "ForgotPasswordDto": {
+        "type": "object",
+        "properties": {
+          "email": {
+            "type": "string",
+            "example": "user@example.com"
+          }
+        },
+        "required": [
+          "email"
+        ]
+      },
+      "ResetPasswordDto": {
+        "type": "object",
+        "properties": {
+          "token": {
+            "type": "string",
+            "example": "a1b2c3d4-..."
+          },
+          "password": {
+            "type": "string",
+            "example": "newpassword123"
+          }
+        },
+        "required": [
+          "token",
+          "password"
+        ]
+      },
+      "ResendVerificationDto": {
+        "type": "object",
+        "properties": {
+          "email": {
+            "type": "string",
+            "example": "user@example.com"
+          }
+        },
+        "required": [
+          "email"
+        ]
+      },
       "Media": {
         "type": "object",
         "properties": {
@@ -3842,7 +4690,6 @@
           "provider": {
             "type": "string",
             "enum": [
-              "depot",
               "s3"
             ]
           },
@@ -3865,10 +4712,6 @@
           },
           "path": {
             "type": "string",
-            "nullable": true
-          },
-          "depotFileId": {
-            "type": "number",
             "nullable": true
           },
           "url": {
@@ -3908,7 +4751,6 @@
           "mimetype",
           "size",
           "path",
-          "depotFileId",
           "url",
           "driveId",
           "webviewLink",
@@ -4013,6 +4855,9 @@
           "notificationsEnabled": {
             "type": "boolean"
           },
+          "isActive": {
+            "type": "boolean"
+          },
           "avatar": {
             "nullable": true,
             "type": "object",
@@ -4056,10 +4901,19 @@
               "EMAIL_OTP",
               "GOOGLE",
               "INVITATION",
-              "SSO",
               "SEEDER",
               "UNKNOWN"
             ]
+          },
+          "accountStatus": {
+            "type": "string",
+            "enum": [
+              "INACTIVE",
+              "ACTIVE",
+              "UNVERIFIED",
+              "LOCKED"
+            ],
+            "description": "Derived account state; populated by the API presenter."
           },
           "createdAt": {
             "format": "date-time",
@@ -4078,6 +4932,7 @@
           "fullname",
           "phone",
           "notificationsEnabled",
+          "isActive",
           "avatar",
           "media",
           "roles",
@@ -4089,27 +4944,106 @@
           "updatedAt"
         ]
       },
-      "PaginatedUserResponse": {
+      "SwitchRoleDto": {
         "type": "object",
         "properties": {
-          "meta": {
-            "$ref": "#/components/schemas/PaginationMetaDto"
+          "role": {
+            "type": "string",
+            "description": "Name of the role to act as",
+            "example": "admin"
+          }
+        },
+        "required": [
+          "role"
+        ]
+      },
+      "ReleaseNotesDto": {
+        "type": "object",
+        "properties": {
+          "version": {
+            "type": "string",
+            "example": "1.4.0"
           },
-          "data": {
+          "notes": {
+            "type": "string",
+            "description": "Release body in Markdown"
+          },
+          "publishedAt": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "url": {
+            "type": "string",
+            "description": "Release page URL"
+          }
+        },
+        "required": [
+          "version",
+          "notes",
+          "publishedAt",
+          "url"
+        ]
+      },
+      "CreateInvitationDto": {
+        "type": "object",
+        "properties": {
+          "email": {
+            "type": "string",
+            "example": "user@example.com"
+          },
+          "roleIds": {
+            "example": [
+              1,
+              2
+            ],
             "type": "array",
             "items": {
-              "$ref": "#/components/schemas/User"
+              "type": "number"
             }
           }
         },
         "required": [
-          "meta",
-          "data"
+          "email"
         ]
       },
-      "UpdateUserDto": {
+      "Invitation": {
         "type": "object",
-        "properties": {}
+        "properties": {
+          "id": {
+            "type": "number"
+          },
+          "email": {
+            "type": "string"
+          },
+          "roleIds": {
+            "type": "array",
+            "items": {
+              "type": "number"
+            }
+          },
+          "invitedBy": {
+            "type": "number"
+          },
+          "expiresAt": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "acceptedAt": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "createdAt": {
+            "format": "date-time",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "email",
+          "expiresAt",
+          "createdAt"
+        ]
       },
       "BulkDeleteDto": {
         "type": "object",
@@ -4126,13 +5060,30 @@
           "ids"
         ]
       },
-      "ManageRolesDto": {
+      "AcceptInvitationDto": {
         "type": "object",
-        "properties": {}
-      },
-      "ManageUserPermissionsDto": {
-        "type": "object",
-        "properties": {}
+        "properties": {
+          "token": {
+            "type": "string"
+          },
+          "fullname": {
+            "type": "string",
+            "example": "John Doe"
+          },
+          "phone": {
+            "type": "string",
+            "example": "+1234567890"
+          },
+          "password": {
+            "type": "string",
+            "minLength": 6,
+            "example": "password123"
+          }
+        },
+        "required": [
+          "token",
+          "password"
+        ]
       },
       "PaginatedMediaResponse": {
         "type": "object",
@@ -4221,493 +5172,6 @@
           "results"
         ]
       },
-      "CreateRoleDto": {
-        "type": "object",
-        "properties": {}
-      },
-      "PaginatedRoleResponse": {
-        "type": "object",
-        "properties": {
-          "meta": {
-            "$ref": "#/components/schemas/PaginationMetaDto"
-          },
-          "data": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/Role"
-            }
-          }
-        },
-        "required": [
-          "meta",
-          "data"
-        ]
-      },
-      "UpdateRoleDto": {
-        "type": "object",
-        "properties": {}
-      },
-      "ManagePermissionsDto": {
-        "type": "object",
-        "properties": {}
-      },
-      "CreateInvitationDto": {
-        "type": "object",
-        "properties": {
-          "email": {
-            "type": "string",
-            "example": "user@example.com"
-          },
-          "roleIds": {
-            "example": [
-              1,
-              2
-            ],
-            "type": "array",
-            "items": {
-              "type": "number"
-            }
-          }
-        },
-        "required": [
-          "email"
-        ]
-      },
-      "Invitation": {
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "number"
-          },
-          "email": {
-            "type": "string"
-          },
-          "roleIds": {
-            "type": "array",
-            "items": {
-              "type": "number"
-            }
-          },
-          "invitedBy": {
-            "type": "number"
-          },
-          "expiresAt": {
-            "format": "date-time",
-            "type": "string"
-          },
-          "acceptedAt": {
-            "format": "date-time",
-            "type": "string"
-          },
-          "createdAt": {
-            "format": "date-time",
-            "type": "string"
-          }
-        },
-        "required": [
-          "id",
-          "email",
-          "expiresAt",
-          "createdAt"
-        ]
-      },
-      "AcceptInvitationDto": {
-        "type": "object",
-        "properties": {
-          "token": {
-            "type": "string"
-          },
-          "fullname": {
-            "type": "string",
-            "example": "John Doe"
-          },
-          "phone": {
-            "type": "string",
-            "example": "+1234567890"
-          },
-          "password": {
-            "type": "string",
-            "minLength": 6,
-            "example": "password123"
-          }
-        },
-        "required": [
-          "token",
-          "password"
-        ]
-      },
-      "LoginDto": {
-        "type": "object",
-        "properties": {
-          "email": {
-            "type": "string",
-            "example": "admin@example.com"
-          },
-          "password": {
-            "type": "string",
-            "example": "password123"
-          },
-          "turnstileToken": {
-            "type": "string",
-            "description": "Cloudflare Turnstile verification token"
-          }
-        },
-        "required": [
-          "email",
-          "password"
-        ]
-      },
-      "GoogleLoginDto": {
-        "type": "object",
-        "properties": {
-          "token": {
-            "type": "string",
-            "description": "Google ID Token"
-          }
-        },
-        "required": [
-          "token"
-        ]
-      },
-      "TwoFactorVerifyDto": {
-        "type": "object",
-        "properties": {
-          "challengeToken": {
-            "type": "string",
-            "description": "The challenge token returned by /auth/login"
-          },
-          "code": {
-            "type": "string",
-            "description": "A 6-digit code from the authenticator app, or a recovery code"
-          }
-        },
-        "required": [
-          "challengeToken",
-          "code"
-        ]
-      },
-      "TwoFactorCodeDto": {
-        "type": "object",
-        "properties": {
-          "code": {
-            "type": "string",
-            "description": "A 6-digit code from the authenticator app, or a recovery code"
-          }
-        },
-        "required": [
-          "code"
-        ]
-      },
-      "ForgotPasswordDto": {
-        "type": "object",
-        "properties": {
-          "email": {
-            "type": "string",
-            "example": "user@example.com"
-          }
-        },
-        "required": [
-          "email"
-        ]
-      },
-      "ResetPasswordDto": {
-        "type": "object",
-        "properties": {
-          "token": {
-            "type": "string",
-            "example": "a1b2c3d4-..."
-          },
-          "password": {
-            "type": "string",
-            "example": "newpassword123"
-          }
-        },
-        "required": [
-          "token",
-          "password"
-        ]
-      },
-      "ResendVerificationDto": {
-        "type": "object",
-        "properties": {
-          "email": {
-            "type": "string",
-            "example": "user@example.com"
-          }
-        },
-        "required": [
-          "email"
-        ]
-      },
-      "SwitchRoleDto": {
-        "type": "object",
-        "properties": {
-          "role": {
-            "type": "string",
-            "description": "Name of the role to act as",
-            "example": "admin"
-          }
-        },
-        "required": [
-          "role"
-        ]
-      },
-      "TokenRequestDto": {
-        "type": "object",
-        "properties": {
-          "grant_type": {
-            "type": "string",
-            "enum": [
-              "client_credentials"
-            ]
-          },
-          "client_id": {
-            "type": "string"
-          },
-          "client_secret": {
-            "type": "string"
-          },
-          "scope": {
-            "type": "string",
-            "description": "Space-delimited scopes to request (subset of the client's)."
-          }
-        },
-        "required": [
-          "grant_type",
-          "client_id",
-          "client_secret"
-        ]
-      },
-      "CreateOAuthClientDto": {
-        "type": "object",
-        "properties": {
-          "name": {
-            "type": "string",
-            "description": "Human-readable name for the client."
-          },
-          "scopes": {
-            "description": "Permission scopes this client may request.",
-            "type": "array",
-            "items": {
-              "type": "string"
-            }
-          }
-        },
-        "required": [
-          "name",
-          "scopes"
-        ]
-      },
-      "UpdateOAuthClientDto": {
-        "type": "object",
-        "properties": {
-          "isActive": {
-            "type": "boolean",
-            "description": "Enable or disable the client."
-          }
-        }
-      },
-      "OwnSessionResponse": {
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "number"
-          },
-          "sessionId": {
-            "type": "string"
-          },
-          "userId": {
-            "type": "number"
-          },
-          "ipAddress": {
-            "type": "string",
-            "nullable": true
-          },
-          "userAgent": {
-            "type": "string",
-            "nullable": true
-          },
-          "impersonatedById": {
-            "type": "number",
-            "nullable": true
-          },
-          "isSso": {
-            "type": "boolean"
-          },
-          "audience": {
-            "type": "string",
-            "enum": [
-              "admin"
-            ]
-          },
-          "lastActiveAt": {
-            "format": "date-time",
-            "type": "string"
-          },
-          "expiresAt": {
-            "format": "date-time",
-            "type": "string"
-          },
-          "absoluteExpiresAt": {
-            "format": "date-time",
-            "type": "string"
-          },
-          "revokedAt": {
-            "format": "date-time",
-            "type": "string",
-            "nullable": true
-          },
-          "createdAt": {
-            "format": "date-time",
-            "type": "string"
-          },
-          "updatedAt": {
-            "format": "date-time",
-            "type": "string"
-          },
-          "isCurrent": {
-            "type": "boolean",
-            "description": "True for the session making this request"
-          }
-        },
-        "required": [
-          "id",
-          "sessionId",
-          "userId",
-          "ipAddress",
-          "userAgent",
-          "impersonatedById",
-          "isSso",
-          "audience",
-          "lastActiveAt",
-          "expiresAt",
-          "absoluteExpiresAt",
-          "revokedAt",
-          "createdAt",
-          "updatedAt",
-          "isCurrent"
-        ]
-      },
-      "UserSession": {
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "number"
-          },
-          "sessionId": {
-            "type": "string"
-          },
-          "userId": {
-            "type": "number"
-          },
-          "ipAddress": {
-            "type": "string",
-            "nullable": true
-          },
-          "userAgent": {
-            "type": "string",
-            "nullable": true
-          },
-          "impersonatedById": {
-            "type": "number",
-            "nullable": true
-          },
-          "isSso": {
-            "type": "boolean"
-          },
-          "audience": {
-            "type": "string",
-            "enum": [
-              "admin"
-            ]
-          },
-          "lastActiveAt": {
-            "format": "date-time",
-            "type": "string"
-          },
-          "expiresAt": {
-            "format": "date-time",
-            "type": "string"
-          },
-          "absoluteExpiresAt": {
-            "format": "date-time",
-            "type": "string"
-          },
-          "revokedAt": {
-            "format": "date-time",
-            "type": "string",
-            "nullable": true
-          },
-          "createdAt": {
-            "format": "date-time",
-            "type": "string"
-          },
-          "updatedAt": {
-            "format": "date-time",
-            "type": "string"
-          }
-        },
-        "required": [
-          "id",
-          "sessionId",
-          "userId",
-          "ipAddress",
-          "userAgent",
-          "impersonatedById",
-          "isSso",
-          "audience",
-          "lastActiveAt",
-          "expiresAt",
-          "absoluteExpiresAt",
-          "revokedAt",
-          "createdAt",
-          "updatedAt"
-        ]
-      },
-      "PaginatedSessionResponse": {
-        "type": "object",
-        "properties": {
-          "meta": {
-            "$ref": "#/components/schemas/PaginationMetaDto"
-          },
-          "data": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/UserSession"
-            }
-          }
-        },
-        "required": [
-          "meta",
-          "data"
-        ]
-      },
-      "CreatePermissionDto": {
-        "type": "object",
-        "properties": {}
-      },
-      "PaginatedPermissionResponse": {
-        "type": "object",
-        "properties": {
-          "meta": {
-            "$ref": "#/components/schemas/PaginationMetaDto"
-          },
-          "data": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/Permission"
-            }
-          }
-        },
-        "required": [
-          "meta",
-          "data"
-        ]
-      },
-      "UpdatePermissionDto": {
-        "type": "object",
-        "properties": {}
-      },
       "Notification": {
         "type": "object",
         "properties": {
@@ -4776,62 +5240,7 @@
           "createdAt"
         ]
       },
-      "AuditLog": {
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "number"
-          },
-          "action": {
-            "type": "string"
-          },
-          "actorId": {
-            "type": "number",
-            "nullable": true
-          },
-          "actorEmail": {
-            "type": "string",
-            "nullable": true
-          },
-          "subjectType": {
-            "type": "string",
-            "nullable": true
-          },
-          "subjectId": {
-            "type": "string",
-            "nullable": true
-          },
-          "summary": {
-            "type": "string",
-            "nullable": true
-          },
-          "metadata": {
-            "type": "object",
-            "nullable": true
-          },
-          "ipAddress": {
-            "type": "string",
-            "nullable": true
-          },
-          "createdAt": {
-            "format": "date-time",
-            "type": "string"
-          }
-        },
-        "required": [
-          "id",
-          "action",
-          "actorId",
-          "actorEmail",
-          "subjectType",
-          "subjectId",
-          "summary",
-          "metadata",
-          "ipAddress",
-          "createdAt"
-        ]
-      },
-      "PaginatedAuditResponse": {
+      "PaginatedNotificationResponse": {
         "type": "object",
         "properties": {
           "meta": {
@@ -4840,7 +5249,506 @@
           "data": {
             "type": "array",
             "items": {
-              "$ref": "#/components/schemas/AuditLog"
+              "$ref": "#/components/schemas/Notification"
+            }
+          }
+        },
+        "required": [
+          "meta",
+          "data"
+        ]
+      },
+      "TokenRequestDto": {
+        "type": "object",
+        "properties": {
+          "grant_type": {
+            "type": "string",
+            "enum": [
+              "client_credentials"
+            ]
+          },
+          "client_id": {
+            "type": "string"
+          },
+          "client_secret": {
+            "type": "string"
+          },
+          "scope": {
+            "type": "string",
+            "description": "Space-delimited scopes to request (subset of the client's)."
+          }
+        },
+        "required": [
+          "grant_type",
+          "client_id",
+          "client_secret"
+        ]
+      },
+      "CreateOAuthClientDto": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "Human-readable name for the client."
+          },
+          "scopes": {
+            "description": "Permission scopes this client may request.",
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        },
+        "required": [
+          "name",
+          "scopes"
+        ]
+      },
+      "UpdateOAuthClientDto": {
+        "type": "object",
+        "properties": {
+          "isActive": {
+            "type": "boolean",
+            "description": "Enable or disable the client."
+          }
+        }
+      },
+      "CreatePermissionDto": {
+        "type": "object",
+        "properties": {}
+      },
+      "PaginatedPermissionResponse": {
+        "type": "object",
+        "properties": {
+          "meta": {
+            "$ref": "#/components/schemas/PaginationMetaDto"
+          },
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Permission"
+            }
+          }
+        },
+        "required": [
+          "meta",
+          "data"
+        ]
+      },
+      "UpdatePermissionDto": {
+        "type": "object",
+        "properties": {}
+      },
+      "ReportCategoryCountsDto": {
+        "type": "object",
+        "properties": {
+          "organic": {
+            "type": "number"
+          },
+          "plastic": {
+            "type": "number"
+          },
+          "paper": {
+            "type": "number"
+          },
+          "unclassified": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "organic",
+          "plastic",
+          "paper",
+          "unclassified"
+        ]
+      },
+      "Report": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "number"
+          },
+          "reporterId": {
+            "type": "number"
+          },
+          "reporter": {
+            "$ref": "#/components/schemas/User"
+          },
+          "media": {
+            "$ref": "#/components/schemas/Media"
+          },
+          "mediaId": {
+            "type": "number"
+          },
+          "description": {
+            "type": "string"
+          },
+          "latitude": {
+            "type": "number",
+            "nullable": true
+          },
+          "longitude": {
+            "type": "number",
+            "nullable": true
+          },
+          "predictedCategory": {
+            "type": "string",
+            "enum": [
+              "ORGANIC_WASTE",
+              "PLASTIC_WASTE",
+              "PAPER_WASTE"
+            ],
+            "nullable": true
+          },
+          "confidence": {
+            "type": "number",
+            "nullable": true
+          },
+          "modelVersion": {
+            "type": "string",
+            "nullable": true
+          },
+          "classificationStatus": {
+            "type": "string",
+            "enum": [
+              "COMPLETED",
+              "FAILED"
+            ]
+          },
+          "classificationError": {
+            "type": "string",
+            "nullable": true
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "PENDING",
+              "IN_PROGRESS",
+              "COMPLETED",
+              "REJECTED"
+            ]
+          },
+          "createdAt": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "updatedAt": {
+            "format": "date-time",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "reporterId",
+          "reporter",
+          "media",
+          "mediaId",
+          "description",
+          "latitude",
+          "longitude",
+          "predictedCategory",
+          "confidence",
+          "modelVersion",
+          "classificationStatus",
+          "classificationError",
+          "status",
+          "createdAt",
+          "updatedAt"
+        ]
+      },
+      "ReportStatsDto": {
+        "type": "object",
+        "properties": {
+          "total": {
+            "type": "number"
+          },
+          "pending": {
+            "type": "number"
+          },
+          "inProgress": {
+            "type": "number"
+          },
+          "completed": {
+            "type": "number"
+          },
+          "rejected": {
+            "type": "number"
+          },
+          "byCategory": {
+            "$ref": "#/components/schemas/ReportCategoryCountsDto"
+          },
+          "recentReports": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Report"
+            }
+          }
+        },
+        "required": [
+          "total",
+          "pending",
+          "inProgress",
+          "completed",
+          "rejected",
+          "byCategory",
+          "recentReports"
+        ]
+      },
+      "PaginatedReportResponse": {
+        "type": "object",
+        "properties": {
+          "meta": {
+            "$ref": "#/components/schemas/PaginationMetaDto"
+          },
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Report"
+            }
+          }
+        },
+        "required": [
+          "meta",
+          "data"
+        ]
+      },
+      "CreateReportDto": {
+        "type": "object",
+        "properties": {
+          "description": {
+            "type": "string",
+            "minLength": 3,
+            "maxLength": 2000
+          },
+          "mediaId": {
+            "type": "number"
+          },
+          "latitude": {
+            "type": "number",
+            "minimum": -90,
+            "maximum": 90
+          },
+          "longitude": {
+            "type": "number",
+            "minimum": -180,
+            "maximum": 180
+          }
+        },
+        "required": [
+          "description",
+          "mediaId"
+        ]
+      },
+      "UpdateReportDto": {
+        "type": "object",
+        "properties": {}
+      },
+      "UpdateReportStatusDto": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "string",
+            "enum": [
+              "PENDING",
+              "IN_PROGRESS",
+              "COMPLETED",
+              "REJECTED"
+            ]
+          }
+        },
+        "required": [
+          "status"
+        ]
+      },
+      "CreateRoleDto": {
+        "type": "object",
+        "properties": {}
+      },
+      "PaginatedRoleResponse": {
+        "type": "object",
+        "properties": {
+          "meta": {
+            "$ref": "#/components/schemas/PaginationMetaDto"
+          },
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Role"
+            }
+          }
+        },
+        "required": [
+          "meta",
+          "data"
+        ]
+      },
+      "UpdateRoleDto": {
+        "type": "object",
+        "properties": {}
+      },
+      "ManagePermissionsDto": {
+        "type": "object",
+        "properties": {}
+      },
+      "OwnSessionResponse": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "number"
+          },
+          "sessionId": {
+            "type": "string"
+          },
+          "userId": {
+            "type": "number"
+          },
+          "ipAddress": {
+            "type": "string",
+            "nullable": true
+          },
+          "userAgent": {
+            "type": "string",
+            "nullable": true
+          },
+          "impersonatedById": {
+            "type": "number",
+            "nullable": true
+          },
+          "audience": {
+            "type": "string",
+            "enum": [
+              "admin"
+            ]
+          },
+          "lastActiveAt": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "expiresAt": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "absoluteExpiresAt": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "revokedAt": {
+            "format": "date-time",
+            "type": "string",
+            "nullable": true
+          },
+          "createdAt": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "updatedAt": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "isCurrent": {
+            "type": "boolean",
+            "description": "True for the session making this request"
+          }
+        },
+        "required": [
+          "id",
+          "sessionId",
+          "userId",
+          "ipAddress",
+          "userAgent",
+          "impersonatedById",
+          "audience",
+          "lastActiveAt",
+          "expiresAt",
+          "absoluteExpiresAt",
+          "revokedAt",
+          "createdAt",
+          "updatedAt",
+          "isCurrent"
+        ]
+      },
+      "UserSession": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "number"
+          },
+          "sessionId": {
+            "type": "string"
+          },
+          "userId": {
+            "type": "number"
+          },
+          "ipAddress": {
+            "type": "string",
+            "nullable": true
+          },
+          "userAgent": {
+            "type": "string",
+            "nullable": true
+          },
+          "impersonatedById": {
+            "type": "number",
+            "nullable": true
+          },
+          "audience": {
+            "type": "string",
+            "enum": [
+              "admin"
+            ]
+          },
+          "lastActiveAt": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "expiresAt": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "absoluteExpiresAt": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "revokedAt": {
+            "format": "date-time",
+            "type": "string",
+            "nullable": true
+          },
+          "createdAt": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "updatedAt": {
+            "format": "date-time",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "sessionId",
+          "userId",
+          "ipAddress",
+          "userAgent",
+          "impersonatedById",
+          "audience",
+          "lastActiveAt",
+          "expiresAt",
+          "absoluteExpiresAt",
+          "revokedAt",
+          "createdAt",
+          "updatedAt"
+        ]
+      },
+      "PaginatedSessionResponse": {
+        "type": "object",
+        "properties": {
+          "meta": {
+            "$ref": "#/components/schemas/PaginationMetaDto"
+          },
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/UserSession"
             }
           }
         },
@@ -4930,6 +5838,47 @@
           "localDateTime",
           "timeZone"
         ]
+      },
+      "PaginatedUserResponse": {
+        "type": "object",
+        "properties": {
+          "meta": {
+            "$ref": "#/components/schemas/PaginationMetaDto"
+          },
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/User"
+            }
+          }
+        },
+        "required": [
+          "meta",
+          "data"
+        ]
+      },
+      "UpdateUserDto": {
+        "type": "object",
+        "properties": {}
+      },
+      "UpdateUserStatusDto": {
+        "type": "object",
+        "properties": {
+          "isActive": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "isActive"
+        ]
+      },
+      "ManageRolesDto": {
+        "type": "object",
+        "properties": {}
+      },
+      "ManageUserPermissionsDto": {
+        "type": "object",
+        "properties": {}
       }
     }
   }

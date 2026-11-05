@@ -1,4 +1,5 @@
 import type { TableSearch } from '@/lib/query/options'
+import type { ReportSearchParams } from '@/lib/schemas/reports'
 import type { CurrentUser } from '@/types/auth'
 import type { QueryClient } from '@tanstack/react-query'
 import {
@@ -10,6 +11,8 @@ import {
   oauthClientsQueryOptions,
   permissionsQueryOptions,
   profileQueryOptions,
+  reportQueryOptions,
+  reportsQueryOptions,
   rolesQueryOptions,
   sessionQueryOptions,
   sessionsQueryOptions,
@@ -22,7 +25,7 @@ type LoaderContext = { queryClient: QueryClient; session?: CurrentUser }
 export async function loadAdminRoute(
   context: LoaderContext,
   route: string,
-  search: TableSearch = {},
+  search: TableSearch & Partial<ReportSearchParams> = {},
 ) {
   const session = context.session ?? (await requireAuth({ context })).session
   const queryClient = context.queryClient
@@ -32,6 +35,14 @@ export async function loadAdminRoute(
     case '/':
       if (allowed('stats.read'))
         return queryClient.ensureQueryData(statsOverviewQueryOptions())
+      return null
+    case '/reports':
+      if (allowed('reports.read.all') || allowed('reports.read.own'))
+        return queryClient.ensureQueryData(
+          reportsQueryOptions(search as ReportSearchParams),
+        )
+      return null
+    case '/reports/new':
       return null
     case '/users':
       if (allowed('users.read'))
@@ -76,4 +87,17 @@ export async function loadAdminRoute(
     default:
       return queryClient.ensureQueryData(sessionQueryOptions())
   }
+}
+
+export async function loadReportRoute(
+  context: LoaderContext,
+  reportId: number,
+) {
+  const session = context.session ?? (await requireAuth({ context })).session
+  if (
+    !session.permissions.includes('reports.read.all') &&
+    !session.permissions.includes('reports.read.own')
+  )
+    return null
+  return context.queryClient.ensureQueryData(reportQueryOptions(reportId))
 }

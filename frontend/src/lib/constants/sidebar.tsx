@@ -8,6 +8,7 @@ import {
   LayoutDashboard,
   Mail,
   MonitorSmartphone,
+  Recycle,
   ScrollText,
   Shield,
   Users,
@@ -18,6 +19,7 @@ export const SIDEBAR_COLLAPSED_WIDTH = 70
 
 export const MENU_PERMISSIONS = {
   dashboard: 'menu.dashboard',
+  reports: 'menu.reports',
   users: 'menu.users',
   database: 'menu.database',
   roles: 'menu.roles',
@@ -53,6 +55,14 @@ export const sidebarData: Array<NavGroup> = [
         label: 'Dashboard',
         href: '/',
         menuPermission: MENU_PERMISSIONS.dashboard,
+      },
+      {
+        key: 'reports',
+        icon: <Recycle size={20} />,
+        label: 'Reports',
+        href: '/reports',
+        menuPermission: MENU_PERMISSIONS.reports,
+        permission: ['reports.read.own', 'reports.read.all'],
       },
     ],
   },

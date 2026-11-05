@@ -11,7 +11,6 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { BlacklistedToken } from './entities/blacklisted-token.entity';
 import { PasswordResetToken } from './entities/password-reset-token.entity';
 import { EmailVerificationToken } from './entities/email-verification-token.entity';
-import { RevokedSsoSession } from './entities/revoked-sso-session.entity';
 import { TwoFactorRecoveryCode } from './entities/two-factor-recovery-code.entity';
 import { User } from '../users/entities/user.entity';
 
@@ -31,7 +30,6 @@ import { SessionsModule } from '../sessions/sessions.module';
       BlacklistedToken,
       PasswordResetToken,
       EmailVerificationToken,
-      RevokedSsoSession,
       TwoFactorRecoveryCode,
       User,
     ]),

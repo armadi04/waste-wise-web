@@ -15,6 +15,7 @@ import { Role } from '../../../src/roles/entities/role.entity';
 import { Permission } from '../../../src/permissions/entities/permission.entity';
 import { Media } from '../../../src/media/entities/media.entity';
 import { GrantPolicyService } from '../../../src/roles/grant-policy.service';
+import { SessionsService } from '../../../src/sessions/sessions.service';
 import type { AuthenticatedUser } from '../../../src/auth/interfaces/auth-request.interface';
 
 describe('UsersService', () => {
@@ -24,8 +25,10 @@ describe('UsersService', () => {
   let permissionsRepository: Repository<Permission>;
   let mediaRepository: Repository<Media>;
   let eventEmitter: EventEmitter2;
+  let sessionsService: { revokeAllForUser: jest.Mock };
 
   beforeEach(async () => {
+    sessionsService = { revokeAllForUser: jest.fn() };
     const module: TestingModule = await Test.createTestingModule({
       providers: [
         UsersService,
@@ -50,6 +53,7 @@ describe('UsersService', () => {
           useValue: {
             findBy: jest.fn().mockResolvedValue([]),
             find: jest.fn().mockResolvedValue([]),
+            findOneBy: jest.fn(),
           },
         },
         {
@@ -61,6 +65,7 @@ describe('UsersService', () => {
           useValue: { findOneBy: jest.fn() },
         },
         { provide: EventEmitter2, useValue: { emit: jest.fn() } },
+        { provide: SessionsService, useValue: sessionsService },
       ],
     }).compile();
 
@@ -98,6 +103,54 @@ describe('UsersService', () => {
       );
       expect(emailFilter.objectLiteralParameters).toEqual({ email: 'A@B.COM' });
       expect(result).toBe(user);
+    });
+  });
+
+  describe('findOrCreateGoogleUser', () => {
+    it('creates a verified Google user with the default role', async () => {
+      (rolesRepository.findOneBy as jest.Mock).mockResolvedValue({
+        id: 2,
+        name: 'user',
+      });
+      (rolesRepository.findBy as jest.Mock).mockResolvedValue([
+        { id: 2, name: 'user' },
+      ]);
+      const created = {
+        id: 9,
+        email: 'google@b.com',
+        isActive: true,
+        emailVerifiedAt: new Date(),
+      } as User;
+      (usersRepository.findOne as jest.Mock)
+        .mockResolvedValueOnce(null)
+        .mockResolvedValueOnce(created);
+
+      const result = await service.findOrCreateGoogleUser({
+        email: 'google@b.com',
+        fullname: 'Google User',
+      });
+
+      expect(usersRepository.save).toHaveBeenCalledWith(
+        expect.objectContaining({
+          email: 'google@b.com',
+          fullname: 'Google User',
+          roles: [{ id: 2, name: 'user' }],
+          registerMethod: RegisterMethodEnum.GOOGLE,
+        }),
+      );
+      expect(result).toMatchObject(created);
+    });
+
+    it('returns the existing account instead of registering again', async () => {
+      const existing = { id: 4, email: 'existing@b.com' } as User;
+      (usersRepository.findOne as jest.Mock).mockResolvedValue(existing);
+
+      const result = await service.findOrCreateGoogleUser({
+        email: 'existing@b.com',
+      });
+
+      expect(result).toBe(existing);
+      expect(usersRepository.save).not.toHaveBeenCalled();
     });
   });
 
@@ -215,6 +268,79 @@ describe('UsersService', () => {
           clause.registerMethod === RegisterMethodEnum.INVITATION,
       ),
     ).toBe(true);
+  });
+
+  describe('account activation', () => {
+    it('derives INACTIVE before other account states', async () => {
+      (usersRepository.findOne as jest.Mock).mockResolvedValue({
+        id: 1,
+        isActive: false,
+        lockedUntil: new Date(Date.now() + 60_000),
+        emailVerifiedAt: new Date(),
+      });
+
+      const user = await service.findOne(1);
+
+      expect(user.accountStatus).toBe('INACTIVE');
+    });
+
+    it('refuses self-deactivation', async () => {
+      (usersRepository.findOne as jest.Mock).mockResolvedValue({
+        id: 1,
+        email: 'self@b.com',
+        roles: [],
+      });
+      const actor = {
+        userId: 1,
+        email: 'self@b.com',
+        roles: ['superadmin'],
+        permissions: [],
+        emailVerified: true,
+      } as AuthenticatedUser;
+
+      await expect(service.setActiveAs(actor, 1, false)).rejects.toThrow(
+        ForbiddenException,
+      );
+    });
+
+    it('deactivates a user, saves the flag and revokes every session', async () => {
+      const target = { id: 2, email: 'target@b.com', roles: [] } as User;
+      const actor = {
+        userId: 1,
+        email: 'admin@b.com',
+        roles: ['superadmin'],
+        permissions: [],
+        emailVerified: true,
+      } as AuthenticatedUser;
+      (usersRepository.findOne as jest.Mock)
+        .mockResolvedValueOnce(target)
+        .mockResolvedValueOnce({ ...target, isActive: false });
+      (usersRepository.preload as jest.Mock).mockResolvedValue({
+        ...target,
+        isActive: false,
+      });
+      (usersRepository.save as jest.Mock).mockImplementation((user) =>
+        Promise.resolve(user),
+      );
+
+      const result = await service.setActiveAs(actor, 2, false);
+
+      expect(usersRepository.preload).toHaveBeenCalledWith({
+        id: 2,
+        isActive: false,
+      });
+      expect(sessionsService.revokeAllForUser).toHaveBeenCalledWith(2);
+      expect(result.isActive).toBe(false);
+      expect(eventEmitter.emit).toHaveBeenCalledWith(
+        'user.status_updated',
+        expect.objectContaining({
+          actorId: 1,
+          targetId: 2,
+          targetEmail: 'target@b.com',
+          isActive: false,
+        }),
+      );
+    });
   });
 
   describe('update', () => {
@@ -484,7 +610,9 @@ describe('UsersService', () => {
 
       await service.remove(1);
 
-      expect(usersRepository.softRemove).toHaveBeenCalledWith(user);
+      expect(usersRepository.softRemove).toHaveBeenCalledWith(
+        expect.objectContaining({ id: 1, email: 'a@b.com' }),
+      );
       expect(eventEmitter.emit).toHaveBeenCalledWith(
         'user.deleted',
         expect.objectContaining({ userId: 1 }),

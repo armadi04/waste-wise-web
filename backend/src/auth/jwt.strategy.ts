@@ -94,11 +94,6 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
       };
     }
 
-    // SSO sessions ended via back-channel logout are revoked by their sid.
-    if (payload.sid && (await this.authService.isSessionRevoked(payload.sid))) {
-      throw new UnauthorizedException('Session has been revoked');
-    }
-
     // Device sessions signed out from the profile page (or by an admin) stop
     // working immediately, rather than lingering for the token's remaining TTL.
     // Tokens minted before session tracking carry no `sessionId` and stay valid.
@@ -113,6 +108,8 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
     if (!user) {
       throw new UnauthorizedException('User not found');
     }
+    if (user.isActive === false)
+      throw new UnauthorizedException('Account is inactive');
 
     // Scope authorization to the chosen role (validated against the freshly
     // loaded user). Mirrors AuthService.buildTokens: a valid activeRole scopes
@@ -147,9 +144,6 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
       permissions: Array.from(permissions),
       emailVerified: !!user.emailVerifiedAt,
       ...(activeRole ? { activeRole } : {}),
-      // Propagated so the SPA (which no longer decodes the JWT) can tell an SSO
-      // session apart and route logout through RP-initiated logout.
-      ...(payload.sid ? { sid: payload.sid } : {}),
       ...(payload.sessionId ? { sessionId: payload.sessionId } : {}),
       ...(payload.impersonatorId
         ? { impersonatorId: payload.impersonatorId }

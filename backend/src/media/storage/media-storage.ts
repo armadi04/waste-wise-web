@@ -1,9 +1,8 @@
 import type { UploadedMultipartFile } from '@nestjs/platform-fastify/multipart';
-export type MediaProvider = 'depot' | 's3';
+export type MediaProvider = 's3';
 
 export interface StoredObject {
   path: string | null;
-  depotFileId?: number | null;
   remoteName?: string | null;
   userId?: number | null;
 }

@@ -3,11 +3,6 @@ import { z } from 'zod';
 
 const profileSchema = z.discriminatedUnion('provider', [
   z.object({
-    provider: z.literal('depot'),
-    baseUrl: z.string().url(),
-    apiKey: z.string().min(1),
-  }),
-  z.object({
     provider: z.literal('s3'),
     endpoint: z.string().url().optional(),
     region: z.string().min(1),
@@ -47,15 +42,6 @@ export function resolveStorageProfiles(source: Record<string, unknown>) {
       'MEDIA_STORAGE_PROFILES contains an invalid profile; check provider credentials and location fields',
     );
   const profiles = new Map<string, StorageProfile>(Object.entries(parsed.data));
-  const baseUrl = text('DEPOT_BASE_URL');
-  const apiKey = text('DEPOT_API_KEY');
-  if (!profiles.has('depot-default') && baseUrl && apiKey) {
-    profiles.set('depot-default', {
-      provider: 'depot',
-      baseUrl,
-      apiKey,
-    });
-  }
   const region = text('S3_REGION');
   const bucket = text('S3_BUCKET');
   const accessKeyId = text('S3_ACCESS_KEY_ID');
@@ -83,7 +69,7 @@ export function resolveStorageProfiles(source: Record<string, unknown>) {
   }
   const selected =
     text('MEDIA_STORAGE_PROFILE') ||
-    `${text('MEDIA_PROVIDER') || 'depot'}-default`;
+    `${text('MEDIA_PROVIDER') || 's3'}-default`;
   if (!profiles.has(selected))
     throw new StorageConfigurationError(
       'Selected media storage profile is not configured',
@@ -93,17 +79,12 @@ export function resolveStorageProfiles(source: Record<string, unknown>) {
 
 /** Credentials may rotate; a profile's physical location may not. */
 export function storageFingerprint(profile: StorageProfile): string {
-  const location =
-    profile.provider === 'depot'
-      ? ['depot', new URL(profile.baseUrl).href.replace(/\/$/, '')]
-      : [
-          's3',
-          profile.endpoint
-            ? new URL(profile.endpoint).href.replace(/\/$/, '')
-            : null,
-          profile.region,
-          profile.bucket,
-          profile.forcePathStyle,
-        ];
+  const location = [
+    's3',
+    profile.endpoint ? new URL(profile.endpoint).href.replace(/\/$/, '') : null,
+    profile.region,
+    profile.bucket,
+    profile.forcePathStyle,
+  ];
   return createHash('sha256').update(JSON.stringify(location)).digest('hex');
 }

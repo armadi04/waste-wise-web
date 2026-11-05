@@ -1,8 +1,8 @@
-# Nestplate Starter
+# WasteWise
 
-A full-stack starter built on **NestJS 12 + Bun** and **React 19 + Vite**.
+Smart Waste Management Platform built on **NestJS 12 + Bun** and **React 19 + Vite**.
 Authentication, RBAC, media management, real-time notifications, responsive navigation,
-and a generic dashboard are included — ready to clone and extend.
+waste reports with ML-assisted classification, and a role-aware dashboard are included.
 
 This README is a summary. Start with each package's `docs/ARCHITECTURE.md`, then read
 the task-oriented guide linked below. Backend and frontend are independent Bun packages;
@@ -12,20 +12,22 @@ there is no root package-manager workspace.
 
 | Feature | Details |
 |---|---|
-| Authentication | JWT access/refresh cookies, Google OAuth, OIDC authorization-code + PKCE, back-channel logout, token blacklisting |
+| Authentication | JWT access/refresh cookies, Google OAuth, token blacklisting |
 | Account security | TOTP 2FA, recovery codes, account lockout, idle/absolute session deadlines, refresh rotation and reuse detection |
 | Email verification | Token-based verification with 24-hour expiry; server guard and client gate |
 | Invitations | Admin invites; invitee chooses a password and receives an auto-verified account |
 | CSRF | Double-submit cookie on refresh, logout and role switching |
 | RBAC | Roles, direct permissions, active-role scoping, grant ceiling, API guards and UI gates |
-| Media | **Depot by default**, or direct S3-compatible storage; per-user ownership and admin override |
+| Media | S3-compatible storage; per-user ownership and admin override |
 | Notifications | Socket.IO, polling fallback and browser desktop notifications |
 | Audit and sessions | Append-only audit trail, device session management and controlled impersonation |
 | Rate limiting | Global IP throttle (100/min by default), stricter credential/upload endpoints |
 | Configuration | Zod startup validation; Redis optional with in-memory fallback |
 | API identity | `GET /api/v1`: name, URI API version, documentation URL |
 | Health | `GET /api/v1/health`: PostgreSQL ping and heap memory check |
-| Dashboard and tables | Generic Recharts statistics, sortable/searchable/paginated DataTable, Excel export |
+| Reports | Role-scoped report CRUD, URL-driven filters, status transitions, media photos, ML classification results and audit trail |
+| Users | Existing user management plus activate/deactivate, session revocation, account status and role names |
+| Dashboard and tables | Role-aware report statistics, Recharts distributions, sortable/searchable/paginated DataTable, Excel export |
 | PWA | Installable frontend, production service worker and update handling |
 | GraphQL | Optional schema-first API, DataLoaders and OAuth client credentials |
 | Email | SMTP outbox with retries; no mail-provider API dependency |
@@ -37,7 +39,7 @@ there is no root package-manager workspace.
 | Runtime | Bun **1.3.14+** |
 | Backend | NestJS 12 · TypeORM 1.1 · PostgreSQL 14+ · Socket.IO 4.8 |
 | Cache | Redis, or per-process memory |
-| Storage | Depot SDK, or Bun S3Client (AWS / compatible endpoints) |
+| Storage | Bun S3Client (AWS / compatible endpoints) |
 | Frontend | React 19 · Vite 8 · TanStack Router 1 · TanStack Query 5 |
 | State | Zustand (client) · Query (server) · URL params (tables) · react-hook-form (forms) |
 | UI | HeroUI 2.8 · Tailwind CSS 4 |
@@ -57,16 +59,14 @@ nestplate/
 
 ## Getting started
 
-Prerequisites: Bun 1.3.14+, a **new PostgreSQL database**, and credentials for the selected
-media provider. Redis is optional. Backend SDK packages use GitHub Packages: authenticate
-the `@univstekom` registry before installing (see [backend setup](backend/docs/DEVELOPMENT.md#setup)).
+Prerequisites: Bun 1.3.14+, a **new PostgreSQL database**, and S3 media storage credentials. Redis is optional.
 
 ```bash
 # Terminal 1
 cd backend
 bun install --frozen-lockfile
 cp .env.example .env
-# Configure database, JWT, admin and Depot credentials (or select S3).
+# Configure database, JWT, admin and S3 credentials.
 bun run migration:run
 bun run seed
 bun run start:dev
@@ -78,7 +78,8 @@ cp .env.example .env
 bun run dev
 ```
 
-Backend: **localhost:3000**, REST base `/api/v1`. Frontend: **localhost:3001**; Vite proxies
+The optional ML service runs separately from its own repository; set `ML_SERVICE_URL` on the
+backend (default service API: `POST /api/v1/predict`). Backend: **localhost:3000**, REST base `/api/v1`. Frontend: **localhost:3001**; Vite proxies
 `/api` and `/socket.io` to the backend. Leave `VITE_API_URL` empty for same-origin requests.
 Swagger UI is `/api/docs` outside production; OpenAPI documents are `/api/docs/openapi.json` and `/api/docs/openapi.yaml`.
 Sign in with the admin email/password configured in the backend env.

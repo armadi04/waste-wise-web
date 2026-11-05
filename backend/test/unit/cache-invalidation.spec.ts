@@ -9,6 +9,14 @@ describe('cross-resource cache invalidation', () => {
     await new CacheInvalidationListener({ clearKeys } as any).clearUsers();
     expect(clearKeys).toHaveBeenCalledWith('*/users*');
   });
+  it('clears users and sessions when account status changes', async () => {
+    const clearKeys = mock(async () => {});
+    await new CacheInvalidationListener({
+      clearKeys,
+    } as any).clearUserStatusCaches();
+    expect(clearKeys).toHaveBeenCalledWith('*/users*');
+    expect(clearKeys).toHaveBeenCalledWith('*/sessions*');
+  });
   it('clears resource lists after successful writes, preserving read and failed request caches', async () => {
     const clearKeys = mock(async () => {});
     const Interceptor = ClearCacheOnWrite('*/users*');

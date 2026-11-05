@@ -18,13 +18,13 @@ Session lifetimes follow OWASP idle + absolute timeouts, per session `audience`
 
 | Audience | Opened by | Access JWT | Idle (max gap between refreshes) | Absolute (since login) |
 |---|---|---|---|---|
-| `admin` | dashboard password/Google/2FA, SSO, impersonation | 15 min | 2 h (`SESSION_ADMIN_IDLE_MINUTES`) | 8 h (`SESSION_ADMIN_ABSOLUTE_HOURS`) |
+| `admin` | dashboard password/Google/2FA, impersonation | 15 min | 2 h (`SESSION_ADMIN_IDLE_MINUTES`) | 8 h (`SESSION_ADMIN_ABSOLUTE_HOURS`) |
 
 The `user_sessions` row is authoritative: `expiresAt` is the idle deadline, slid by each
 refresh but never past `absoluteExpiresAt`; refresh and every request are refused once either
 passes. Refresh JWTs expire after the idle window and session cookies after the absolute
 deadline. Clients refresh on 401, so the short access TTL is transparent; after the absolute
-limit users sign in again (silent SSO may re-authenticate through the IdP). The starter
+limit users sign in again. The starter
 baseline includes session deadlines; no legacy audience backfill is needed.
 
 Access tokens carry `tokenType: 'user'` and refresh tokens `tokenType: 'refresh'`. The JWT
@@ -38,7 +38,7 @@ JWT strategy reloads permissions from the database on every request. Keep claims
 browsers silently drop cookies over ~4 KB, and a superadmin token that listed every permission
 did exactly that, bouncing every login back to the sign-in page.
 
-Login/Google/2FA/SSO issue backend cookies after their provider/credential checks. Refresh
+Login/Google/2FA issue backend cookies after their provider/credential checks. Refresh
 rotates tokens/cookies: the used refresh token is blacklisted with reason `rotated`. It stays
 spendable for 30 seconds (`REFRESH_REUSE_GRACE_MS`) so tabs refreshing together don't sign
 each other out; a rotated token presented after that window is treated as stolen — its device
@@ -49,7 +49,7 @@ session cookies.
 The reusable login-code mail helper queues messages with `redactAfterSend` and a 10-minute `expiresAt`: the outbox
 clears their body once delivery succeeds or gives up, drops a code that expired while queued,
 and logs row ids instead of recipient addresses. Starter login uses passwords/Google,
-TOTP and optional SSO; the helper is not a public email-OTP login endpoint.
+TOTP; the helper is not a public email-OTP login endpoint.
 
 Request logs carry method, path (no query string) and status — never
 headers or cookies. Set `TRUST_PROXY` to verified proxy addresses/subnets when the API sits
@@ -64,11 +64,6 @@ All under `/api/v1/auth`. Tighter throttles protect the credential routes.
 |---------------|-------|----------|---------|
 | `POST /login` | — | 10/min | Email+password (+ Turnstile); sets cookies, returns `accessToken` — or a two-factor challenge |
 | `POST /google` | — | 10/min | Google sign-in (id-token or `ya29.` access-token) |
-| `GET /sso/login` | — | default | Start the OIDC auth-code+PKCE flow (302 to the IdP) |
-| `GET /sso/silent` | — | default | Silent login (`prompt=none`); logs in if an IdP session exists, else falls back |
-| `GET /sso/callback` | — | default | IdP redirect target; provisions the user, sets cookies, 302 into the SPA |
-| `GET /sso/logout` | — | default | RP-initiated logout: clears cookies, 302 to the IdP end-session |
-| `POST /sso/backchannel-logout` | — | default | IdP-to-server signed `logout_token`; revokes the session |
 | `POST /2fa/verify` | — | 5/min | Spend a challenge token + code; finishes the login |
 | `GET /2fa` | `AuthGuard('jwt')` | default | Whether it's on, and recovery codes left |
 | `POST /2fa/setup` | `AuthGuard('jwt')` | 5/min | Start enrollment: secret, otpauth URL, QR data URL |
@@ -91,17 +86,15 @@ All under `/api/v1/auth`. Tighter throttles protect the credential routes.
 
 - **`JwtStrategy`** (`src/auth/jwt.strategy.ts`) accepts Bearer, then accessToken cookie,
   then a legacy query token extractor. Browser clients use cookies; do not introduce new
-  token-in-URL flows. It rejects blacklisted tokens, two-factor challenges, revoked SSO sid
+  token-in-URL flows. It rejects blacklisted tokens, two-factor challenges
   and inactive device sessions, then reloads identity/permissions from the database.
   Machine tokens re-check current client activity/scopes on each request.
   Returned identity includes userId/email/roles/permissions/emailVerified and optional
-  activeRole, sid, sessionId and impersonatorId. `/auth/me` exposes the controller projection.
+  activeRole, sessionId and impersonatorId. `/auth/me` exposes the controller projection.
 
 - **Google** — `AuthController.googleLogin` branches on the token: a `ya29.`-prefixed value
   is validated as a Google *access token*, anything else as an *id token*
   (`google-auth-library`). Requires `GOOGLE_CLIENT_ID`.
-- **SSO (OIDC)** — `SsoModule` (`src/sso/`) runs a server-side authorization-code + PKCE flow
-  against an OpenID Connect provider via `@univstekom/passport-sdk`. See the dedicated section below.
 - **Turnstile** — `TurnstileService.verify` checks the Cloudflare CAPTCHA before login.
   Uses `TURNSTILE_SECRET` (`TURNSTILE_SECRET_KEY` is a legacy fallback).
   Required by default in staging/production; local development activates when a secret is set.
@@ -194,63 +187,6 @@ Use it sparingly — e.g. the profile fetch needed to render the "verify your em
 or logout. Verification tokens live in `email_verification_tokens` (24h); registration emits
 the email over SMTP (see [Operations](OPERATIONS.md#integration-diagnostics)).
 
-## SSO (OIDC single sign-on)
-
-`SsoModule` (`src/sso/`) lets users sign in through an external **OpenID Connect provider**
-(e.g. `passport.stekom.ac.id`). The API is a **confidential client**: it runs the
-authorization-code + PKCE flow server-side via the **[`@univstekom/passport-sdk`](https://github.com/univstekom/passport-sdk)**
-`PassportClient`, then mints the app's **own** session cookies — the SPA never sees the
-IdP tokens. `SsoService` is a thin wrapper that delegates the OIDC protocol to the SDK and
-keeps only the app-specific provisioning. It's optional: leave `SSO_ISSUER` unset and the
-routes return `503` while `SsoService.enabled` is `false`.
-
-```text
-GET /api/v1/auth/sso/login
-   │  PKCE verifier+state → short-lived httpOnly cookies (sameSite=lax)
-   ▼  302 → IdP /auth
-IdP authenticates the user, 302s back →
-GET /api/v1/auth/sso/callback?code&state
-   │  exchange code (client_secret_post) → verified id_token (sub, sid)
-   │  fetch identity from UserInfo (email, name, roles) — see note below
-   │  provision-or-update local user (SsoService.provisionUser)
-   │  AuthService.login(user, sid) → mint tokens carrying the OIDC `sid`
-   ├── accessToken   → httpOnly cookie  (identity is fetched from /auth/me)
-   ├── refreshToken  → httpOnly cookie
-   ├── csrfToken     → readable cookie
-   └── ssoIdToken   → httpOnly cookie   (end-session hint for logout)
-   ▼  302 → SSO_SUCCESS_REDIRECT (into the SPA)
-```
-
-- **Identity from UserInfo** — the provider keeps the **ID token minimal** (`sub`, `sid`
-  only); `email`/`name`/`phone`/`roles` are released at the **UserInfo** endpoint. So
-  `SsoService.exchange` runs `PassportClient.handleCallback` (verifies the ID token) **then**
-  `PassportClient.userInfo` (fetches the identity claims) and merges them before provisioning.
-- **Provisioning** — `SsoService.provisionUser` looks up the user by email. First-time users
-  are auto-created (auto-verified, random unusable password) and granted the `SSO_DEFAULT_ROLE`
-  (default `user`); returning users have their name/phone refreshed. The SSO `roles`/`permissions`
-  claims are **intentionally ignored** — access is managed in-app via the normal RBAC model.
-- **Silent login** (`GET /sso/silent`) — builds the authorize URL with `prompt=none`. If an
-  IdP session exists the user is logged in with no click; otherwise the IdP returns
-  `login_required` and the callback (detecting the `error` query param) falls back to the
-  logged-out page instead of throwing. A short-lived non-httpOnly `ssoSilent` cookie is set
-  per attempt so the SPA tries **once** and then renders the login form rather than looping.
-  The frontend opts in with `VITE_SSO_SILENT=true`.
-- **Logout** — SSO sessions carry a `sid` in their JWT, so the SPA routes logout to
-  `GET /sso/logout` (RP-initiated): it clears the cookies and 302s through the IdP
-  `session/end`. The IdP then fires back-channel logout to revoke the session everywhere.
-- **Back-channel logout & session revocation** — the IdP POSTs a signed `logout_token` to
-  `POST /sso/backchannel-logout`. `SsoService.verifyLogoutToken` (delegating to the SDK)
-  verifies it (RS256 via the IdP JWKS, `iss`/`aud`, the back-channel-logout event claim, no
-  `nonce`), then
-  `AuthService.revokeSession(sid)` records the `sid` in `revoked_sso_sessions`. Because tokens carry the SSO sid, `JwtStrategy` (and `refresh`) reject any token whose
-  `sid` is revoked — ending the session app-wide.
-
-**Env** (all optional; set in `src/config/env.ts`): `SSO_ISSUER`, `SSO_CLIENT_ID`,
-`SSO_CLIENT_SECRET`, `SSO_REDIRECT_URI`, `SSO_POST_LOGOUT_URI`, `SSO_SUCCESS_REDIRECT`
-(default `/`), `SSO_DEFAULT_ROLE` (default `user`). The redirect URI is browser-facing and
-proxied to the API — e.g. `http://localhost:3001/api/v1/auth/sso/callback`. If the IdP sits
-behind a bot-protection proxy (Cloudflare), add a WAF skip for its `/oidc/*` machine endpoints.
-
 ## Supporting token entities
 
 | Entity | Table | Lifetime | Purpose |
@@ -258,7 +194,6 @@ behind a bot-protection proxy (Cloudflare), add a WAF skip for its `/oidc/*` mac
 | `BlacklistedToken` | `blacklisted_tokens` | until access-token expiry | Invalidate a JWT on logout |
 | `PasswordResetToken` | `password_reset_tokens` | ~30 min | One-time password reset |
 | `EmailVerificationToken` | `email_verification_tokens` | 24 h | Email verification |
-| `RevokedSsoSession` | `revoked_sso_sessions` | permanent | SSO `sid`s revoked via back-channel logout |
 | `UserSession` | `user_sessions` | 2 h idle / 8 h absolute by default | Device sessions — see below |
 | `TwoFactorRecoveryCode` | `two_factor_recovery_codes` | until used | Single-use 2FA backup codes |
 
@@ -314,8 +249,6 @@ replayed inside the tolerance window it stays valid for.
 `two_factor_recovery_codes`. They're accepted anywhere a TOTP code is (login, disable,
 re-issue) and are consumed on use — without them, a lost phone would mean a lost account.
 
-SSO logins skip this: the identity provider owns that account's factors.
-
 ## Signing in as another user
 
 `POST /auth/impersonate/:id` (permission `users.impersonate`, which the superadmin role gets
@@ -340,9 +273,7 @@ That makes "sign out this device" real: revoking the row kills the access token 
 instead of waiting out its TTL. Tokens minted before this existed carry no `sessionId` and
 keep working until they expire.
 
-Login records the request IP and User-Agent on the row so a user can recognise their devices;
-SSO logins are flagged `isSso`.
-
+Login records the request IP and User-Agent on the row so a user can recognise their devices.
 | Method & path | Guard | Purpose |
 |---------------|-------|---------|
 | `GET /api/v1/sessions/me` | `AuthGuard('jwt')` | The caller's live sessions, with `isCurrent` |
@@ -390,8 +321,8 @@ check does not override backend guards, ownership or active-role scoping.
 ## Account registration method
 
 Users record their original creation method as `registerMethod`: `EMAIL_OTP`, `GOOGLE`,
-`INVITATION`, `SSO`, `SEEDER`, or `UNKNOWN`. Google provisioning, invitation acceptance,
-SSO provisioning, and new seeded identities supply this value internally. `EMAIL_OTP` remains
+`INVITATION`, `SEEDER`, or `UNKNOWN`. Google provisioning, invitation acceptance,
+and new seeded identities supply this value internally. `EMAIL_OTP` remains
 an enum value for extensions; starter has no email-OTP login route.
 Later login, verification, or profile/password changes do not overwrite it.
 

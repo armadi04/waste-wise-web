@@ -89,7 +89,7 @@ and `registerMethod` live in validated URL search state and participate in the s
 key used by the loader and page hook. Changing a filter resets page to 1 and preserves other
 search/sort/limit values. Selecting All removes that filter.
 
-The Register Method column uses labeled badges for Email & OTP, Google, Undangan, SSO,
+The Register Method column uses labeled badges for Email & OTP, Google, Undangan,
 Seeder, and Tidak diketahui. It describes account creation, not the latest sign-in.
 Users export fetches all matching rows with the active search, filters, and sorting, and
 exports the registration-method label. No additional permission or menu is required.
