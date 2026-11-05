@@ -3,10 +3,7 @@
 ## Setup
 
 Use Bun 1.3.14+, PostgreSQL 14+ and a new database (suggested name `nestplate`). Redis is
-optional. SDK packages are served through the checked-in `@univstekom` GitHub Packages registry.
-Configure a package-read token through your user-level npm/Bun authentication or CI secret;
-never commit it. Docker accepts the raw token through BuildKit `node_auth`.
-Backend CI accepts `NODE_AUTH_TOKEN`; forks need a package-read token with access to both SDKs.
+optional. All dependencies come from the public npm registry; no registry token is needed.
 
 From `backend/`:
 

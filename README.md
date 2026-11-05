@@ -59,9 +59,7 @@ nestplate/
 
 ## Getting started
 
-Prerequisites: Bun 1.3.14+, a **new PostgreSQL database**, and credentials for the selected
-media provider. Redis is optional. Backend SDK packages use GitHub Packages: authenticate
-the `@univstekom` registry before installing (see [backend setup](backend/docs/DEVELOPMENT.md#setup)).
+Prerequisites: Bun 1.3.14+, a **new PostgreSQL database**, and S3 media storage credentials. Redis is optional.
 
 ```bash
 # Terminal 1

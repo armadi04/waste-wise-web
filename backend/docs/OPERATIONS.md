@@ -2,13 +2,13 @@
 
 ## Build and deployment
 
-Build from `backend/`. SDK installation uses a GitHub Packages package-read token:
+Build from `backend/`:
 
 ```bash
-docker build --secret id=node_auth,env=NODE_AUTH_TOKEN -t nestplate-api .
+docker build -t nestplate-api .
 ```
 
-The secret contains the raw token, not an entire `.npmrc`. Runtime uses Bun and UTC.
+Runtime uses Bun and UTC.
 Supply DB/JWT/storage and optional Redis/SMTP credentials at runtime.
 Keep `NODE_ENV=production`, `DB_SYNCHRONIZE=false`, `DB_SEED=false`.
 Entrypoint runs pending compiled migrations before starting the API on port 3000.
