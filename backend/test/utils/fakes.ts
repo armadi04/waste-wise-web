@@ -30,13 +30,12 @@ export function makeFakeStorage(): MediaStorage {
       const stored = {
         ...object,
         path: `uploads/${id}-${file.originalname}`,
-        depotFileId: id,
       };
       await onReserved(stored);
       return stored;
     },
     getSignedUrl: async (object) =>
-      `https://depot.test/signed/${object.depotFileId}`,
+      `https://storage.test/signed/${object.path}`,
     delete: async () => undefined,
   };
 }

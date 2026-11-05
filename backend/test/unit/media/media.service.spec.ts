@@ -70,7 +70,7 @@ describe('MediaService lifecycle', () => {
       upload: mock(async (_file, object, reserved) => {
         expect(row?.state).toBe('pending');
         expect(row?.remoteName).toBe(object.remoteName);
-        const stored = { ...object, path: 'remote/key', depotFileId: 42 };
+        const stored = { ...object, path: 'remote/key' };
         await reserved(stored);
         return stored;
       }),
@@ -82,8 +82,8 @@ describe('MediaService lifecycle', () => {
       { get: () => 'http://localhost:3001' } as unknown as ConfigService,
       {
         selected: {
-          provider: 'depot',
-          profile: 'depot-default',
+          provider: 's3',
+          profile: 's3-default',
           fingerprint: '0'.repeat(64),
           adapter,
         },
@@ -99,7 +99,7 @@ describe('MediaService lifecycle', () => {
   it('persists staging identity before external I/O and publishes only after reservation is stored', async () => {
     const result = await service.uploadFile(file, 7);
     expect(result.state).toBe('ready');
-    expect(result.depotFileId).toBe(42);
+    expect(result.path).toBe('remote/key');
     expect(result.url).toBe('http://localhost:3001/api/v1/media/1/view');
     expect(result.cleanupAt).toBeNull();
     expect(result.cleanupLeaseToken).toBeNull();

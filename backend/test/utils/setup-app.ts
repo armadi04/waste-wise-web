@@ -52,8 +52,8 @@ export async function setupTestApp(
     .overrideProvider(MediaStorageService)
     .useValue({
       selected: {
-        provider: 'depot',
-        profile: 'depot-default',
+        provider: 's3',
+        profile: 's3-default',
         fingerprint: '0'.repeat(64),
         adapter: storage,
       },

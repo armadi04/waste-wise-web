@@ -69,7 +69,6 @@ export class MediaService extends BaseService<Media> {
         remoteName: key,
         userId,
         state: 'pending',
-        depotFileId: null,
         cleanupAt: new Date(Date.now() + MEDIA_LEASE_MS),
         cleanupLeaseUntil: new Date(Date.now() + MEDIA_LEASE_MS),
         cleanupLeaseToken: token,
@@ -82,7 +81,7 @@ export class MediaService extends BaseService<Media> {
         async (reserved) => {
           const result = await this.mediaRepository.update(
             { id: media.id, state: 'pending', cleanupLeaseToken: token },
-            { path: reserved.path, depotFileId: reserved.depotFileId ?? null },
+            { path: reserved.path },
           );
           if (!result.affected) throw new Error('Upload lease no longer owned');
         },
@@ -93,7 +92,6 @@ export class MediaService extends BaseService<Media> {
         { id: media.id, state: 'pending', cleanupLeaseToken: token },
         {
           path: stored.path,
-          depotFileId: stored.depotFileId ?? null,
           url: `${baseUrl.replace(/\/+$/, '')}${API_BASE_PATH}/media/${media.id}/view`,
           state: 'ready',
           cleanupAt: null,

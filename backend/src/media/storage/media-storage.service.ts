@@ -5,7 +5,6 @@ import {
   storageFingerprint,
 } from '@/config/media-storage.config';
 import type { MediaProvider, MediaStorage } from './media-storage';
-import { DepotStorageProvider } from './depot-storage.provider';
 import { S3StorageProvider } from './s3-storage.provider';
 
 export interface StorageSelection {
@@ -25,8 +24,6 @@ export class MediaStorageService {
       'MEDIA_PROVIDER',
       'MEDIA_STORAGE_PROFILE',
       'MEDIA_STORAGE_PROFILES',
-      'DEPOT_BASE_URL',
-      'DEPOT_API_KEY',
       'S3_ENDPOINT',
       'S3_REGION',
       'S3_BUCKET',
@@ -58,17 +55,14 @@ export class MediaStorageService {
       throw new ServiceUnavailableException(
         'Recorded storage profile is not configured',
       );
-    const adapter =
-      profile.provider === 'depot'
-        ? new DepotStorageProvider(profile.baseUrl, profile.apiKey)
-        : new S3StorageProvider({
-            endpoint: profile.endpoint,
-            region: profile.region,
-            bucket: profile.bucket,
-            accessKeyId: profile.accessKeyId,
-            secretAccessKey: profile.secretAccessKey,
-            virtualHostedStyle: !profile.forcePathStyle,
-          });
+    const adapter = new S3StorageProvider({
+      endpoint: profile.endpoint,
+      region: profile.region,
+      bucket: profile.bucket,
+      accessKeyId: profile.accessKeyId,
+      secretAccessKey: profile.secretAccessKey,
+      virtualHostedStyle: !profile.forcePathStyle,
+    });
     const selection = {
       profile: id,
       provider: profile.provider,
