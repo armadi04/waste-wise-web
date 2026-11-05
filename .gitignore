@@ -1,7 +1,5 @@
 .claude/settings.local.json
 .commandcode/
 
-# semantic-release is installed at the root with --no-save when checking a
-# release locally (see RELEASING.md); neither artefact belongs in the repo.
 node_modules/
 package.json

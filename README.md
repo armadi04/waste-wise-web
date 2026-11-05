@@ -53,8 +53,7 @@ nestplate/
 ├── frontend/     # React SPA, shared UI, typed routes, unit/browser tests
 ├── CLAUDE.md     # Shared working rules
 ├── AGENTS.md     # Agent entry point
-├── DESIGN.md     # Starter UI conventions
-└── RELEASING.md  # Semantic-release and in-app changelog
+└── DESIGN.md     # Starter UI conventions
 ```
 
 ## Getting started
@@ -127,7 +126,7 @@ E2E suites are opt-in; default test scripts run unit tests.
 | [Naming](frontend/docs/NAMING_CONVENTIONS.md) | Organize hooks, views, stores and barrels |
 | [Agent guide](frontend/docs/AI_AGENT_GUIDE.md) | Follow implementation and verification conventions |
 
-Repository-wide: [Releasing](RELEASING.md), [Design](DESIGN.md), [Working rules](CLAUDE.md).
+Repository-wide: [Design](DESIGN.md), [Working rules](CLAUDE.md).
 
 ## Two rules to remember
 

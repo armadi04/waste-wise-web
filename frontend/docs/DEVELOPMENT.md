@@ -33,9 +33,8 @@ Required: `bun run lint`, `bun run test`, `bun run build`.
 Vitest discovers unit tests under `test/`, excluding `test/e2e/`.
 
 Browser E2E is optional, only run when explicitly requested: `bun run test:e2e`.
-Frontend CI runs default checks; manually dispatch with `run_e2e=true` for browser tests.
 Playwright uses mocked browser API responses and its own Vite port; it does not prove live
-Google/SMTP/storage integration. CI installs bundled Chromium. Local execution can use
+Google/SMTP/storage integration. Local execution can use
 `PLAYWRIGHT_CHROMIUM_EXECUTABLE` (default `/usr/bin/google-chrome`).
 
 ## Generated contracts
