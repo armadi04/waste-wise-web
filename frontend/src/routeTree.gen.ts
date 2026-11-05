@@ -26,7 +26,6 @@ import { Route as usersUsersRouteImport } from './routes/(users)/users'
 import { Route as ReportsIndexRouteImport } from './routes/reports.index'
 import { Route as ReportsReportIdRouteImport } from './routes/reports.$reportId'
 import { Route as ReportsNewRouteImport } from './routes/reports.new'
-import { Route as databasesoauthOauthClientsRouteImport } from './routes/(databases)/(oauth)/oauth-clients'
 import { Route as databasespermissionsPermissionsRouteImport } from './routes/(databases)/(permissions)/permissions'
 import { Route as databasesrolesRolesRouteImport } from './routes/(databases)/(roles)/roles'
 
@@ -115,12 +114,6 @@ const ReportsNewRoute = ReportsNewRouteImport.update({
   path: '/new',
   getParentRoute: () => ReportsRoute,
 } as any)
-const databasesoauthOauthClientsRoute =
-  databasesoauthOauthClientsRouteImport.update({
-    id: '/(databases)/(oauth)/oauth-clients',
-    path: '/oauth-clients',
-    getParentRoute: () => rootRouteImport,
-  } as any)
 const databasespermissionsPermissionsRoute =
   databasespermissionsPermissionsRouteImport.update({
     id: '/(databases)/(permissions)/permissions',
@@ -151,7 +144,6 @@ export interface FileRoutesByFullPath {
   '/reports/$reportId': typeof ReportsReportIdRoute
   '/reports/new': typeof ReportsNewRoute
   '/reports/': typeof ReportsIndexRoute
-  '/oauth-clients': typeof databasesoauthOauthClientsRoute
   '/permissions': typeof databasespermissionsPermissionsRoute
   '/roles': typeof databasesrolesRolesRoute
 }
@@ -172,7 +164,6 @@ export interface FileRoutesByTo {
   '/reports/$reportId': typeof ReportsReportIdRoute
   '/reports/new': typeof ReportsNewRoute
   '/reports': typeof ReportsIndexRoute
-  '/oauth-clients': typeof databasesoauthOauthClientsRoute
   '/permissions': typeof databasespermissionsPermissionsRoute
   '/roles': typeof databasesrolesRolesRoute
 }
@@ -195,7 +186,6 @@ export interface FileRoutesById {
   '/reports/$reportId': typeof ReportsReportIdRoute
   '/reports/new': typeof ReportsNewRoute
   '/reports/': typeof ReportsIndexRoute
-  '/(databases)/(oauth)/oauth-clients': typeof databasesoauthOauthClientsRoute
   '/(databases)/(permissions)/permissions': typeof databasespermissionsPermissionsRoute
   '/(databases)/(roles)/roles': typeof databasesrolesRolesRoute
 }
@@ -219,7 +209,6 @@ export interface FileRouteTypes {
     | '/reports/$reportId'
     | '/reports/new'
     | '/reports/'
-    | '/oauth-clients'
     | '/permissions'
     | '/roles'
   fileRoutesByTo: FileRoutesByTo
@@ -240,7 +229,6 @@ export interface FileRouteTypes {
     | '/reports/$reportId'
     | '/reports/new'
     | '/reports'
-    | '/oauth-clients'
     | '/permissions'
     | '/roles'
   id:
@@ -262,7 +250,6 @@ export interface FileRouteTypes {
     | '/reports/$reportId'
     | '/reports/new'
     | '/reports/'
-    | '/(databases)/(oauth)/oauth-clients'
     | '/(databases)/(permissions)/permissions'
     | '/(databases)/(roles)/roles'
   fileRoutesById: FileRoutesById
@@ -282,7 +269,6 @@ export interface RootRouteChildren {
   sessionsSessionsRoute: typeof sessionsSessionsRoute
   usersInvitationsRoute: typeof usersInvitationsRoute
   usersUsersRoute: typeof usersUsersRoute
-  databasesoauthOauthClientsRoute: typeof databasesoauthOauthClientsRoute
   databasespermissionsPermissionsRoute: typeof databasespermissionsPermissionsRoute
   databasesrolesRolesRoute: typeof databasesrolesRolesRoute
 }
@@ -408,13 +394,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ReportsNewRouteImport
       parentRoute: typeof ReportsRoute
     }
-    '/(databases)/(oauth)/oauth-clients': {
-      id: '/(databases)/(oauth)/oauth-clients'
-      path: '/oauth-clients'
-      fullPath: '/oauth-clients'
-      preLoaderRoute: typeof databasesoauthOauthClientsRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/(databases)/(permissions)/permissions': {
       id: '/(databases)/(permissions)/permissions'
       path: '/permissions'
@@ -462,7 +441,6 @@ const rootRouteChildren: RootRouteChildren = {
   sessionsSessionsRoute: sessionsSessionsRoute,
   usersInvitationsRoute: usersInvitationsRoute,
   usersUsersRoute: usersUsersRoute,
-  databasesoauthOauthClientsRoute: databasesoauthOauthClientsRoute,
   databasespermissionsPermissionsRoute: databasespermissionsPermissionsRoute,
   databasesrolesRolesRoute: databasesrolesRolesRoute,
 }

@@ -1,1 +1,0 @@
-export { getColumns } from './columns'

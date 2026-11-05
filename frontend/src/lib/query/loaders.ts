@@ -7,7 +7,6 @@ import {
   invitationsQueryOptions,
   mediaQueryOptions,
   notificationsQueryOptions,
-  oauthClientsQueryOptions,
   permissionsQueryOptions,
   profileQueryOptions,
   reportQueryOptions,
@@ -58,10 +57,6 @@ export async function loadAdminRoute(
     case '/invitations':
       if (allowed('users.invite'))
         return queryClient.ensureQueryData(invitationsQueryOptions(search))
-      return null
-    case '/oauth-clients':
-      if (allowed('oauth.clients.read'))
-        return queryClient.ensureQueryData(oauthClientsQueryOptions(search))
       return null
     case '/media':
       if (allowed('media.read'))

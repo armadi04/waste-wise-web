@@ -19,10 +19,6 @@ export const queryKeys = {
     all: ['invitations'],
     list: (filters: Filters) => ['invitations', filters],
   },
-  oauthClients: {
-    all: ['oauth-clients'],
-    list: (filters: Filters) => ['oauth-clients', filters],
-  },
   media: {
     all: ['media'],
     list: (filters: Filters) => ['media', filters],
