@@ -1,7 +1,6 @@
 import {
   Bell,
   Database,
-  History,
   Image as ImageIcon,
   Key,
   KeyRound,
@@ -156,12 +155,6 @@ export const sidebarData: Array<NavGroup> = [
         icon: <Bell size={20} />,
         label: 'Notifications',
         href: '/notifications',
-      },
-      {
-        key: 'changelog',
-        icon: <History size={20} />,
-        label: 'Changelog',
-        href: '/changelog',
       },
     ],
   },

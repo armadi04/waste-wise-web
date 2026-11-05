@@ -463,23 +463,6 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/changelog": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** Published release notes, newest first */
-        get: operations["ChangelogController_findAll_v1"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
     "/api/v1/health": {
         parameters: {
             query?: never;
@@ -1578,16 +1561,6 @@ export interface components {
              */
             role: string;
         };
-        ReleaseNotesDto: {
-            /** @example 1.4.0 */
-            version: string;
-            /** @description Release body in Markdown */
-            notes: string;
-            /** Format: date-time */
-            publishedAt: string | null;
-            /** @description Release page URL */
-            url: string;
-        };
         CreateInvitationDto: {
             /** @example user@example.com */
             email: string;
@@ -2486,25 +2459,6 @@ export interface operations {
                         emailVerified?: boolean;
                         activeRole?: string;
                     };
-                };
-            };
-        };
-    };
-    ChangelogController_findAll_v1: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["ReleaseNotesDto"][];
                 };
             };
         };

@@ -61,7 +61,6 @@ export const queryKeys = {
   profile: ['profile'],
   twoFactor: ['two-factor'],
   invitation: (token?: string) => ['invitation', token],
-  changelog: ['changelog'],
   session: ['session'],
   health: ['health'],
 }

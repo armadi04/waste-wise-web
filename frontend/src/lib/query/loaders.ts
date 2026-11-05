@@ -4,7 +4,6 @@ import type { CurrentUser } from '@/types/auth'
 import type { QueryClient } from '@tanstack/react-query'
 import {
   auditLogsQueryOptions,
-  changelogQueryOptions,
   invitationsQueryOptions,
   mediaQueryOptions,
   notificationsQueryOptions,
@@ -82,8 +81,6 @@ export async function loadAdminRoute(
       return queryClient.ensureQueryData(
         notificationsQueryOptions(search.page ?? 1, search.limit ?? 10),
       )
-    case '/changelog':
-      return queryClient.ensureQueryData(changelogQueryOptions())
     default:
       return queryClient.ensureQueryData(sessionQueryOptions())
   }

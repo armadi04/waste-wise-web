@@ -10,7 +10,6 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
-import { Route as ChangelogRouteImport } from './routes/changelog'
 import { Route as ProfileRouteImport } from './routes/profile'
 import { Route as ReportsRouteImport } from './routes/reports'
 import { Route as auditAuditLogsRouteImport } from './routes/(audit)/audit-logs'
@@ -34,11 +33,6 @@ import { Route as databasesrolesRolesRouteImport } from './routes/(databases)/(r
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ChangelogRoute = ChangelogRouteImport.update({
-  id: '/changelog',
-  path: '/changelog',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ProfileRoute = ProfileRouteImport.update({
@@ -141,7 +135,6 @@ const databasesrolesRolesRoute = databasesrolesRolesRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
-  '/changelog': typeof ChangelogRoute
   '/profile': typeof ProfileRoute
   '/reports': typeof ReportsRouteWithChildren
   '/audit-logs': typeof auditAuditLogsRoute
@@ -164,7 +157,6 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
-  '/changelog': typeof ChangelogRoute
   '/profile': typeof ProfileRoute
   '/audit-logs': typeof auditAuditLogsRoute
   '/accept-invite': typeof authAcceptInviteRoute
@@ -187,7 +179,6 @@ export interface FileRoutesByTo {
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
-  '/changelog': typeof ChangelogRoute
   '/profile': typeof ProfileRoute
   '/reports': typeof ReportsRouteWithChildren
   '/(audit)/audit-logs': typeof auditAuditLogsRoute
@@ -212,7 +203,6 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
-    | '/changelog'
     | '/profile'
     | '/reports'
     | '/audit-logs'
@@ -235,7 +225,6 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
-    | '/changelog'
     | '/profile'
     | '/audit-logs'
     | '/accept-invite'
@@ -257,7 +246,6 @@ export interface FileRouteTypes {
   id:
     | '__root__'
     | '/'
-    | '/changelog'
     | '/profile'
     | '/reports'
     | '/(audit)/audit-logs'
@@ -281,7 +269,6 @@ export interface FileRouteTypes {
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
-  ChangelogRoute: typeof ChangelogRoute
   ProfileRoute: typeof ProfileRoute
   ReportsRoute: typeof ReportsRouteWithChildren
   auditAuditLogsRoute: typeof auditAuditLogsRoute
@@ -307,13 +294,6 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/changelog': {
-      id: '/changelog'
-      path: '/changelog'
-      fullPath: '/changelog'
-      preLoaderRoute: typeof ChangelogRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/profile': {
@@ -469,7 +449,6 @@ const ReportsRouteWithChildren =
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
-  ChangelogRoute: ChangelogRoute,
   ProfileRoute: ProfileRoute,
   ReportsRoute: ReportsRouteWithChildren,
   auditAuditLogsRoute: auditAuditLogsRoute,

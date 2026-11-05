@@ -12,7 +12,6 @@ import {
   getInvitation,
   getProfile,
 } from '@/lib/services/auth.service'
-import { getReleaseNotes } from '@/lib/services/changelog.service'
 import { getInvitations } from '@/lib/services/invitation.service'
 import { getMediaList } from '@/lib/services/media.service'
 import {
@@ -356,15 +355,6 @@ export function invitationQueryOptions(token?: string) {
     queryFn: () => getInvitation(token!),
     enabled: !!token,
     retry: false,
-  })
-}
-
-export function changelogQueryOptions() {
-  return queryOptions({
-    queryKey: queryKeys.changelog,
-    queryFn: getReleaseNotes,
-    // Releases change a few times a month at most; don't refetch on every mount.
-    staleTime: 10 * 60 * 1000,
   })
 }
 

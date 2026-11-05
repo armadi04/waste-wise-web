@@ -1,4 +1,3 @@
-import { Link } from '@tanstack/react-router'
 import { RefreshCw, Sparkles } from 'lucide-react'
 import { addToast } from '@/components/shared/controls/toast'
 import { Button, Chip } from '@/components/shared/controls'
@@ -6,7 +5,6 @@ import {
   SettingRow,
   SettingsCard,
 } from '@/components/features/settings/components/settings-primitives'
-import { useChangelog } from '@/hooks/changelog'
 import { usePwaUpdate } from '@/hooks/global/use-pwa-update'
 import { BRAND_NAME } from '@/lib/constants/brand'
 
@@ -18,7 +16,6 @@ export function UpdateSection() {
     checkForUpdate,
     applyUpdate,
   } = usePwaUpdate()
-  const { version } = useChangelog()
 
   const handleCheck = async () => {
     const result = await checkForUpdate()
@@ -39,7 +36,7 @@ export function UpdateSection() {
   return (
     <SettingsCard title="Updates">
       <SettingRow
-        label={version ? `App Version — ${version}` : 'App Version'}
+        label="App Version"
         description={
           updateAvailable
             ? 'A new version is ready. Update to get the latest features and fixes.'
@@ -72,19 +69,13 @@ export function UpdateSection() {
           )
         }
       >
-        <div className="mt-2 flex flex-wrap items-center gap-2">
-          {updateAvailable && (
+        {updateAvailable && (
+          <div className="mt-2">
             <Chip size="sm" color="warning" variant="flat">
               Update available
             </Chip>
-          )}
-          <Link
-            to="/changelog"
-            className="text-xs text-[var(--app-link)] underline-offset-2 hover:underline"
-          >
-            View the changelog
-          </Link>
-        </div>
+          </div>
+        )}
       </SettingRow>
     </SettingsCard>
   )
