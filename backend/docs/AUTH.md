@@ -70,6 +70,10 @@ All under `/api/v1/auth`. Tighter throttles protect the credential routes.
 | `POST /login` | — | 10/min | Email+password (+ Turnstile); sets cookies, returns `accessToken` — or a two-factor challenge |
 | `POST /google` | — | 10/min | Google sign-in (id-token or `ya29.` access-token) |
 | `POST /2fa/verify` | — | 5/min | Spend a challenge token + code; finishes the login |
+| `POST /mobile/google` | — | 10/min | Native app Google sign-in; opens a `mobile` session and returns `accessToken`, `refreshToken`, `sessionExpiresAt` in the body (no cookies) — or a two-factor challenge |
+| `POST /mobile/2fa/verify` | — | 5/min | Spend a mobile challenge token + code; returns the mobile session tokens |
+| `POST /mobile/refresh` | — (refresh token in body) | 20/min | Rotate the refresh token; returns new `accessToken`, `refreshToken`, `sessionExpiresAt` |
+| `POST /mobile/logout` | — (refresh token in body; optional Bearer access token is blacklisted) | 20/min | Revoke the mobile device session |
 | `GET /2fa` | `AuthGuard('jwt')` | default | Whether it's on, and recovery codes left |
 | `POST /2fa/setup` | `AuthGuard('jwt')` | 5/min | Start enrollment: secret, otpauth URL, QR data URL |
 | `POST /2fa/enable` | `AuthGuard('jwt')` | 5/min | Confirm with a code; returns the recovery codes |
