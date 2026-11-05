@@ -35,7 +35,7 @@ The starter baseline requires a new database. Applied migrations are immutable.
 | `media/` | Ownership and the S3 storage adapter |
 | `mail/` | Templates, SMTP outbox, retries and redaction |
 | `notifications/`, `app-refresh/` | Persisted notifications, realtime and refresh signals |
-| `audit/`, `stats/`, `health/`, `changelog/` | Audit, generic dashboard, probes, release notes |
+| `audit/`, `stats/`, `health/` | Audit, generic dashboard, probes |
 | `time-zone/` | Account display preferences and explicit-zone time previews |
 | `common/` | BaseService, pagination, cache, filters, validation and utilities |
 | `config/`, `database/` | Env/Swagger, CLI DataSource, migrations and seed |

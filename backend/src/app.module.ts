@@ -27,7 +27,6 @@ import { SessionsModule } from './sessions/sessions.module';
 import { ScheduleModule } from '@nestjs/schedule';
 import { AuditModule } from './audit/audit.module';
 import { StatsModule } from './stats/stats.module';
-import { ChangelogModule } from './changelog/changelog.module';
 import { AppRefreshModule } from './app-refresh/app-refresh.module';
 import { GraphqlApiModule } from './graphql/graphql-api.module';
 import { TimeZoneModule } from './time-zone/time-zone.module';
@@ -162,7 +161,6 @@ const initLogger = pino({
     ScheduleModule.forRoot(),
     AuditModule,
     StatsModule,
-    ChangelogModule,
     AppRefreshModule,
     TimeZoneModule,
     // Opt-in GraphQL API — mounted only when GRAPHQL_ENABLED=true.

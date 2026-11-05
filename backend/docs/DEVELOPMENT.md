@@ -45,7 +45,6 @@ Source of truth: `src/config/env.ts`; template: `.env.example`. Invalid/missing 
 | SMTP | SMTP_HOST optional, SMTP_PORT=587, SMTP_SECURE=false, SMTP_USER/PASS, MAIL_FROM/NAME |
 | Rate limits | THROTTLE_TTL=60000 ms, THROTTLE_LIMIT=100 |
 | GraphQL | GRAPHQL_ENABLED=false; limits and flags in [GraphQL](GRAPHQL.md#enabling-it) |
-| Releases | GITHUB_REPO (set to your fork), GITHUB_TOKEN optional |
 
 Inactive storage credentials are not required. Keep them configured if existing records need
 that provider. SMTP is required for real invitation/reset/verification delivery.

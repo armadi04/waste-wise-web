@@ -1077,36 +1077,6 @@
         ]
       }
     },
-    "/api/v1/changelog": {
-      "get": {
-        "operationId": "ChangelogController_findAll_v1",
-        "parameters": [],
-        "responses": {
-          "200": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/ReleaseNotesDto"
-                  }
-                }
-              }
-            }
-          }
-        },
-        "security": [
-          {
-            "bearer": []
-          }
-        ],
-        "summary": "Published release notes, newest first",
-        "tags": [
-          "Changelog"
-        ]
-      }
-    },
     "/api/v1/health": {
       "get": {
         "description": "Checks PostgreSQL connectivity with a dedicated pool (1 second acquisition timeout, 1 second server statement timeout, 1.5 second transport fallback) and a 300 MiB heap limit. This does not validate schema or business operations. Returns HTTP 200 when both checks succeed, otherwise HTTP 503 with sanitized dependency status.",
@@ -4955,34 +4925,6 @@
         },
         "required": [
           "role"
-        ]
-      },
-      "ReleaseNotesDto": {
-        "type": "object",
-        "properties": {
-          "version": {
-            "type": "string",
-            "example": "1.4.0"
-          },
-          "notes": {
-            "type": "string",
-            "description": "Release body in Markdown"
-          },
-          "publishedAt": {
-            "type": "string",
-            "format": "date-time",
-            "nullable": true
-          },
-          "url": {
-            "type": "string",
-            "description": "Release page URL"
-          }
-        },
-        "required": [
-          "version",
-          "notes",
-          "publishedAt",
-          "url"
         ]
       },
       "CreateInvitationDto": {
