@@ -130,6 +130,10 @@ const baseEnvSchema = z.object({
     .min(1000)
     .max(60000)
     .default(15000),
+  // Reject classifications below this top-1 confidence (0-1). Unset keeps every
+  // prediction. The model has no "not waste" class, so this is the only guard
+  // against unrelated photos being forced into a category.
+  ML_MIN_CONFIDENCE: z.coerce.number().min(0).max(1).optional(),
 
   // App
   APP_URL: z.string().url().default('http://localhost:3001'),

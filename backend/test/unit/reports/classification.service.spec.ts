@@ -102,6 +102,75 @@ describe('ClassificationService', () => {
     expect(result.errorCode).toBe('ML_INVALID_RESPONSE');
   });
 
+  describe('ML_MIN_CONFIDENCE', () => {
+    function withMinConfidence(
+      min: number | undefined,
+      confidence: number,
+    ): ClassificationService {
+      const config = {
+        get: jest.fn((key: string) => {
+          if (key === 'ML_SERVICE_URL') return 'http://ml:8000';
+          if (key === 'ML_SERVICE_TIMEOUT_MS') return 5000;
+          if (key === 'ML_MIN_CONFIDENCE') return min;
+          return undefined;
+        }),
+      };
+      const storage = {
+        forMedia: jest.fn(() => ({
+          getSignedUrl: jest.fn(() => Promise.resolve('https://media/file')),
+        })),
+      };
+      fetchMock
+        .mockResolvedValueOnce({
+          ok: true,
+          arrayBuffer: () => Promise.resolve(new ArrayBuffer(4)),
+        })
+        .mockResolvedValueOnce({
+          ok: true,
+          json: () =>
+            Promise.resolve({
+              predicted_class: 'paper',
+              confidence,
+              model_version: '1.0.0',
+            }),
+        });
+      return new ClassificationService(config as never, storage as never);
+    }
+
+    it('rejects a prediction below the minimum without a category', async () => {
+      const result = await withMinConfidence(0.7, 0.575).classify(media);
+
+      expect(result).toEqual({
+        status: ClassificationStatus.FAILED,
+        category: null,
+        confidence: null,
+        modelVersion: null,
+        errorCode: 'ML_LOW_CONFIDENCE',
+      });
+    });
+
+    it('accepts a prediction exactly at the minimum', async () => {
+      const result = await withMinConfidence(0.7, 0.7).classify(media);
+
+      expect(result.status).toBe(ClassificationStatus.COMPLETED);
+      expect(result.category).toBe(WasteCategory.PAPER_WASTE);
+    });
+
+    it('accepts a prediction above the minimum', async () => {
+      const result = await withMinConfidence(0.7, 0.93).classify(media);
+
+      expect(result.status).toBe(ClassificationStatus.COMPLETED);
+      expect(result.confidence).toBe(0.93);
+    });
+
+    it('keeps every prediction when no minimum is configured', async () => {
+      const result = await withMinConfidence(undefined, 0.34).classify(media);
+
+      expect(result.status).toBe(ClassificationStatus.COMPLETED);
+      expect(result.confidence).toBe(0.34);
+    });
+  });
+
   it('fails clearly when no ML service is configured', async () => {
     const unconfigured = new ClassificationService(
       { get: jest.fn(() => undefined) } as never,

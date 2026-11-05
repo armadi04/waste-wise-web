@@ -86,6 +86,13 @@ export class ClassificationService {
           : undefined;
       if (!category || confidence === undefined)
         return this.failed('ML_INVALID_RESPONSE');
+      const minConfidence = this.config.get<number>('ML_MIN_CONFIDENCE');
+      if (minConfidence !== undefined && confidence < minConfidence) {
+        this.logger.warn(
+          `Classification below minimum confidence: ${confidence} < ${minConfidence}`,
+        );
+        return this.failed('ML_LOW_CONFIDENCE');
+      }
       return {
         status: ClassificationStatus.COMPLETED,
         category,

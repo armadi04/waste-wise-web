@@ -29,7 +29,7 @@ Source of truth: `src/config/env.ts`; template: `.env.example`. Invalid/missing 
 | Database (required) | DB_HOST, DB_USERNAME, DB_PASSWORD, DB_NAME; DB_PORT=5432 |
 | Identity (required) | JWT_SECRET (min 16 chars), ADMIN_EMAIL, ADMIN_PASSWORD (min 8 chars) |
 | Demo user | DEMO_USER_EMAIL/DEMO_USER_PASSWORD (min 8 chars); development/test defaults are `user@smart-waste.local` / `DemoUser123!`, deployed environments require explicit values |
-| Reports / ML | ML_SERVICE_URL (optional), ML_SERVICE_TIMEOUT_MS=15000; without the URL reports still save with classification FAILED |
+| Reports / ML | ML_SERVICE_URL (optional), ML_SERVICE_TIMEOUT_MS=15000, ML_MIN_CONFIDENCE (optional, 0-1; lower confidence is stored as FAILED with `ML_LOW_CONFIDENCE` and no category); without the URL reports still save with classification FAILED |
 | Storage | MEDIA_PROVIDER=s3; S3 credentials required (see below) |
 | Storage profiles | MEDIA_STORAGE_PROFILE optional; MEDIA_STORAGE_PROFILES JSON map of named locations/credentials |
 | Upload limits | MEDIA_MAX_FILE_SIZE=20971520 bytes (max 100 MiB); MEDIA_MAX_CONCURRENT_UPLOADS=4 (1–16); MEDIA_ALLOWED_MIME_TYPES signature allowlist |
