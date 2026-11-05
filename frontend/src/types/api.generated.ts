@@ -629,7 +629,7 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** View a public (non-private) media file */
+        /** View a media file (private files need a session) */
         get: operations["MediaController_viewFile_v1"];
         put?: never;
         post?: never;
