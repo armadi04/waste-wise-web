@@ -10,6 +10,7 @@ import request from 'supertest';
 import type { App } from 'supertest/types';
 import { randomUUID } from 'crypto';
 import { getRepositoryToken } from '@nestjs/typeorm';
+import { ThrottlerStorage } from '@nestjs/throttler';
 import { Repository } from 'typeorm';
 import { setupTestApp, type TestContext } from './utils/setup-app';
 import {
@@ -39,7 +40,14 @@ describe('Auth (e2e)', () => {
 
   beforeEach(async () => {
     await cleanDatabase(ctx.dataSource, adminEmail());
+    // Route budgets (e.g. 5/min on /auth/mobile/2fa/verify) persist in memory
+    // across cases; clear them so each case starts with a full budget.
+    resetThrottleStorage();
   });
+
+  function resetThrottleStorage(): void {
+    ctx.moduleRef.get(ThrottlerStorage, { strict: false }).storage.clear();
+  }
 
   afterAll(async () => {
     await ctx.app.close();
@@ -432,6 +440,10 @@ describe('Auth (e2e)', () => {
           .send({ challengeToken, code: '000000' })
           .expect(401);
       }
+
+      // The loop above already spent the 5/min route budget; clear it so the
+      // final request reaches the lockout check instead of being throttled.
+      resetThrottleStorage();
 
       const res = await request(server)
         .post('/api/v1/auth/mobile/2fa/verify')
