@@ -53,7 +53,7 @@ export function GoogleLoginButton({
     <Button
       variant="flat"
       color="primary"
-      className="flex-1"
+      className="w-full"
       startContent={
         <svg className="w-5 h-5" viewBox="0 0 24 24">
           <path
@@ -76,7 +76,9 @@ export function GoogleLoginButton({
       }
       onPress={() => handleGoogleLogin()}
     >
-      <span className="text-[var(--app-link)] font-medium">Google</span>
+      <span className="text-[var(--app-link)] font-medium">
+        Continue with Google
+      </span>
     </Button>
   )
 }
