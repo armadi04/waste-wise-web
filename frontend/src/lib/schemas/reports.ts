@@ -1,9 +1,9 @@
 import { z } from 'zod'
 import {
+  CATEGORY_FILTER_VALUES,
   REPORT_IMAGE_MAX_BYTES,
   REPORT_IMAGE_MIME_TYPES,
   REPORT_STATUS_VALUES,
-  WASTE_CATEGORY_VALUES,
 } from '@/lib/constants/reports'
 
 const optionalCoordinate = (min: number, max: number) =>
@@ -47,7 +47,7 @@ export const reportSearchSchema = z.object({
   limit: z.coerce.number().int().min(1).max(100).optional(),
   search: z.string().optional(),
   status: z.enum(REPORT_STATUS_VALUES).optional(),
-  category: z.enum(WASTE_CATEGORY_VALUES).optional(),
+  category: z.enum(CATEGORY_FILTER_VALUES).optional(),
   from: z.string().optional(),
   to: z.string().optional(),
   reporterId: z.coerce.number().int().positive().optional(),

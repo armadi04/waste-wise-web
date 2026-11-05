@@ -11,6 +11,8 @@ export type ReportStats = components['schemas']['ReportStatsDto']
 export type ReportStatus = Report['status']
 export type WasteCategory = NonNullable<Report['predictedCategory']>
 export type ClassificationStatus = Report['classificationStatus']
+/** List filter value: a waste category, or reports without one. */
+export type CategoryFilter = WasteCategory | 'UNCLASSIFIED'
 
 export type Notification = components['schemas']['Notification']
 export type NotificationType = components['schemas']['Notification']['type']

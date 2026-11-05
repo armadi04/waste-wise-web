@@ -216,6 +216,25 @@ describe('ReportsService', () => {
     expect(result.meta).toEqual({ total: 1, page: 1, lastPage: 1 });
   });
 
+  it('filters unclassified reports by a missing predicted category', async () => {
+    const builder = queryBuilder([[], 0]);
+    repository.createQueryBuilder.mockReturnValue(builder);
+
+    await service.listReports(actor(1, ['reports.read.own']), {
+      page: 1,
+      limit: 20,
+      category: 'UNCLASSIFIED',
+    });
+
+    expect(builder.andWhere).toHaveBeenCalledWith(
+      'report.predictedCategory IS NULL',
+    );
+    expect(builder.andWhere).not.toHaveBeenCalledWith(
+      'report.predictedCategory = :category',
+      expect.anything(),
+    );
+  });
+
   it('aggregates status and category counts within the caller scope', async () => {
     repository.createQueryBuilder
       .mockReturnValueOnce(

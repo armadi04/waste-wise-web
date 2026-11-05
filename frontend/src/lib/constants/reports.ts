@@ -1,4 +1,5 @@
 import type {
+  CategoryFilter,
   ClassificationStatus,
   ReportStatus,
   WasteCategory,
@@ -16,6 +17,11 @@ export const WASTE_CATEGORY_VALUES = [
   'PLASTIC_WASTE',
   'PAPER_WASTE',
 ] as const satisfies ReadonlyArray<WasteCategory>
+
+export const CATEGORY_FILTER_VALUES = [
+  ...WASTE_CATEGORY_VALUES,
+  'UNCLASSIFIED',
+] as const satisfies ReadonlyArray<CategoryFilter>
 
 export const REPORT_STATUS_LABEL: Record<ReportStatus, string> = {
   PENDING: 'Pending',
@@ -40,6 +46,11 @@ export const WASTE_CATEGORY_LABEL: Record<WasteCategory, string> = {
   PAPER_WASTE: 'Paper Waste',
 }
 
+export const CATEGORY_FILTER_LABEL: Record<CategoryFilter, string> = {
+  ...WASTE_CATEGORY_LABEL,
+  UNCLASSIFIED: 'Unclassified',
+}
+
 export const WASTE_CATEGORY_COLOR: Record<
   WasteCategory,
   'default' | 'primary' | 'success' | 'warning' | 'danger'
@@ -59,13 +70,11 @@ export const REPORT_STATUS_TRANSITIONS: Record<
   REJECTED: [],
 }
 
-export const CLASSIFICATION_STATUS_LABEL: Record<
-  ClassificationStatus,
-  string
-> = {
-  COMPLETED: 'Classified',
-  FAILED: 'Classification failed',
-}
+export const CLASSIFICATION_STATUS_LABEL: Record<ClassificationStatus, string> =
+  {
+    COMPLETED: 'Classified',
+    FAILED: 'Classification failed',
+  }
 
 export const CLASSIFICATION_ERROR_LABEL: Record<string, string> = {
   ML_UNAVAILABLE: 'AI service is unavailable. Category was not saved.',

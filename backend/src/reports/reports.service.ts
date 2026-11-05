@@ -18,7 +18,7 @@ import {
 import { ClassificationService } from './classification.service';
 import { CreateReportDto } from './dto/create-report.dto';
 import { UpdateReportDto } from './dto/update-report.dto';
-import { ReportQueryDto } from './dto/report-query.dto';
+import { ReportQueryDto, UNCLASSIFIED_CATEGORY } from './dto/report-query.dto';
 import { ReportStatsDto } from './dto/report-stats.dto';
 import {
   ClassificationStatus,
@@ -308,7 +308,9 @@ export class ReportsService extends BaseService<Report> {
   ): void {
     if (query.status)
       builder.andWhere('report.status = :status', { status: query.status });
-    if (query.category)
+    if (query.category === UNCLASSIFIED_CATEGORY)
+      builder.andWhere('report.predictedCategory IS NULL');
+    else if (query.category)
       builder.andWhere('report.predictedCategory = :category', {
         category: query.category,
       });

@@ -1619,7 +1619,12 @@ export interface components {
             latitude?: number;
             longitude?: number;
         };
-        UpdateReportDto: Record<string, never>;
+        UpdateReportDto: {
+            description?: string;
+            mediaId?: number;
+            latitude?: number;
+            longitude?: number;
+        };
         UpdateReportStatusDto: {
             /** @enum {string} */
             status: "PENDING" | "IN_PROGRESS" | "COMPLETED" | "REJECTED";
@@ -3078,7 +3083,8 @@ export interface operations {
                 direction?: "ASC" | "DESC";
                 paginated?: boolean;
                 status?: "PENDING" | "IN_PROGRESS" | "COMPLETED" | "REJECTED";
-                category?: "ORGANIC_WASTE" | "PLASTIC_WASTE" | "PAPER_WASTE";
+                /** @description Waste category, or UNCLASSIFIED for reports without one */
+                category?: "ORGANIC_WASTE" | "PLASTIC_WASTE" | "PAPER_WASTE" | "UNCLASSIFIED";
                 /** @description Inclusive start date (YYYY-MM-DD) */
                 from?: string;
                 /** @description Inclusive end date (YYYY-MM-DD) */

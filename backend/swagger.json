@@ -2412,12 +2412,14 @@
             "name": "category",
             "required": false,
             "in": "query",
+            "description": "Waste category, or UNCLASSIFIED for reports without one",
             "schema": {
               "type": "string",
               "enum": [
                 "ORGANIC_WASTE",
                 "PLASTIC_WASTE",
-                "PAPER_WASTE"
+                "PAPER_WASTE",
+                "UNCLASSIFIED"
               ]
             }
           },
