@@ -30,9 +30,9 @@ The starter baseline requires a new database. Applied migrations are immutable.
 
 | Location | Responsibility |
 |---|---|
-| `auth/`, `sso/`, `oauth/`, `sessions/` | Identity, factors, providers, RBAC, machine clients, device sessions |
+| `auth/`, `oauth/`, `sessions/` | Identity, factors, providers, RBAC, machine clients, device sessions |
 | `users/`, `roles/`, `permissions/`, `invitations/` | Administrative resources |
-| `media/` | Ownership and Depot/direct S3 adapters |
+| `media/` | Ownership and the S3 storage adapter |
 | `mail/` | Templates, SMTP outbox, retries and redaction |
 | `notifications/`, `app-refresh/` | Persisted notifications, realtime and refresh signals |
 | `audit/`, `stats/`, `health/`, `changelog/` | Audit, generic dashboard, probes, release notes |
@@ -69,8 +69,8 @@ id `report:<id>:status:<status>`; a failed notification never fails the status u
 Socket.IO namespace `notifications` accepts cookie or explicit token auth and emits
 `new_notification` and `app_refresh`. HTTP polling supplies a notification fallback.
 
-Media rows retain their immutable storage profile/location fingerprint, object key and optional
-Depot ID. Upload admission/size/content limits precede storage. Pending records exist before
+Media rows retain their immutable storage profile/location fingerprint, object key.
+Upload admission/size/content limits precede storage. Pending records exist before
 I/O; only ready rows are public. Deleting rows are hidden and retried by a persistent UTC
 cleanup worker with SKIP LOCKED and fenced leases. Reads/deletes use recorded profiles, never
 the new default. Keep archived profiles configured for existing files and cleanup jobs.

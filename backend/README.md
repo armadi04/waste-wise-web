@@ -1,7 +1,7 @@
 # WasteWise backend
 
 NestJS 12.1.2 with Fastify 5 on Bun, PostgreSQL and TypeORM. Owns auth/RBAC, users, invitations, 2FA,
-sessions, media (Depot/direct S3), waste reports with ML-assisted classification,
+sessions, media (S3-compatible storage), waste reports with ML-assisted classification,
 SMTP outbox, notifications, audit, health, dashboard statistics and optional GraphQL.
 
 ## Quick start
@@ -40,7 +40,7 @@ curl http://localhost:3000/api/v1/health
 
 Keep `DB_SYNCHRONIZE=false`. Baseline supports new databases only.
 
-`MEDIA_PROVIDER=depot` is default; use `s3` for direct S3-compatible storage. Reports call
+Media uses S3-compatible storage (`MEDIA_PROVIDER=s3`). Reports call
 the internal ML service at `ML_SERVICE_URL` (`POST /api/v1/predict`) and still save with
 `classificationStatus=FAILED` when it is unavailable. Required env and optional integrations
 are listed in [Development](docs/DEVELOPMENT.md#environment).

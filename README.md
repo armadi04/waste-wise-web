@@ -12,13 +12,13 @@ there is no root package-manager workspace.
 
 | Feature | Details |
 |---|---|
-| Authentication | JWT access/refresh cookies, Google OAuth, OIDC authorization-code + PKCE, back-channel logout, token blacklisting |
+| Authentication | JWT access/refresh cookies, Google OAuth, token blacklisting |
 | Account security | TOTP 2FA, recovery codes, account lockout, idle/absolute session deadlines, refresh rotation and reuse detection |
 | Email verification | Token-based verification with 24-hour expiry; server guard and client gate |
 | Invitations | Admin invites; invitee chooses a password and receives an auto-verified account |
 | CSRF | Double-submit cookie on refresh, logout and role switching |
 | RBAC | Roles, direct permissions, active-role scoping, grant ceiling, API guards and UI gates |
-| Media | **Depot by default**, or direct S3-compatible storage; per-user ownership and admin override |
+| Media | S3-compatible storage; per-user ownership and admin override |
 | Notifications | Socket.IO, polling fallback and browser desktop notifications |
 | Audit and sessions | Append-only audit trail, device session management and controlled impersonation |
 | Rate limiting | Global IP throttle (100/min by default), stricter credential/upload endpoints |
@@ -39,7 +39,7 @@ there is no root package-manager workspace.
 | Runtime | Bun **1.3.14+** |
 | Backend | NestJS 12 · TypeORM 1.1 · PostgreSQL 14+ · Socket.IO 4.8 |
 | Cache | Redis, or per-process memory |
-| Storage | Depot SDK, or Bun S3Client (AWS / compatible endpoints) |
+| Storage | Bun S3Client (AWS / compatible endpoints) |
 | Frontend | React 19 · Vite 8 · TanStack Router 1 · TanStack Query 5 |
 | State | Zustand (client) · Query (server) · URL params (tables) · react-hook-form (forms) |
 | UI | HeroUI 2.8 · Tailwind CSS 4 |
@@ -68,7 +68,7 @@ the `@univstekom` registry before installing (see [backend setup](backend/docs/D
 cd backend
 bun install --frozen-lockfile
 cp .env.example .env
-# Configure database, JWT, admin and Depot credentials (or select S3).
+# Configure database, JWT, admin and S3 credentials.
 bun run migration:run
 bun run seed
 bun run start:dev
