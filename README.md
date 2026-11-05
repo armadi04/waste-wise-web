@@ -81,6 +81,7 @@ The optional ML service runs separately from its own repository; set `ML_SERVICE
 backend (default service API: `POST /api/v1/predict`). Backend: **localhost:3000**, REST base `/api/v1`. Frontend: **localhost:3001**; Vite proxies
 `/api` and `/socket.io` to the backend. Leave `VITE_API_URL` empty for same-origin requests.
 Swagger UI is `/api/docs` outside production; OpenAPI documents are `/api/docs/openapi.json` and `/api/docs/openapi.yaml`.
+A static, read-only API reference built from `backend/swagger.json` lives in `docs/index.html` (published with GitHub Pages at https://armadi04.github.io/waste-wise-web/). Regenerate it with `bun run docs:api` in `backend` after `bun run spec:generate`.
 Sign in with the admin email/password configured in the backend env.
 
 The starter baseline is for **new databases only**, not an upgrade path for the original
