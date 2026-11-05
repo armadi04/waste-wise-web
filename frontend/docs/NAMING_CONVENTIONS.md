@@ -18,7 +18,7 @@ Keep UI/email/notification copy in the language of the existing screen or produc
 Match existing Prettier/ESLint style: two spaces, single quotes, no semicolons, trailing
 commas and import ordering. Use `@/` for src imports. TanStack `(group)` and `$resource`
 route filenames follow framework syntax. Do not rename API fields or database identifiers
-as a formatting change. OAuth fields retain protocol spelling (`access_token`, etc.).
+as a formatting change. Token fields retain protocol spelling (`access_token`, etc.).
 
 ## Feature organization
 
@@ -53,7 +53,7 @@ Shared page/search configuration belongs in a pure module, not in an imported ro
 ## Hook organization
 
 Keep custom hooks in `src/hooks/<domain>/`.
-Domains are `auth`, `profile`, `users`, `invitations`, `roles`, `permissions`, `oauth-clients`,
+Domains are `auth`, `profile`, `users`, `invitations`, `roles`, `permissions`,
 `media`, `notifications`, `sessions`, `audit`, and `dashboard`, plus `global/` helpers.
 Use `global/` for cross-feature mutation, table, export, confirmation, navigation,
 appearance, PWA, and utility hooks. Do not embed custom hook declarations in view modules.

@@ -720,11 +720,20 @@ describe('AuthService', () => {
 
   describe('validateGoogleAccessToken', () => {
     const originalFetch = globalThis.fetch;
+    const setTokenInfo = (info: unknown) => {
+      (service as unknown as { googleClient: unknown }).googleClient = {
+        getTokenInfo:
+          info instanceof Error
+            ? jest.fn().mockRejectedValue(info)
+            : jest.fn().mockResolvedValue(info),
+      };
+    };
     afterEach(() => {
       globalThis.fetch = originalFetch;
     });
 
     it('should throw when Google rejects the access token', async () => {
+      setTokenInfo({ aud: 'google-client-id' });
       globalThis.fetch = jest.fn().mockResolvedValue({ ok: false }) as never;
 
       await expect(service.validateGoogleAccessToken('ya29.x')).rejects.toThrow(
@@ -732,7 +741,35 @@ describe('AuthService', () => {
       );
     });
 
+    it('should reject an access token issued to a foreign client', async () => {
+      setTokenInfo({
+        aud: 'someone-elses-client',
+        azp: 'someone-elses-client',
+      });
+      globalThis.fetch = jest.fn() as never;
+
+      await expect(service.validateGoogleAccessToken('ya29.x')).rejects.toThrow(
+        'Invalid Google access token',
+      );
+      expect(globalThis.fetch).not.toHaveBeenCalled();
+      expect(usersService.findOrCreateGoogleUser).not.toHaveBeenCalled();
+    });
+
+    it('should reject when tokeninfo and userinfo disagree on the email', async () => {
+      setTokenInfo({ aud: 'google-client-id', email: 'a@b.com' });
+      globalThis.fetch = jest.fn().mockResolvedValue({
+        ok: true,
+        json: async () => ({ email: 'other@b.com' }),
+      }) as never;
+
+      await expect(service.validateGoogleAccessToken('ya29.x')).rejects.toThrow(
+        UnauthorizedException,
+      );
+      expect(usersService.findOrCreateGoogleUser).not.toHaveBeenCalled();
+    });
+
     it('should return the registered user for a valid access token', async () => {
+      setTokenInfo({ aud: 'google-client-id', email: 'x@b.com' });
       globalThis.fetch = jest.fn().mockResolvedValue({
         ok: true,
         json: async () => ({ email: 'x@b.com', name: 'Google User' }),
@@ -746,6 +783,23 @@ describe('AuthService', () => {
 
       const result = await service.validateGoogleAccessToken('ya29.x');
       expect((result as User).email).toBe('x@b.com');
+    });
+  });
+
+  describe('google sign-in without GOOGLE_CLIENT_ID', () => {
+    it('fails closed instead of skipping the audience check', async () => {
+      const verifyIdToken = jest.fn();
+      (service as unknown as { googleClient: unknown }).googleClient = {
+        verifyIdToken,
+      };
+      (
+        service as unknown as { configService: { get: () => undefined } }
+      ).configService = { get: () => undefined };
+
+      await expect(service.validateGoogleUser('tok')).rejects.toThrow(
+        'Google sign-in is not configured',
+      );
+      expect(verifyIdToken).not.toHaveBeenCalled();
     });
   });
 

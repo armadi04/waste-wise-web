@@ -1,5 +1,6 @@
 import {
   BadRequestException,
+  ConflictException,
   ForbiddenException,
   Injectable,
   NotFoundException,
@@ -18,7 +19,7 @@ import {
 import { ClassificationService } from './classification.service';
 import { CreateReportDto } from './dto/create-report.dto';
 import { UpdateReportDto } from './dto/update-report.dto';
-import { ReportQueryDto } from './dto/report-query.dto';
+import { ReportQueryDto, UNCLASSIFIED_CATEGORY } from './dto/report-query.dto';
 import { ReportStatsDto } from './dto/report-stats.dto';
 import {
   ClassificationStatus,
@@ -94,7 +95,15 @@ export class ReportsService extends BaseService<Report> {
     dto: CreateReportDto,
     ipAddress?: string | null,
   ): Promise<Report> {
+    this.assertCoordinatePair(dto.latitude, dto.longitude);
     const media = await this.assertUsableMedia(actor, dto.mediaId);
+    // A client that timed out and retries re-sends the same uploaded photo.
+    // Return the report it already created instead of making a duplicate.
+    const existing = await this.reports.findOneBy({
+      reporterId: actor.userId,
+      mediaId: media.id,
+    });
+    if (existing) return this.findOneForActor(actor, existing.id);
     const classification = await this.classification.classify(media);
     const report = await super.create({
       reporterId: actor.userId,
@@ -145,6 +154,10 @@ export class ReportsService extends BaseService<Report> {
     if (dto.description !== undefined) changes.description = dto.description;
     if (dto.latitude !== undefined) changes.latitude = dto.latitude;
     if (dto.longitude !== undefined) changes.longitude = dto.longitude;
+    this.assertCoordinatePair(
+      dto.latitude !== undefined ? dto.latitude : report.latitude,
+      dto.longitude !== undefined ? dto.longitude : report.longitude,
+    );
 
     let reclassified = false;
     if (dto.mediaId !== undefined && dto.mediaId !== report.mediaId) {
@@ -203,7 +216,13 @@ export class ReportsService extends BaseService<Report> {
     const report = await this.findOneForActor(actor, id);
     const from = report.status;
     assertStatusTransition(from, status);
-    await super.update(id, { status });
+    // Conditional write: if another admin moved the report meanwhile, the
+    // status no longer equals `from` and nothing is updated.
+    const result = await this.reports.update({ id, status: from }, { status });
+    if (!result.affected)
+      throw new ConflictException(
+        'Report status changed by someone else; reload and try again',
+      );
     const view = await this.findOneForActor(actor, id);
     this.recordAudit(
       actor,
@@ -308,7 +327,9 @@ export class ReportsService extends BaseService<Report> {
   ): void {
     if (query.status)
       builder.andWhere('report.status = :status', { status: query.status });
-    if (query.category)
+    if (query.category === UNCLASSIFIED_CATEGORY)
+      builder.andWhere('report.predictedCategory IS NULL');
+    else if (query.category)
       builder.andWhere('report.predictedCategory = :category', {
         category: query.category,
       });
@@ -368,6 +389,19 @@ export class ReportsService extends BaseService<Report> {
 
   private scopeParams(actor: AuthenticatedUser): Record<string, number> {
     return this.canReadAll(actor) ? {} : { actorId: actor.userId };
+  }
+
+  /** Coordinates are stored as a pair: both set, or both absent. */
+  private assertCoordinatePair(
+    latitude: number | null | undefined,
+    longitude: number | null | undefined,
+  ): void {
+    const hasLat = latitude !== undefined && latitude !== null;
+    const hasLng = longitude !== undefined && longitude !== null;
+    if (hasLat !== hasLng)
+      throw new BadRequestException(
+        'latitude and longitude must be provided together',
+      );
   }
 
   private async assertUsableMedia(

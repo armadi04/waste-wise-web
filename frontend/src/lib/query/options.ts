@@ -1,7 +1,6 @@
 import { keepPreviousData, queryOptions } from '@tanstack/react-query'
 import type { UserSearchParams } from '@/lib/schemas/users'
 import type { ReportSearchParams } from '@/lib/schemas/reports'
-import type { OAuthClient } from '@/lib/services/oauth-client.service'
 import type { Invitation, PaginatedData } from '@/types/api'
 import type { Permission, Role, UserProfile } from '@/types/auth'
 import type { Media } from '@/types/media'
@@ -12,14 +11,12 @@ import {
   getInvitation,
   getProfile,
 } from '@/lib/services/auth.service'
-import { getReleaseNotes } from '@/lib/services/changelog.service'
 import { getInvitations } from '@/lib/services/invitation.service'
 import { getMediaList } from '@/lib/services/media.service'
 import {
   getNotifications,
   getUnreadCount,
 } from '@/lib/services/notification.service'
-import { getOAuthClients } from '@/lib/services/oauth-client.service'
 import { getPermissions } from '@/lib/services/permission.service'
 import { getRoles } from '@/lib/services/role.service'
 import { getMySessions, getSessions } from '@/lib/services/session.service'
@@ -133,23 +130,6 @@ export function invitationsQueryOptions(params: TableSearch) {
         direction: direction || 'desc',
         paginated: true,
       }) as Promise<PaginatedData<Invitation>>,
-    placeholderData: keepPreviousData,
-  })
-}
-
-export function oauthClientsQueryOptions(params: TableSearch) {
-  const { page, limit, search, sort, direction } = params
-  return queryOptions({
-    queryKey: queryKeys.oauthClients.list({ page, limit, search, sort, direction }),
-    queryFn: () =>
-      getOAuthClients({
-        page: page || 1,
-        limit: limit || 20,
-        search: search || '',
-        sort: sort || 'createdAt',
-        direction: direction || 'desc',
-        paginated: true,
-      }) as Promise<PaginatedData<OAuthClient>>,
     placeholderData: keepPreviousData,
   })
 }
@@ -356,15 +336,6 @@ export function invitationQueryOptions(token?: string) {
     queryFn: () => getInvitation(token!),
     enabled: !!token,
     retry: false,
-  })
-}
-
-export function changelogQueryOptions() {
-  return queryOptions({
-    queryKey: queryKeys.changelog,
-    queryFn: getReleaseNotes,
-    // Releases change a few times a month at most; don't refetch on every mount.
-    staleTime: 10 * 60 * 1000,
   })
 }
 

@@ -15,7 +15,6 @@ import { AllExceptionsFilter } from '@/common/filters/all-exceptions.filter';
 import { GqlThrottlerGuard } from '@/common/guards/gql-throttler.guard';
 import { JwtStrategy } from '@/auth/jwt.strategy';
 import { AuthService } from '@/auth/auth.service';
-import { OAuthClientService } from '@/oauth/oauth-client.service';
 import { SessionsService } from '@/sessions/sessions.service';
 import { GraphqlApiModule } from '@/graphql/graphql-api.module';
 import { DataloaderModule } from '@/graphql/dataloaders/dataloader.module';
@@ -66,7 +65,6 @@ const services = [
     MediaService,
     NotificationsService,
     InvitationsService,
-    OAuthClientService,
     SessionsService,
   ].map((provide) => ({ provide, useValue: {} })),
   {
@@ -180,6 +178,13 @@ describe('Production GraphQL module with mocked feature services', () => {
 describe('Socket.IO HTTP transport on the Fastify HTTP server, without database', () => {
   let app: NestFastifyApplication;
   let base: string;
+  const revokedToken = jwt.sign({ sub: 1, roles: ['user'] });
+  const revokedSessionToken = jwt.sign({
+    sub: 1,
+    roles: ['user'],
+    sessionId: 'revoked-session',
+  });
+  const inactiveToken = jwt.sign({ sub: 2, roles: ['user'] });
   beforeAll(async () => {
     const module = await Test.createTestingModule({
       providers: [
@@ -188,6 +193,20 @@ describe('Socket.IO HTTP transport on the Fastify HTTP server, without database'
         {
           provide: AppRefreshService,
           useValue: { current: () => '2026-10-26T00:00:00.000Z' },
+        },
+        {
+          provide: AuthService,
+          useValue: {
+            isTokenBlacklisted: async (value: string) => value === revokedToken,
+            getProfile: async (id: number) =>
+              id === 2 ? { id, isActive: false } : { id, isActive: true },
+          },
+        },
+        {
+          provide: SessionsService,
+          useValue: {
+            isActive: async (id: string) => id !== 'revoked-session',
+          },
         },
       ],
     }).compile();
@@ -245,6 +264,18 @@ describe('Socket.IO HTTP transport on the Fastify HTTP server, without database'
       { token: 'invalid' },
       { token: jwt.sign({ sub: 1, tokenType: 'refresh' }) },
       { token: jwt.sign({ sub: 1, tokenType: '2fa' }) },
+    ]) {
+      const packets = await connect({}, auth as Record<string, string>);
+      expect(packets).toContain('41/notifications,');
+      expect(packets).not.toContain('app_refresh');
+    }
+  });
+
+  it('disconnects blacklisted tokens, revoked sessions and inactive accounts', async () => {
+    for (const auth of [
+      { token: revokedToken },
+      { token: revokedSessionToken },
+      { token: inactiveToken },
     ]) {
       const packets = await connect({}, auth);
       expect(packets).toContain('41/notifications,');

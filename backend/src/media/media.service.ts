@@ -44,14 +44,13 @@ export class MediaService extends BaseService<Media> {
     input: UploadedMultipartFile,
     userId: number,
     imageOnly = false,
+    isPrivate = false,
   ): Promise<Media> {
     if (!Number.isSafeInteger(userId) || userId < 1)
       throw new ForbiddenException('Media uploads require a user account');
     const file = await this.uploadValidation.transform(input);
     if (imageOnly && !file.mimetype.startsWith('image/'))
-      throw new UnsupportedMediaTypeException(
-        'An image is required for an avatar',
-      );
+      throw new UnsupportedMediaTypeException('An image is required');
     const selection = this.storage.selected;
     const token = randomUUID();
     const key = `media/${userId}/${randomUUID()}`;
@@ -68,6 +67,7 @@ export class MediaService extends BaseService<Media> {
         path: key,
         remoteName: key,
         userId,
+        isPrivate,
         state: 'pending',
         cleanupAt: new Date(Date.now() + MEDIA_LEASE_MS),
         cleanupLeaseUntil: new Date(Date.now() + MEDIA_LEASE_MS),

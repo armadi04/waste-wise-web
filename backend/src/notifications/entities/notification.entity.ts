@@ -48,6 +48,13 @@ export class Notification {
   @Index()
   actorId: number;
 
+  @ManyToOne(() => User, { onDelete: 'SET NULL', nullable: true })
+  @JoinColumn({
+    name: 'actorId',
+    foreignKeyConstraintName: 'FK_notifications_actorId',
+  })
+  actor: User | null;
+
   @ApiProperty()
   @Column({ name: 'title' })
   title: string;

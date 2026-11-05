@@ -8,7 +8,7 @@ Application code, files, folders, services, DTOs, and custom API contracts use E
 - Constants use UPPER_SNAKE_CASE.
 - REST paths use English kebab-case.
 - Physical database table and column names are unchanged; migrations are immutable.
-- OAuth2/OIDC protocol fields such as `grant_type`, `client_id`, `access_token`, `expires_in`, and `email_verified` retain their standard spelling.
+- Token and Google sign-in fields such as `access_token`, `expires_in`, and `email_verified` retain their standard spelling.
 - REST errors expose stable English `code` values (`UNAUTHORIZED`, `NOT_FOUND`, and so on); the frontend maps these codes to Indonesian customer-facing messages.
 
 

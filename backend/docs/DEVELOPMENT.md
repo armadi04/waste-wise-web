@@ -29,7 +29,7 @@ Source of truth: `src/config/env.ts`; template: `.env.example`. Invalid/missing 
 | Database (required) | DB_HOST, DB_USERNAME, DB_PASSWORD, DB_NAME; DB_PORT=5432 |
 | Identity (required) | JWT_SECRET (min 16 chars), ADMIN_EMAIL, ADMIN_PASSWORD (min 8 chars) |
 | Demo user | DEMO_USER_EMAIL/DEMO_USER_PASSWORD (min 8 chars); development/test defaults are `user@smart-waste.local` / `DemoUser123!`, deployed environments require explicit values |
-| Reports / ML | ML_SERVICE_URL (optional), ML_SERVICE_TIMEOUT_MS=15000; without the URL reports still save with classification FAILED |
+| Reports / ML | ML_SERVICE_URL (optional), ML_SERVICE_TOKEN (optional, >=16 chars; sent as `X-Internal-Token`, must equal the ML `INTERNAL_TOKEN`), ML_SERVICE_TIMEOUT_MS=15000 (one deadline for media fetch + inference), ML_MIN_CONFIDENCE (optional, 0-1; lower confidence is stored as FAILED with `ML_LOW_CONFIDENCE` and no category); without the URL reports still save with classification FAILED |
 | Storage | MEDIA_PROVIDER=s3; S3 credentials required (see below) |
 | Storage profiles | MEDIA_STORAGE_PROFILE optional; MEDIA_STORAGE_PROFILES JSON map of named locations/credentials |
 | Upload limits | MEDIA_MAX_FILE_SIZE=20971520 bytes (max 100 MiB); MEDIA_MAX_CONCURRENT_UPLOADS=4 (1–16); MEDIA_ALLOWED_MIME_TYPES signature allowlist |
@@ -45,7 +45,6 @@ Source of truth: `src/config/env.ts`; template: `.env.example`. Invalid/missing 
 | SMTP | SMTP_HOST optional, SMTP_PORT=587, SMTP_SECURE=false, SMTP_USER/PASS, MAIL_FROM/NAME |
 | Rate limits | THROTTLE_TTL=60000 ms, THROTTLE_LIMIT=100 |
 | GraphQL | GRAPHQL_ENABLED=false; limits and flags in [GraphQL](GRAPHQL.md#enabling-it) |
-| Releases | GITHUB_REPO (set to your fork), GITHUB_TOKEN optional |
 
 Inactive storage credentials are not required. Keep them configured if existing records need
 that provider. SMTP is required for real invitation/reset/verification delivery.
@@ -81,7 +80,7 @@ own run. `migrate:fresh[:seed]` drops schema and is only for explicitly authoriz
 
 ## Tests and isolation
 
-Required checks: `bun run lint`, `bun run test`, `bun run build`.
+Required checks: `bun run lint`, `bun run typecheck` (src + tests), `bun run test`, `bun run build`. `bun run lint:check` lints without rewriting files.
 For HTTP adapter/auth/upload/GraphQL/realtime changes also run `bun run test:http`.
 This suite uses Fastify `inject()` with mocked services and the actual GraphQL module;
 Socket.IO handshakes use an ephemeral loopback port. It never connects to a database

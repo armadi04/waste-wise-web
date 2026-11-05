@@ -10,7 +10,6 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
-import { Route as ChangelogRouteImport } from './routes/changelog'
 import { Route as ProfileRouteImport } from './routes/profile'
 import { Route as ReportsRouteImport } from './routes/reports'
 import { Route as auditAuditLogsRouteImport } from './routes/(audit)/audit-logs'
@@ -27,18 +26,12 @@ import { Route as usersUsersRouteImport } from './routes/(users)/users'
 import { Route as ReportsIndexRouteImport } from './routes/reports.index'
 import { Route as ReportsReportIdRouteImport } from './routes/reports.$reportId'
 import { Route as ReportsNewRouteImport } from './routes/reports.new'
-import { Route as databasesoauthOauthClientsRouteImport } from './routes/(databases)/(oauth)/oauth-clients'
 import { Route as databasespermissionsPermissionsRouteImport } from './routes/(databases)/(permissions)/permissions'
 import { Route as databasesrolesRolesRouteImport } from './routes/(databases)/(roles)/roles'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ChangelogRoute = ChangelogRouteImport.update({
-  id: '/changelog',
-  path: '/changelog',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ProfileRoute = ProfileRouteImport.update({
@@ -121,12 +114,6 @@ const ReportsNewRoute = ReportsNewRouteImport.update({
   path: '/new',
   getParentRoute: () => ReportsRoute,
 } as any)
-const databasesoauthOauthClientsRoute =
-  databasesoauthOauthClientsRouteImport.update({
-    id: '/(databases)/(oauth)/oauth-clients',
-    path: '/oauth-clients',
-    getParentRoute: () => rootRouteImport,
-  } as any)
 const databasespermissionsPermissionsRoute =
   databasespermissionsPermissionsRouteImport.update({
     id: '/(databases)/(permissions)/permissions',
@@ -141,7 +128,6 @@ const databasesrolesRolesRoute = databasesrolesRolesRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
-  '/changelog': typeof ChangelogRoute
   '/profile': typeof ProfileRoute
   '/reports': typeof ReportsRouteWithChildren
   '/audit-logs': typeof auditAuditLogsRoute
@@ -158,13 +144,11 @@ export interface FileRoutesByFullPath {
   '/reports/$reportId': typeof ReportsReportIdRoute
   '/reports/new': typeof ReportsNewRoute
   '/reports/': typeof ReportsIndexRoute
-  '/oauth-clients': typeof databasesoauthOauthClientsRoute
   '/permissions': typeof databasespermissionsPermissionsRoute
   '/roles': typeof databasesrolesRolesRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
-  '/changelog': typeof ChangelogRoute
   '/profile': typeof ProfileRoute
   '/audit-logs': typeof auditAuditLogsRoute
   '/accept-invite': typeof authAcceptInviteRoute
@@ -180,14 +164,12 @@ export interface FileRoutesByTo {
   '/reports/$reportId': typeof ReportsReportIdRoute
   '/reports/new': typeof ReportsNewRoute
   '/reports': typeof ReportsIndexRoute
-  '/oauth-clients': typeof databasesoauthOauthClientsRoute
   '/permissions': typeof databasespermissionsPermissionsRoute
   '/roles': typeof databasesrolesRolesRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
-  '/changelog': typeof ChangelogRoute
   '/profile': typeof ProfileRoute
   '/reports': typeof ReportsRouteWithChildren
   '/(audit)/audit-logs': typeof auditAuditLogsRoute
@@ -204,7 +186,6 @@ export interface FileRoutesById {
   '/reports/$reportId': typeof ReportsReportIdRoute
   '/reports/new': typeof ReportsNewRoute
   '/reports/': typeof ReportsIndexRoute
-  '/(databases)/(oauth)/oauth-clients': typeof databasesoauthOauthClientsRoute
   '/(databases)/(permissions)/permissions': typeof databasespermissionsPermissionsRoute
   '/(databases)/(roles)/roles': typeof databasesrolesRolesRoute
 }
@@ -212,7 +193,6 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
-    | '/changelog'
     | '/profile'
     | '/reports'
     | '/audit-logs'
@@ -229,13 +209,11 @@ export interface FileRouteTypes {
     | '/reports/$reportId'
     | '/reports/new'
     | '/reports/'
-    | '/oauth-clients'
     | '/permissions'
     | '/roles'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
-    | '/changelog'
     | '/profile'
     | '/audit-logs'
     | '/accept-invite'
@@ -251,13 +229,11 @@ export interface FileRouteTypes {
     | '/reports/$reportId'
     | '/reports/new'
     | '/reports'
-    | '/oauth-clients'
     | '/permissions'
     | '/roles'
   id:
     | '__root__'
     | '/'
-    | '/changelog'
     | '/profile'
     | '/reports'
     | '/(audit)/audit-logs'
@@ -274,14 +250,12 @@ export interface FileRouteTypes {
     | '/reports/$reportId'
     | '/reports/new'
     | '/reports/'
-    | '/(databases)/(oauth)/oauth-clients'
     | '/(databases)/(permissions)/permissions'
     | '/(databases)/(roles)/roles'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
-  ChangelogRoute: typeof ChangelogRoute
   ProfileRoute: typeof ProfileRoute
   ReportsRoute: typeof ReportsRouteWithChildren
   auditAuditLogsRoute: typeof auditAuditLogsRoute
@@ -295,7 +269,6 @@ export interface RootRouteChildren {
   sessionsSessionsRoute: typeof sessionsSessionsRoute
   usersInvitationsRoute: typeof usersInvitationsRoute
   usersUsersRoute: typeof usersUsersRoute
-  databasesoauthOauthClientsRoute: typeof databasesoauthOauthClientsRoute
   databasespermissionsPermissionsRoute: typeof databasespermissionsPermissionsRoute
   databasesrolesRolesRoute: typeof databasesrolesRolesRoute
 }
@@ -307,13 +280,6 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/changelog': {
-      id: '/changelog'
-      path: '/changelog'
-      fullPath: '/changelog'
-      preLoaderRoute: typeof ChangelogRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/profile': {
@@ -428,13 +394,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ReportsNewRouteImport
       parentRoute: typeof ReportsRoute
     }
-    '/(databases)/(oauth)/oauth-clients': {
-      id: '/(databases)/(oauth)/oauth-clients'
-      path: '/oauth-clients'
-      fullPath: '/oauth-clients'
-      preLoaderRoute: typeof databasesoauthOauthClientsRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/(databases)/(permissions)/permissions': {
       id: '/(databases)/(permissions)/permissions'
       path: '/permissions'
@@ -469,7 +428,6 @@ const ReportsRouteWithChildren =
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
-  ChangelogRoute: ChangelogRoute,
   ProfileRoute: ProfileRoute,
   ReportsRoute: ReportsRouteWithChildren,
   auditAuditLogsRoute: auditAuditLogsRoute,
@@ -483,7 +441,6 @@ const rootRouteChildren: RootRouteChildren = {
   sessionsSessionsRoute: sessionsSessionsRoute,
   usersInvitationsRoute: usersInvitationsRoute,
   usersUsersRoute: usersUsersRoute,
-  databasesoauthOauthClientsRoute: databasesoauthOauthClientsRoute,
   databasespermissionsPermissionsRoute: databasespermissionsPermissionsRoute,
   databasesrolesRolesRoute: databasesrolesRolesRoute,
 }

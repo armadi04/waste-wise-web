@@ -1,10 +1,8 @@
 import {
   Bell,
   Database,
-  History,
   Image as ImageIcon,
   Key,
-  KeyRound,
   LayoutDashboard,
   Mail,
   MonitorSmartphone,
@@ -26,7 +24,6 @@ export const MENU_PERMISSIONS = {
   permissions: 'menu.permissions',
   media: 'menu.media',
   invitations: 'menu.invitations',
-  oauth: 'menu.oauth',
   sessions: 'menu.sessions',
   audit: 'menu.audit',
 } as const
@@ -107,14 +104,6 @@ export const sidebarData: Array<NavGroup> = [
             menuPermission: MENU_PERMISSIONS.permissions,
             permission: 'permissions.read',
           },
-          {
-            key: 'oauth-clients',
-            icon: <KeyRound size={18} />,
-            label: 'OAuth Clients',
-            href: '/oauth-clients',
-            menuPermission: MENU_PERMISSIONS.oauth,
-            permission: 'oauth.clients.read',
-          },
         ],
       },
       {
@@ -156,12 +145,6 @@ export const sidebarData: Array<NavGroup> = [
         icon: <Bell size={20} />,
         label: 'Notifications',
         href: '/notifications',
-      },
-      {
-        key: 'changelog',
-        icon: <History size={20} />,
-        label: 'Changelog',
-        href: '/changelog',
       },
     ],
   },

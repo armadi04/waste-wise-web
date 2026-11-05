@@ -25,11 +25,12 @@ describe('starter permissions', () => {
         (method) =>
           (Reflect.getMetadata(
             PERMISSIONS_KEY,
-            controller.prototype[method] as object,
+            (controller.prototype as unknown as Record<string, object>)[method],
           ) ?? []) as string[],
       ),
     );
     expect(required.length).toBeGreaterThan(0);
-    for (const permission of required) expect(names).toContain(permission);
+    for (const permission of required)
+      expect(names).toContain(permission as never);
   });
 });

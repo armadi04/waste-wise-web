@@ -1,16 +1,21 @@
 /**
  * Session lifetime policy per audience (OWASP idle + absolute timeouts).
  *
- * - `admin`: dashboard password/Google/2FA and impersonation sessions.
+ * - `admin`: browser sessions (dashboard password/Google/2FA, impersonation).
+ * - `mobile`: native app sessions from the `/auth/mobile/*` endpoints. They
+ *   currently share the admin lifetimes; the audience labels the device.
  *
  * Idle = longest gap between refreshes; each refresh slides the session's
  * `expiresAt` forward, never past `absoluteExpiresAt`. Absolute = hard limit
  * since login, after which the user must sign in again. Values come from env
  * (validated in config/env.ts) and are read per call so tests can override.
  */
-export type SessionAudience = 'admin';
+export type SessionAudience = 'admin' | 'mobile';
 
-export const SESSION_AUDIENCES: readonly SessionAudience[] = ['admin'];
+export const SESSION_AUDIENCES: readonly SessionAudience[] = [
+  'admin',
+  'mobile',
+];
 
 /** Access JWT lifetime for every audience; clients refresh on 401. */
 export const ACCESS_TOKEN_TTL = '15m';
@@ -32,7 +37,9 @@ export function sessionPolicy(
   audience: SessionAudience,
   source: Record<string, string | undefined> = process.env,
 ): SessionPolicy {
-  if (audience !== 'admin') throw new Error('Unknown session audience');
+  if (!SESSION_AUDIENCES.includes(audience)) {
+    throw new Error('Unknown session audience');
+  }
   return {
     idleMs: positive(source.SESSION_ADMIN_IDLE_MINUTES, 120) * MINUTE,
     absoluteMs: positive(source.SESSION_ADMIN_ABSOLUTE_HOURS, 8) * HOUR,

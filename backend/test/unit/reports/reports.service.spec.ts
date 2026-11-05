@@ -1,4 +1,8 @@
-import { BadRequestException, ForbiddenException } from '@nestjs/common';
+import {
+  BadRequestException,
+  ConflictException,
+  ForbiddenException,
+} from '@nestjs/common';
 import { describe, beforeEach, expect, it, jest } from 'bun:test';
 import { ReportsService } from '../../../src/reports/reports.service';
 import {
@@ -58,6 +62,8 @@ describe('ReportsService', () => {
   let repository: {
     findOne: ReturnType<typeof jest.fn>;
     find: ReturnType<typeof jest.fn>;
+    update: ReturnType<typeof jest.fn>;
+    findOneBy: ReturnType<typeof jest.fn>;
     create: ReturnType<typeof jest.fn>;
     save: ReturnType<typeof jest.fn>;
     preload: ReturnType<typeof jest.fn>;
@@ -72,6 +78,8 @@ describe('ReportsService', () => {
     repository = {
       findOne: jest.fn(),
       find: jest.fn().mockResolvedValue([]),
+      update: jest.fn().mockResolvedValue({ affected: 1 }),
+      findOneBy: jest.fn().mockResolvedValue(null),
       create: jest.fn((value: Partial<Report>) => value),
       save: jest.fn((value: Partial<Report>) =>
         Promise.resolve({ id: 4, ...value }),
@@ -123,6 +131,24 @@ describe('ReportsService', () => {
       }),
     );
     expect(result.id).toBe(4);
+  });
+
+  it('returns the existing report when a client retries with the same photo', async () => {
+    repository.findOneBy.mockResolvedValue(report({ id: 4 }));
+    repository.findOne.mockResolvedValue(report({ id: 4 }));
+
+    const result = await service.createForActor(actor(1, ['reports.create']), {
+      description: 'retry after timeout',
+      mediaId: 9,
+    });
+
+    expect(result.id).toBe(4);
+    expect(repository.findOneBy).toHaveBeenCalledWith({
+      reporterId: 1,
+      mediaId: 9,
+    });
+    expect(classification.classify).not.toHaveBeenCalled();
+    expect(repository.save).not.toHaveBeenCalled();
   });
 
   it('records a report audit event after creation', async () => {
@@ -216,6 +242,25 @@ describe('ReportsService', () => {
     expect(result.meta).toEqual({ total: 1, page: 1, lastPage: 1 });
   });
 
+  it('filters unclassified reports by a missing predicted category', async () => {
+    const builder = queryBuilder([[], 0]);
+    repository.createQueryBuilder.mockReturnValue(builder);
+
+    await service.listReports(actor(1, ['reports.read.own']), {
+      page: 1,
+      limit: 20,
+      category: 'UNCLASSIFIED',
+    });
+
+    expect(builder.andWhere).toHaveBeenCalledWith(
+      'report.predictedCategory IS NULL',
+    );
+    expect(builder.andWhere).not.toHaveBeenCalledWith(
+      'report.predictedCategory = :category',
+      expect.anything(),
+    );
+  });
+
   it('aggregates status and category counts within the caller scope', async () => {
     repository.createQueryBuilder
       .mockReturnValueOnce(
@@ -265,6 +310,44 @@ describe('ReportsService', () => {
       from: ReportStatus.PENDING,
       to: ReportStatus.IN_PROGRESS,
     });
+  });
+
+  it('rejects a status change when another admin already moved the report', async () => {
+    repository.findOne.mockResolvedValue(
+      report({ status: ReportStatus.PENDING }),
+    );
+    repository.update.mockResolvedValue({ affected: 0 });
+
+    await expect(
+      service.updateStatusForActor(
+        actor(2, ['reports.status.update', 'reports.read.all']),
+        4,
+        ReportStatus.IN_PROGRESS,
+      ),
+    ).rejects.toBeInstanceOf(ConflictException);
+    expect(repository.update).toHaveBeenCalledWith(
+      { id: 4, status: ReportStatus.PENDING },
+      { status: ReportStatus.IN_PROGRESS },
+    );
+  });
+
+  it('requires latitude and longitude together on create and update', async () => {
+    await expect(
+      service.createForActor(actor(1, ['reports.create']), {
+        description: 'half a location',
+        mediaId: 9,
+        latitude: -6.2,
+      }),
+    ).rejects.toBeInstanceOf(BadRequestException);
+
+    repository.findOne.mockResolvedValue(
+      report({ latitude: null, longitude: null }),
+    );
+    await expect(
+      service.updateForActor(actor(1, ['reports.update.own']), 4, {
+        longitude: 106.8,
+      }),
+    ).rejects.toBeInstanceOf(BadRequestException);
   });
 
   it('does not emit a status change for an invalid transition', async () => {

@@ -1077,36 +1077,6 @@
         ]
       }
     },
-    "/api/v1/changelog": {
-      "get": {
-        "operationId": "ChangelogController_findAll_v1",
-        "parameters": [],
-        "responses": {
-          "200": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/ReleaseNotesDto"
-                  }
-                }
-              }
-            }
-          }
-        },
-        "security": [
-          {
-            "bearer": []
-          }
-        ],
-        "summary": "Published release notes, newest first",
-        "tags": [
-          "Changelog"
-        ]
-      }
-    },
     "/api/v1/health": {
       "get": {
         "description": "Checks PostgreSQL connectivity with a dedicated pool (1 second acquisition timeout, 1 second server statement timeout, 1.5 second transport fallback) and a 300 MiB heap limit. This does not validate schema or business operations. Returns HTTP 200 when both checks succeed, otherwise HTTP 503 with sanitized dependency status.",
@@ -1846,7 +1816,7 @@
             "bearer": []
           }
         ],
-        "summary": "View a public (non-private) media file",
+        "summary": "View a media file (private files need a session)",
         "tags": [
           "Media"
         ]
@@ -2076,260 +2046,6 @@
         "summary": "Mark all notifications as read",
         "tags": [
           "Notifications"
-        ]
-      }
-    },
-    "/api/v1/oauth/token": {
-      "post": {
-        "operationId": "OAuthController_token_v1",
-        "parameters": [],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/TokenRequestDto"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": ""
-          }
-        },
-        "summary": "Issue an access token (client_credentials grant)",
-        "tags": [
-          "OAuth"
-        ]
-      }
-    },
-    "/api/v1/oauth/clients": {
-      "post": {
-        "operationId": "OAuthController_create_v1",
-        "parameters": [],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/CreateOAuthClientDto"
-              }
-            }
-          }
-        },
-        "responses": {
-          "201": {
-            "description": ""
-          }
-        },
-        "security": [
-          {
-            "bearer": []
-          }
-        ],
-        "summary": "Register an OAuth client (returns the secret once)",
-        "tags": [
-          "OAuth"
-        ]
-      },
-      "get": {
-        "operationId": "OAuthController_findAll_v1",
-        "parameters": [
-          {
-            "name": "page",
-            "required": false,
-            "in": "query",
-            "schema": {
-              "default": 1,
-              "type": "number"
-            }
-          },
-          {
-            "name": "limit",
-            "required": false,
-            "in": "query",
-            "schema": {
-              "maximum": 100,
-              "default": 10,
-              "type": "number"
-            }
-          },
-          {
-            "name": "search",
-            "required": false,
-            "in": "query",
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "sort",
-            "required": false,
-            "in": "query",
-            "schema": {
-              "default": "createdAt",
-              "type": "string"
-            }
-          },
-          {
-            "name": "direction",
-            "required": false,
-            "in": "query",
-            "schema": {
-              "default": "DESC",
-              "type": "string",
-              "enum": [
-                "ASC",
-                "DESC"
-              ]
-            }
-          },
-          {
-            "name": "paginated",
-            "required": false,
-            "in": "query",
-            "schema": {
-              "type": "boolean"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": ""
-          }
-        },
-        "security": [
-          {
-            "bearer": []
-          }
-        ],
-        "summary": "List OAuth clients",
-        "tags": [
-          "OAuth"
-        ]
-      }
-    },
-    "/api/v1/oauth/clients/{id}": {
-      "get": {
-        "operationId": "OAuthController_findOne_v1",
-        "parameters": [
-          {
-            "name": "id",
-            "required": true,
-            "in": "path",
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": ""
-          }
-        },
-        "security": [
-          {
-            "bearer": []
-          }
-        ],
-        "summary": "Get an OAuth client by id",
-        "tags": [
-          "OAuth"
-        ]
-      },
-      "patch": {
-        "operationId": "OAuthController_update_v1",
-        "parameters": [
-          {
-            "name": "id",
-            "required": true,
-            "in": "path",
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/UpdateOAuthClientDto"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": ""
-          }
-        },
-        "security": [
-          {
-            "bearer": []
-          }
-        ],
-        "summary": "Update an OAuth client",
-        "tags": [
-          "OAuth"
-        ]
-      },
-      "delete": {
-        "operationId": "OAuthController_remove_v1",
-        "parameters": [
-          {
-            "name": "id",
-            "required": true,
-            "in": "path",
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": ""
-          }
-        },
-        "security": [
-          {
-            "bearer": []
-          }
-        ],
-        "summary": "Revoke (soft-delete) an OAuth client",
-        "tags": [
-          "OAuth"
-        ]
-      }
-    },
-    "/api/v1/oauth/clients/bulk-delete": {
-      "post": {
-        "operationId": "OAuthController_bulkRemove_v1",
-        "parameters": [],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/BulkDeleteDto"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": ""
-          }
-        },
-        "security": [
-          {
-            "bearer": []
-          }
-        ],
-        "summary": "Revoke (soft-delete) multiple OAuth clients",
-        "tags": [
-          "OAuth"
         ]
       }
     },
@@ -2696,12 +2412,14 @@
             "name": "category",
             "required": false,
             "in": "query",
+            "description": "Waste category, or UNCLASSIFIED for reports without one",
             "schema": {
               "type": "string",
               "enum": [
                 "ORGANIC_WASTE",
                 "PLASTIC_WASTE",
-                "PAPER_WASTE"
+                "PAPER_WASTE",
+                "UNCLASSIFIED"
               ]
             }
           },
@@ -4957,34 +4675,6 @@
           "role"
         ]
       },
-      "ReleaseNotesDto": {
-        "type": "object",
-        "properties": {
-          "version": {
-            "type": "string",
-            "example": "1.4.0"
-          },
-          "notes": {
-            "type": "string",
-            "description": "Release body in Markdown"
-          },
-          "publishedAt": {
-            "type": "string",
-            "format": "date-time",
-            "nullable": true
-          },
-          "url": {
-            "type": "string",
-            "description": "Release page URL"
-          }
-        },
-        "required": [
-          "version",
-          "notes",
-          "publishedAt",
-          "url"
-        ]
-      },
       "CreateInvitationDto": {
         "type": "object",
         "properties": {
@@ -5258,61 +4948,6 @@
           "data"
         ]
       },
-      "TokenRequestDto": {
-        "type": "object",
-        "properties": {
-          "grant_type": {
-            "type": "string",
-            "enum": [
-              "client_credentials"
-            ]
-          },
-          "client_id": {
-            "type": "string"
-          },
-          "client_secret": {
-            "type": "string"
-          },
-          "scope": {
-            "type": "string",
-            "description": "Space-delimited scopes to request (subset of the client's)."
-          }
-        },
-        "required": [
-          "grant_type",
-          "client_id",
-          "client_secret"
-        ]
-      },
-      "CreateOAuthClientDto": {
-        "type": "object",
-        "properties": {
-          "name": {
-            "type": "string",
-            "description": "Human-readable name for the client."
-          },
-          "scopes": {
-            "description": "Permission scopes this client may request.",
-            "type": "array",
-            "items": {
-              "type": "string"
-            }
-          }
-        },
-        "required": [
-          "name",
-          "scopes"
-        ]
-      },
-      "UpdateOAuthClientDto": {
-        "type": "object",
-        "properties": {
-          "isActive": {
-            "type": "boolean",
-            "description": "Enable or disable the client."
-          }
-        }
-      },
       "CreatePermissionDto": {
         "type": "object",
         "properties": {}
@@ -5541,7 +5176,26 @@
       },
       "UpdateReportDto": {
         "type": "object",
-        "properties": {}
+        "properties": {
+          "description": {
+            "type": "string",
+            "minLength": 3,
+            "maxLength": 2000
+          },
+          "mediaId": {
+            "type": "number"
+          },
+          "latitude": {
+            "type": "number",
+            "minimum": -90,
+            "maximum": 90
+          },
+          "longitude": {
+            "type": "number",
+            "minimum": -180,
+            "maximum": 180
+          }
+        }
       },
       "UpdateReportStatusDto": {
         "type": "object",
@@ -5617,7 +5271,8 @@
           "audience": {
             "type": "string",
             "enum": [
-              "admin"
+              "admin",
+              "mobile"
             ]
           },
           "lastActiveAt": {
@@ -5694,7 +5349,8 @@
           "audience": {
             "type": "string",
             "enum": [
-              "admin"
+              "admin",
+              "mobile"
             ]
           },
           "lastActiveAt": {

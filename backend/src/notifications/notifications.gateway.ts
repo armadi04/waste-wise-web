@@ -10,11 +10,21 @@ import { Logger } from '@nestjs/common';
 import { Notification } from './entities/notification.entity';
 import { JwtPayload } from '../auth/interfaces/jwt-payload.interface';
 import { AppRefreshService } from '../app-refresh/app-refresh.service';
+import { AuthService } from '../auth/auth.service';
+import { SessionsService } from '../sessions/sessions.service';
+
+/** Same allow-list as REST CORS; credentials only with an explicit list. */
+function socketCors() {
+  const origins = (process.env.ALLOWED_ORIGINS ?? '*')
+    .split(',')
+    .map((value) => value.trim())
+    .filter(Boolean);
+  if (!origins.length || origins.includes('*')) return { origin: '*' };
+  return { origin: origins, credentials: true };
+}
 
 @WebSocketGateway({
-  cors: {
-    origin: '*',
-  },
+  cors: socketCors(),
   namespace: 'notifications',
 })
 export class NotificationsGateway
@@ -28,6 +38,8 @@ export class NotificationsGateway
   constructor(
     private readonly jwtService: JwtService,
     private readonly appRefresh: AppRefreshService,
+    private readonly authService: AuthService,
+    private readonly sessionsService: SessionsService,
   ) {}
 
   /** Reads the accessToken from the raw Cookie header of the WS handshake. */
@@ -62,6 +74,27 @@ export class NotificationsGateway
       // two-factor challenge or a refresh token.
       if (payload.tokenType === '2fa' || payload.tokenType === 'refresh') {
         this.logger.warn(`Rejected non-session token: ${client.id}`);
+        client.disconnect();
+        return;
+      }
+      // Same revocation rules as JwtStrategy: signed-out tokens, revoked device
+      // sessions and deactivated accounts must not keep a live channel.
+      if (await this.authService.isTokenBlacklisted(token)) {
+        this.logger.warn(`Rejected blacklisted token: ${client.id}`);
+        client.disconnect();
+        return;
+      }
+      if (
+        payload.sessionId &&
+        !(await this.sessionsService.isActive(payload.sessionId))
+      ) {
+        this.logger.warn(`Rejected revoked session: ${client.id}`);
+        client.disconnect();
+        return;
+      }
+      const account = await this.authService.getProfile(payload.sub);
+      if (!account || account.isActive === false) {
+        this.logger.warn(`Rejected inactive account: ${client.id}`);
         client.disconnect();
         return;
       }

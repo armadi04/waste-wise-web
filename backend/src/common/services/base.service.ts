@@ -8,7 +8,7 @@ import {
   DeepPartial,
   FindOptionsWhere,
 } from 'typeorm';
-import { QueryDeepPartialEntity } from 'typeorm/query-builder/QueryPartialEntity';
+import type { QueryDeepPartialEntity } from 'typeorm';
 import { ApiProperty } from '@nestjs/swagger';
 import { EventEmitter2 } from '@nestjs/event-emitter';
 import { toFindOptionsRelations } from '@/common/helpers/find-options.util';

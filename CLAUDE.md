@@ -3,7 +3,7 @@
 These instructions apply to both independent Bun packages. Read the relevant
 [backend](backend/docs/AI_AGENT_GUIDE.md) or [admin](frontend/docs/AI_AGENT_GUIDE.md) guide
 before changing that package. Project guides own technical rules; this file owns shared
-workflow and release policy. User instructions take precedence.
+workflow and commit policy. User instructions take precedence.
 
 ## Working agreement
 
@@ -25,13 +25,10 @@ workflow and release policy. User instructions take precedence.
 - Commit/push only when explicitly requested. If working on master, create a branch first.
   Git author is armadi04. Preserve unrelated user changes.
 
-## Releases and review
+## Commits and review
 
-Use type(scope):description. Semantic-release cuts versions from master; do not tag manually
-or create CHANGELOG.md. Commit descriptions for feat/fix appear to users, so describe the
-resulting behavior and choose established frontend changelog scopes when applicable.
-PRs explain the behavior, validation and affected routes/search states; include screenshots
-or recordings for UI changes. Follow [Releasing](RELEASING.md) for release configuration.
+Use type(scope):description. PRs explain the behavior, validation and affected routes/search
+states; include screenshots or recordings for UI changes.
 
 ## Cross-project changes
 

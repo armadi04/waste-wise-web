@@ -71,6 +71,7 @@ describe('TwoFactorService', () => {
         {
           provide: ConfigService,
           useValue: {
+            getOrThrow: jest.fn(() => 'test-secret-value-1234'),
             get: jest.fn((key: string) =>
               key === 'JWT_SECRET' ? 'test-secret-value-1234' : 'WasteWise',
             ),

@@ -13,8 +13,8 @@ export interface UserSession {
   userAgent: string | null
   /** Set when an administrator opened this session by signing in as the user. */
   impersonatedById: number | null
-  /** Starter dashboard session policy. */
-  audience: 'admin'
+  /** `admin` = browser dashboard session, `mobile` = native app session. */
+  audience: 'admin' | 'mobile'
   lastActiveAt: string
   /** Idle deadline; slides on refresh, never past `absoluteExpiresAt`. */
   expiresAt: string

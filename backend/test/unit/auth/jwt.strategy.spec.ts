@@ -4,7 +4,6 @@ import type { FastifyRequest as Request } from 'fastify';
 import { describe, beforeEach, it, expect, jest } from 'bun:test';
 import { JwtStrategy } from '../../../src/auth/jwt.strategy';
 import { AuthService } from '../../../src/auth/auth.service';
-import { OAuthClientService } from '@/oauth/oauth-client.service';
 import { SessionsService } from '@/sessions/sessions.service';
 import type { JwtPayload } from '../../../src/auth/interfaces/jwt-payload.interface';
 
@@ -18,23 +17,20 @@ function makeRequest(token?: string): Request {
 describe('JwtStrategy', () => {
   let strategy: JwtStrategy;
   let authService: { isTokenBlacklisted: jest.Mock; getProfile: jest.Mock };
-  let oauthClientService: { getActiveClientScopes: jest.Mock };
   let sessionsService: { isActive: jest.Mock; touch: jest.Mock };
 
   beforeEach(() => {
     authService = { isTokenBlacklisted: jest.fn(), getProfile: jest.fn() };
-    oauthClientService = { getActiveClientScopes: jest.fn() };
     sessionsService = {
       isActive: jest.fn(() => Promise.resolve(true)),
       touch: jest.fn(() => Promise.resolve()),
     };
     const configService = {
-      get: jest.fn(() => 'test-secret'),
+      getOrThrow: jest.fn(() => 'test-secret'),
     } as unknown as ConfigService;
     strategy = new JwtStrategy(
       configService,
       authService as unknown as AuthService,
-      oauthClientService as unknown as OAuthClientService,
       sessionsService as unknown as SessionsService,
     );
   });
@@ -98,7 +94,7 @@ describe('JwtStrategy', () => {
     expect(result.emailVerified).toBe(true);
   });
 
-  it('should extract the token from the query string when no header is present', async () => {
+  it('does not accept a token from the query string', async () => {
     authService.isTokenBlacklisted.mockResolvedValue(false);
     authService.getProfile.mockResolvedValue({
       id: 1,
@@ -114,6 +110,6 @@ describe('JwtStrategy', () => {
 
     await strategy.validate(req, payload);
 
-    expect(authService.isTokenBlacklisted).toHaveBeenCalledWith('query-token');
+    expect(authService.isTokenBlacklisted).not.toHaveBeenCalled();
   });
 });

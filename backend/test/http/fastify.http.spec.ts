@@ -35,7 +35,6 @@ import { JwtStrategy } from '@/auth/jwt.strategy';
 import { CookieCsrfGuard } from '@/auth/cookie-csrf.guard';
 import { TurnstileService } from '@/auth/turnstile.service';
 import { TwoFactorService } from '@/auth/two-factor.service';
-import { OAuthClientService } from '@/oauth/oauth-client.service';
 import { SessionsService } from '@/sessions/sessions.service';
 import { UsersController } from '@/users/users.controller';
 import { UsersService } from '@/users/users.service';
@@ -195,7 +194,6 @@ async function createFixture(
       },
       { provide: TwoFactorService, useValue: { isEnabled: () => false } },
       { provide: SessionsService, useValue: { revokeBySessionId: mock() } },
-      { provide: OAuthClientService, useValue: {} },
       { provide: EventEmitter2, useValue: { emit: mock() } },
       {
         provide: MediaService,
@@ -237,11 +235,10 @@ describe('Fastify HTTP integration without database or external services', () =>
     await app?.close();
   });
 
-  it('accepts legacy unsigned JWT cookies, Bearer and query tokens through real Passport', async () => {
+  it('accepts legacy unsigned JWT cookies and Bearer tokens, never query tokens, through real Passport', async () => {
     for (const options of [
       { headers: { cookie: `accessToken=${encodeURIComponent(token)}` } },
       { headers: { authorization: `Bearer ${token}` } },
-      { query: { token } },
     ]) {
       const res = await app.inject({ url: '/api/v1/auth/me', ...options });
       expect(res.statusCode).toBe(200);
@@ -251,6 +248,10 @@ describe('Fastify HTTP integration without database or external services', () =>
         roles: ['admin'],
       });
     }
+    expect(
+      (await app.inject({ url: '/api/v1/auth/me', query: { token } }))
+        .statusCode,
+    ).toBe(401);
     for (const value of [
       'bad',
       `s:${token}.invalid`,

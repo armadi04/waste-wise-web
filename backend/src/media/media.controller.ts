@@ -17,9 +17,11 @@ import {
   HttpStatus,
   ClassSerializerInterceptor,
   NotFoundException,
+  UnauthorizedException,
 } from '@nestjs/common';
 import type { FastifyReply as Response } from 'fastify';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
+import { OptionalJwtAuthGuard } from '../auth/optional-jwt-auth.guard';
 import {
   ApiTags,
   ApiOperation,
@@ -85,7 +87,17 @@ export class MediaController {
     @UploadedFile() file: UploadedMultipartFile,
     @Req() req: IAuthRequest,
   ) {
-    const result = await this.mediaService.uploadFile(file, req.user.userId);
+    // Photo-report users upload images only; staff with media management
+    // rights may still upload documents, video and archives.
+    const manager =
+      req.user.roles.includes('superadmin') ||
+      req.user.permissions.includes('media.read_all');
+    const result = await this.mediaService.uploadFile(
+      file,
+      req.user.userId,
+      !manager,
+      true, // user uploads are private: served only to the owner and authorized staff
+    );
     await this.cacheService.clearKeys('*/media*');
     return result;
   }
@@ -142,20 +154,31 @@ export class MediaController {
   }
 
   /**
-   * Public endpoint to view a media file — unauthenticated so it can be used
-   * directly in `<img src>` / browser contexts that cannot send a bearer token.
-   * Only NON-private files are served here; private files (isPrivate) must go
-   * through the authenticated, ownership-checked `/stream` endpoint, otherwise a
-   * caller could read any user's private upload by enumerating the id (IDOR).
+   * View a media file. Public files (avatars) need no credentials. Private
+   * files (report photos and other user uploads) require a session (cookie for
+   * the web `<img>`, Bearer for native clients) and the same ownership /
+   * permission rule as `/stream`; staff who can read all reports may also view
+   * them. Anonymous callers get 401 so ids cannot be enumerated.
    */
   @Get(':id/view')
-  @ApiOperation({ summary: 'View a public (non-private) media file' })
-  async viewFile(@Param('id', MediaIdPipe) id: number, @Res() res: Response) {
+  @UseGuards(OptionalJwtAuthGuard)
+  @ApiOperation({ summary: 'View a media file (private files need a session)' })
+  async viewFile(
+    @Param('id', MediaIdPipe) id: number,
+    @Req() req: Partial<IAuthRequest>,
+    @Res() res: Response,
+  ) {
     const media = await this.mediaService.findOne(+id);
     if (media.isPrivate) {
-      throw new ForbiddenException(
-        'This media is private; use the authenticated stream endpoint.',
-      );
+      const user = req.user;
+      if (!user) throw new UnauthorizedException('Sign in to view this media');
+      const privileged =
+        user.roles.includes('superadmin') ||
+        user.permissions.includes('media.read_all') ||
+        user.permissions.includes('reports.read.all');
+      if (!privileged && media.userId !== user.userId) {
+        throw new ForbiddenException('You do not have access to this media');
+      }
     }
     const url = await this.mediaService.getSignedUrl(+id);
     return res.redirect(url, 302);

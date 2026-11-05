@@ -304,7 +304,11 @@ describe('UsersService', () => {
     });
 
     it('deactivates a user, saves the flag and revokes every session', async () => {
-      const target = { id: 2, email: 'target@b.com', roles: [] } as User;
+      const target = {
+        id: 2,
+        email: 'target@b.com',
+        roles: [],
+      } as unknown as User;
       const actor = {
         userId: 1,
         email: 'admin@b.com',

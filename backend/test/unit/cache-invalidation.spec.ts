@@ -29,13 +29,15 @@ describe('cross-resource cache invalidation', () => {
     for (const method of ['GET', 'HEAD'])
       expect(
         await firstValueFrom(
-          interceptor.intercept(context(method), { handle: () => of('ok') }),
+          await interceptor.intercept(context(method), {
+            handle: () => of('ok'),
+          }),
         ),
       ).toBe('ok');
     expect(clearKeys).not.toHaveBeenCalled();
     await expect(
       firstValueFrom(
-        interceptor.intercept(context('POST'), {
+        await interceptor.intercept(context('POST'), {
           handle: () => throwError(() => new Error('write failed')),
         }),
       ),
@@ -43,7 +45,7 @@ describe('cross-resource cache invalidation', () => {
     expect(clearKeys).not.toHaveBeenCalled();
     expect(
       await firstValueFrom(
-        interceptor.intercept(context('POST'), {
+        await interceptor.intercept(context('POST'), {
           handle: () => of({ saved: true }),
         }),
       ),

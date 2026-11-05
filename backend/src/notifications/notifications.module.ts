@@ -8,6 +8,8 @@ import { NotificationsService } from './notifications.service';
 import { NotificationsController } from './notifications.controller';
 import { NotificationsGateway } from './notifications.gateway';
 import { NotificationsListener } from './notifications.listener';
+import { AuthModule } from '../auth/auth.module';
+import { SessionsModule } from '../sessions/sessions.module';
 
 @Module({
   imports: [
@@ -15,13 +17,15 @@ import { NotificationsListener } from './notifications.listener';
     JwtModule.registerAsync({
       imports: [ConfigModule],
       useFactory: (configService: ConfigService) => ({
-        secret: configService.get<string>('JWT_SECRET') || 'secretKey',
+        secret: configService.getOrThrow<string>('JWT_SECRET'),
         signOptions: { expiresIn: '7d' },
       }),
       inject: [ConfigService],
     }),
     ConfigModule,
     AppRefreshModule,
+    AuthModule,
+    SessionsModule,
   ],
   controllers: [NotificationsController],
   providers: [

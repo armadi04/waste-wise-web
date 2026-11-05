@@ -17,14 +17,12 @@ import { User } from '../users/entities/user.entity';
 import { IsUniqueConstraint } from '../common/validators/is-unique.validator';
 import { TurnstileService } from './turnstile.service';
 import { TwoFactorService } from './two-factor.service';
-import { OAuthModule } from '../oauth/oauth.module';
 import { SessionsModule } from '../sessions/sessions.module';
 
 @Module({
   imports: [
     UsersModule,
     PassportModule,
-    OAuthModule,
     SessionsModule,
     TypeOrmModule.forFeature([
       BlacklistedToken,
@@ -36,7 +34,7 @@ import { SessionsModule } from '../sessions/sessions.module';
     JwtModule.registerAsync({
       imports: [ConfigModule],
       useFactory: (configService: ConfigService) => ({
-        secret: configService.get<string>('JWT_SECRET') || 'secretKey',
+        secret: configService.getOrThrow<string>('JWT_SECRET'),
         signOptions: { expiresIn: ACCESS_TOKEN_TTL },
       }),
       inject: [ConfigService],

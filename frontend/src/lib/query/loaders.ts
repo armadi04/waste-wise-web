@@ -4,11 +4,9 @@ import type { CurrentUser } from '@/types/auth'
 import type { QueryClient } from '@tanstack/react-query'
 import {
   auditLogsQueryOptions,
-  changelogQueryOptions,
   invitationsQueryOptions,
   mediaQueryOptions,
   notificationsQueryOptions,
-  oauthClientsQueryOptions,
   permissionsQueryOptions,
   profileQueryOptions,
   reportQueryOptions,
@@ -60,10 +58,6 @@ export async function loadAdminRoute(
       if (allowed('users.invite'))
         return queryClient.ensureQueryData(invitationsQueryOptions(search))
       return null
-    case '/oauth-clients':
-      if (allowed('oauth.clients.read'))
-        return queryClient.ensureQueryData(oauthClientsQueryOptions(search))
-      return null
     case '/media':
       if (allowed('media.read'))
         return queryClient.ensureQueryData(mediaQueryOptions(search))
@@ -82,8 +76,6 @@ export async function loadAdminRoute(
       return queryClient.ensureQueryData(
         notificationsQueryOptions(search.page ?? 1, search.limit ?? 10),
       )
-    case '/changelog':
-      return queryClient.ensureQueryData(changelogQueryOptions())
     default:
       return queryClient.ensureQueryData(sessionQueryOptions())
   }

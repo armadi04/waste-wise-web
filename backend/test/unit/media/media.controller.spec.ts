@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unnecessary-type-assertion -- needed by tsconfig.test.json (bundler resolution) */
 import 'reflect-metadata';
 import { describe, expect, it, mock } from 'bun:test';
 import type { IAuthRequest } from '@/auth/interfaces/auth-request.interface';
@@ -42,9 +43,12 @@ describe('media deletion authorization and serialization', () => {
       })),
       deleteMany,
     };
-    const controller = new MediaController(service, {
-      clearKeys: mock(async () => undefined),
-    });
+    const controller = new MediaController(
+      service as never,
+      {
+        clearKeys: mock(async () => undefined),
+      } as never,
+    );
     await expect(controller.bulkRemove({ ids: [1, 2] }, actor)).rejects.toThrow(
       'permission',
     );
@@ -66,10 +70,15 @@ describe('media deletion authorization and serialization', () => {
         .mockResolvedValueOnce({ userId: 7 }),
       deleteMany: mock(async () => result),
     };
-    const controller = new MediaController(service, {
-      clearKeys: mock(async () => undefined),
-    });
-    expect(await controller.bulkRemove({ ids: [1, 2] }, actor)).toEqual(result);
+    const controller = new MediaController(
+      service as never,
+      {
+        clearKeys: mock(async () => undefined),
+      } as never,
+    );
+    expect(await controller.bulkRemove({ ids: [1, 2] }, actor)).toEqual(
+      result as never,
+    );
   });
   it('does not serialize internal cleanup capabilities or location bindings', () => {
     const media = Object.assign(new Media(), {
@@ -91,5 +100,53 @@ describe('media deletion authorization and serialization', () => {
     ])
       expect(serialized[key]).toBeUndefined();
     expect(serialized.filename).toBe('public.pdf');
+  });
+});
+
+describe('media view access', () => {
+  const makeController = (isPrivate: boolean) =>
+    new MediaController(
+      {
+        findOne: mock(async () => ({ id: 5, userId: 7, isPrivate })),
+        getSignedUrl: mock(async () => 'https://signed.example/file'),
+      } as never,
+      { clearKeys: mock(async () => undefined) } as never,
+    );
+  const reply = () => {
+    const redirect = mock(() => undefined);
+    return { redirect, res: { redirect } as never };
+  };
+  const asUser = (
+    userId: number,
+    permissions: string[] = [],
+    roles: string[] = [],
+  ) => ({ user: { userId, permissions, roles } }) as never;
+
+  it('serves public media (avatars) anonymously', async () => {
+    const r = reply();
+    await makeController(false).viewFile(5, {} as never, r.res);
+    expect(r.redirect).toHaveBeenCalled();
+  });
+
+  it('refuses anonymous access to private media', async () => {
+    const r = reply();
+    await expect(
+      makeController(true).viewFile(5, {} as never, r.res),
+    ).rejects.toThrow('Sign in');
+    expect(r.redirect).not.toHaveBeenCalled();
+  });
+
+  it('refuses a different signed-in user without staff permission', async () => {
+    await expect(
+      makeController(true).viewFile(5, asUser(8), reply().res),
+    ).rejects.toThrow('do not have access');
+  });
+
+  it('allows the owner and report-reading staff', async () => {
+    for (const req of [asUser(7), asUser(1, ['reports.read.all'])]) {
+      const r = reply();
+      await makeController(true).viewFile(5, req, r.res);
+      expect(r.redirect).toHaveBeenCalled();
+    }
   });
 });

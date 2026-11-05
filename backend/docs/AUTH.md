@@ -19,6 +19,11 @@ Session lifetimes follow OWASP idle + absolute timeouts, per session `audience`
 | Audience | Opened by | Access JWT | Idle (max gap between refreshes) | Absolute (since login) |
 |---|---|---|---|---|
 | `admin` | dashboard password/Google/2FA, impersonation | 15 min | 2 h (`SESSION_ADMIN_IDLE_MINUTES`) | 8 h (`SESSION_ADMIN_ABSOLUTE_HOURS`) |
+| `mobile` | native app `/auth/mobile/*` sign-in | 15 min | same as `admin` | same as `admin` |
+
+The admin UI labels `admin` sessions as "Browser" and `mobile` sessions as "Mobile". The
+mobile app sends `User-Agent: WasteWise-Mobile/<version> (Android <release>; <brand> <model>)`.
+Sessions opened before the `mobile` audience existed stay `admin` until they expire.
 
 The `user_sessions` row is authoritative: `expiresAt` is the idle deadline, slid by each
 refresh but never past `absoluteExpiresAt`; refresh and every request are refused once either
@@ -54,7 +59,7 @@ TOTP; the helper is not a public email-OTP login endpoint.
 Request logs carry method, path (no query string) and status — never
 headers or cookies. Set `TRUST_PROXY` to verified proxy addresses/subnets when the API sits
 behind Caddy or another proxy so throttling and sessions see client IPs. Browser identity
-is read through `/api/v1/auth/me`. Mobile/machine clients may use explicit Bearer authorization.
+is read through `/api/v1/auth/me`. Mobile clients may use explicit Bearer authorization.
 
 ## Endpoints
 
@@ -65,6 +70,10 @@ All under `/api/v1/auth`. Tighter throttles protect the credential routes.
 | `POST /login` | — | 10/min | Email+password (+ Turnstile); sets cookies, returns `accessToken` — or a two-factor challenge |
 | `POST /google` | — | 10/min | Google sign-in (id-token or `ya29.` access-token) |
 | `POST /2fa/verify` | — | 5/min | Spend a challenge token + code; finishes the login |
+| `POST /mobile/google` | — | 10/min | Native app Google sign-in; opens a `mobile` session and returns `accessToken`, `refreshToken`, `sessionExpiresAt` in the body (no cookies) — or a two-factor challenge |
+| `POST /mobile/2fa/verify` | — | 5/min | Spend a mobile challenge token + code; returns the mobile session tokens |
+| `POST /mobile/refresh` | — (refresh token in body) | 20/min | Rotate the refresh token; returns new `accessToken`, `refreshToken`, `sessionExpiresAt` |
+| `POST /mobile/logout` | — (refresh token in body; optional Bearer access token is blacklisted) | 20/min | Revoke the mobile device session |
 | `GET /2fa` | `AuthGuard('jwt')` | default | Whether it's on, and recovery codes left |
 | `POST /2fa/setup` | `AuthGuard('jwt')` | 5/min | Start enrollment: secret, otpauth URL, QR data URL |
 | `POST /2fa/enable` | `AuthGuard('jwt')` | 5/min | Confirm with a code; returns the recovery codes |
@@ -88,13 +97,12 @@ All under `/api/v1/auth`. Tighter throttles protect the credential routes.
   then a legacy query token extractor. Browser clients use cookies; do not introduce new
   token-in-URL flows. It rejects blacklisted tokens, two-factor challenges
   and inactive device sessions, then reloads identity/permissions from the database.
-  Machine tokens re-check current client activity/scopes on each request.
   Returned identity includes userId/email/roles/permissions/emailVerified and optional
   activeRole, sessionId and impersonatorId. `/auth/me` exposes the controller projection.
 
 - **Google** — `AuthController.googleLogin` branches on the token: a `ya29.`-prefixed value
   is validated as a Google *access token*, anything else as an *id token*
-  (`google-auth-library`). Requires `GOOGLE_CLIENT_ID`.
+  (`google-auth-library`). Requires `GOOGLE_CLIENT_ID` (comma-separated client IDs); sign-in fails closed when empty. Access-token logins (`ya29.`) are checked with Google tokeninfo and rejected unless `aud`/`azp` is one of those clients.
 - **Turnstile** — `TurnstileService.verify` checks the Cloudflare CAPTCHA before login.
   Uses `TURNSTILE_SECRET` (`TURNSTILE_SECRET_KEY` is a legacy fallback).
   Required by default in staging/production; local development activates when a secret is set.
@@ -150,8 +158,7 @@ same rules (`GrantPolicyService`, `src/roles/grant-policy.service.ts`):
 
 - **Only grant what you hold.** Roles added to a user or invitation, and permissions added to
   a user or role, must consist of permissions the caller holds. Only additions are checked,
-  so a user or role may keep access the editor lacks. OAuth client updates apply the same
-  rule to scopes the client doesn't already have.
+  so a user or role may keep access the editor lacks.
 - **Superadmin is superadmin-only.** Only a superadmin can grant the `superadmin` role,
   change, re-role or delete a superadmin account, or edit, rename or delete the role.
 - **Access fields need manage_* permissions.** `roleIds` / `permissionIds` in `PATCH /users/:id`

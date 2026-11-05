@@ -27,7 +27,6 @@ export const SEEDED_PERMISSIONS: Array<{
   { name: 'menu.permissions', description: 'View permissions in sidebar' },
   { name: 'menu.media', description: 'View media library in sidebar' },
   { name: 'menu.invitations', description: 'View invitations in sidebar' },
-  { name: 'menu.oauth', description: 'View OAuth clients in sidebar' },
   { name: 'menu.sessions', description: 'View sessions in sidebar' },
   { name: 'menu.audit', description: 'View the audit trail in sidebar' },
   { name: 'menu.reports', description: 'View reports in sidebar' },
@@ -88,12 +87,6 @@ export const SEEDED_PERMISSIONS: Array<{
     description: 'Delete all media files regardless of ownership',
   },
   { name: 'media.delete', description: 'Delete media files' },
-
-  // OAuth2 client permissions (client_credentials management)
-  { name: 'oauth.clients.read', description: 'Read OAuth clients' },
-  { name: 'oauth.clients.create', description: 'Register OAuth clients' },
-  { name: 'oauth.clients.update', description: 'Update OAuth clients' },
-  { name: 'oauth.clients.delete', description: 'Revoke OAuth clients' },
 
   // Session permissions
   { name: 'sessions.read', description: 'Read every user session' },

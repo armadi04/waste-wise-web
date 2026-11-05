@@ -16,6 +16,17 @@ describe('session policy', () => {
     });
   });
 
+  it('gives mobile sessions the same lifetimes as browser sessions', () => {
+    const env = { SESSION_ADMIN_IDLE_MINUTES: '45' };
+    expect(sessionPolicy('mobile', env)).toEqual(sessionPolicy('admin', env));
+  });
+
+  it('rejects unknown audiences', () => {
+    expect(() => sessionPolicy('kiosk' as never, {})).toThrow(
+      'Unknown session audience',
+    );
+  });
+
   it('reads positive integer overrides and ignores invalid ones', () => {
     const env = {
       SESSION_ADMIN_IDLE_MINUTES: '30',

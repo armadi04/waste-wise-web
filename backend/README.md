@@ -15,8 +15,7 @@ bun run seed
 bun run start:dev
 ```
 
-GitHub Packages authentication is required for the SDK dependencies. API:
-`localhost:3000/api/v1`; Swagger: `/api/docs` outside production; health: `/api/v1/health`.
+API: `localhost:3000/api/v1`; Swagger: `/api/docs` outside production; health: `/api/v1/health`.
 
 `GET /api/v1` is public and returns only API identity:
 

@@ -180,7 +180,10 @@ export class AuthController {
     user: Omit<User, 'password'>,
     context: { ipAddress: string; userAgent: string },
   ) {
-    const tokens = await this.authService.login(user, { context });
+    const tokens = await this.authService.login(user, {
+      context,
+      audience: 'mobile',
+    });
     this.eventEmitter.emit('audit.record', {
       action: 'auth.login',
       actorId: user.id,

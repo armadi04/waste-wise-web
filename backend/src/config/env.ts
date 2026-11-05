@@ -94,7 +94,7 @@ const baseEnvSchema = z.object({
   REDIS_USERNAME: z.string().optional(),
   REDIS_PASSWORD: z.string().optional(),
 
-  // OAuth / CAPTCHA (optional)
+  // Google sign-in / CAPTCHA (optional)
   GOOGLE_CLIENT_ID: z.string().optional(),
   TURNSTILE_ENABLED: z.enum(['true', 'false', '1', '0']).optional(),
   TURNSTILE_ALLOWED_HOSTNAMES: z.string().optional(),
@@ -111,13 +111,6 @@ const baseEnvSchema = z.object({
   MAIL_FROM: z.string().email().optional(),
   MAIL_FROM_NAME: z.string().optional(),
 
-  // Release notes for the in-app changelog come from this repo's GitHub
-  // Releases. Both are optional so a fresh clone still boots — without a token
-  // the API is rate-limited by IP (and a private fork returns nothing), and the
-  // page then renders empty.
-  GITHUB_REPO: z.string().default('univSTEKOM/nestplate'),
-  GITHUB_TOKEN: z.string().optional(),
-
   // Rate limiting
   THROTTLE_TTL: z.coerce.number().default(60000),
   THROTTLE_LIMIT: z.coerce.number().default(100),
@@ -131,12 +124,18 @@ const baseEnvSchema = z.object({
 
   // ML service (optional; reports still save when unavailable)
   ML_SERVICE_URL: z.string().url().optional(),
+  // Shared secret sent as X-Internal-Token; must match the ML service's INTERNAL_TOKEN.
+  ML_SERVICE_TOKEN: z.string().min(16).optional(),
   ML_SERVICE_TIMEOUT_MS: z.coerce
     .number()
     .int()
     .min(1000)
     .max(60000)
     .default(15000),
+  // Reject classifications below this top-1 confidence (0-1). Unset keeps every
+  // prediction. The model has no "not waste" class, so this is the only guard
+  // against unrelated photos being forced into a category.
+  ML_MIN_CONFIDENCE: z.coerce.number().min(0).max(1).optional(),
 
   // App
   APP_URL: z.string().url().default('http://localhost:3001'),

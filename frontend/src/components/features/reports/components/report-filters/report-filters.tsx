@@ -1,10 +1,10 @@
 import type { ReportSearchParams } from '@/lib/schemas/reports'
-import type { ReportStatus, User, WasteCategory } from '@/types/api'
+import type { CategoryFilter, ReportStatus, User } from '@/types/api'
 import {
+  CATEGORY_FILTER_LABEL,
+  CATEGORY_FILTER_VALUES,
   REPORT_STATUS_LABEL,
   REPORT_STATUS_VALUES,
-  WASTE_CATEGORY_LABEL,
-  WASTE_CATEGORY_VALUES,
 } from '@/lib/constants/reports'
 
 interface ReportFiltersProps {
@@ -31,8 +31,7 @@ export function ReportFilters({
           onChange={(event) =>
             onChange({
               status: (event.target.value || undefined) as
-                | ReportStatus
-                | undefined,
+                ReportStatus | undefined,
             })
           }
         >
@@ -54,15 +53,14 @@ export function ReportFilters({
           onChange={(event) =>
             onChange({
               category: (event.target.value || undefined) as
-                | WasteCategory
-                | undefined,
+                CategoryFilter | undefined,
             })
           }
         >
           <option value="">All</option>
-          {WASTE_CATEGORY_VALUES.map((category) => (
+          {CATEGORY_FILTER_VALUES.map((category) => (
             <option key={category} value={category}>
-              {WASTE_CATEGORY_LABEL[category]}
+              {CATEGORY_FILTER_LABEL[category]}
             </option>
           ))}
         </select>
