@@ -62,7 +62,19 @@ export function LoginPage() {
   }
 
   return (
-    <AuthPageShell>
+    <AuthPageShell
+      footerStart={
+        // Cloudflare Turnstile — gates the submit button
+        <TurnstileWidget
+          widgetRef={turnstileWidgetRef}
+          onSuccess={onTurnstileSuccess}
+          onError={onTurnstileError}
+          onExpire={onTurnstileExpire}
+          onInvalidate={onTurnstileInvalidate}
+          onScriptError={onTurnstileScriptError}
+        />
+      }
+    >
       {/* Header */}
       <div className="space-y-3 text-center">
         <h1 className="text-2xl font-semibold tracking-tight text-foreground sm:text-[28px]">
@@ -147,18 +159,6 @@ export function LoginPage() {
             >
               Forgot password?
             </Link>
-          </div>
-
-          {/* Cloudflare Turnstile — gates the submit button */}
-          <div className="flex justify-center">
-            <TurnstileWidget
-              widgetRef={turnstileWidgetRef}
-              onSuccess={onTurnstileSuccess}
-              onError={onTurnstileError}
-              onExpire={onTurnstileExpire}
-              onInvalidate={onTurnstileInvalidate}
-              onScriptError={onTurnstileScriptError}
-            />
           </div>
 
           {turnstileError && (

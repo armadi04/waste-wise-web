@@ -156,7 +156,7 @@ Admin password and Google login use camelCase `twoFactorRequired`/`challengeToke
 ## Turnstile lifecycle
 
 Password login renders a default-width widget with action `admin-login` and the current
-application theme. The hook and widget share a lifecycle contract: invalidate
+application theme in the `AuthPageShell` `footerStart` slot (bottom-left, outside the card). The hook and widget share a lifecycle contract: invalidate
 readiness on expiry, challenge error, unsupported browser, theme change and unmount; reset
 after every password attempt, including transition to 2FA. Script errors or a 15-second widget
 loading timeout show a reload action; challenge failures offer verification retry.

@@ -35,8 +35,17 @@ vi.mock('@heroui/react', async (importOriginal) => ({
   ),
 }))
 vi.mock('@/components/layout/auth-page-shell/auth-page-shell', () => ({
-  AuthPageShell: ({ children }: { children: ReactNode }) => (
-    <div>{children}</div>
+  AuthPageShell: ({
+    children,
+    footerStart,
+  }: {
+    children: ReactNode
+    footerStart?: ReactNode
+  }) => (
+    <div>
+      {children}
+      {footerStart}
+    </div>
   ),
 }))
 vi.mock('@/components/ui/google-login-button/google-login-button', () => ({
