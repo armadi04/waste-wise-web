@@ -1506,14 +1506,13 @@ export interface components {
         Media: {
             id: number;
             /** @enum {string} */
-            provider: "depot" | "s3";
+            provider: "s3";
             storageProfile: string;
             filename: string;
             originalName: string | null;
             mimetype: string;
             size: number | null;
             path: string | null;
-            depotFileId: number | null;
             url: string | null;
             driveId: string | null;
             webviewLink: string | null;
@@ -1561,7 +1560,7 @@ export interface components {
             /** Format: date-time */
             twoFactorEnabledAt: string | null;
             /** @enum {string} */
-            registerMethod: "EMAIL_OTP" | "GOOGLE" | "INVITATION" | "SSO" | "SEEDER" | "UNKNOWN";
+            registerMethod: "EMAIL_OTP" | "GOOGLE" | "INVITATION" | "SEEDER" | "UNKNOWN";
             /**
              * @description Derived account state; populated by the API presenter.
              * @enum {string}
@@ -1755,7 +1754,6 @@ export interface components {
             ipAddress: string | null;
             userAgent: string | null;
             impersonatedById: number | null;
-            isSso: boolean;
             /** @enum {string} */
             audience: "admin";
             /** Format: date-time */
@@ -1780,7 +1778,6 @@ export interface components {
             ipAddress: string | null;
             userAgent: string | null;
             impersonatedById: number | null;
-            isSso: boolean;
             /** @enum {string} */
             audience: "admin";
             /** Format: date-time */
@@ -3954,7 +3951,7 @@ export interface operations {
                 /** @description Creation window in the selected report timezone, default Asia/Jakarta; 1m and 3m use 30 and 90 days. */
                 createdIn?: "today" | "7d" | "1m" | "3m";
                 /** @description Method used to first create the account. */
-                registerMethod?: "EMAIL_OTP" | "GOOGLE" | "INVITATION" | "SSO" | "SEEDER" | "UNKNOWN";
+                registerMethod?: "EMAIL_OTP" | "GOOGLE" | "INVITATION" | "SEEDER" | "UNKNOWN";
             };
             header?: never;
             path?: never;
