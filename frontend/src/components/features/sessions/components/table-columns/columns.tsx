@@ -1,11 +1,11 @@
-import { LogOut } from 'lucide-react'
+import { LogOut, Monitor, Smartphone } from 'lucide-react'
 import type { GetColumnsParams } from '@/components/features/sessions/components/table-columns/types'
 import type { Column } from '@/components/shared/datatable'
 import type { UserSession } from '@/lib/services/session.service'
 import { Chip } from '@/components/shared/controls'
 import { ActionMenu } from '@/components/shared/action-menu'
 import { formatBusinessDate as format } from '@/lib/utils/format'
-import { describeUserAgent } from '@/lib/utils/user-agent'
+import { describeUserAgent, sessionAudienceLabel } from '@/lib/utils/user-agent'
 
 import { statusOf } from '@/components/features/sessions/components/table-columns/lib/columns-helpers'
 
@@ -36,8 +36,19 @@ export const getColumns = ({
     render: (item) => (
       <div className="flex items-center gap-2">
         <span className="text-sm">{describeUserAgent(item.userAgent)}</span>
-        <Chip size="sm" variant="flat" color="default">
-          {item.audience === 'admin' ? 'Admin' : item.audience}
+        <Chip
+          size="sm"
+          variant="flat"
+          color="default"
+          startContent={
+            item.audience === 'mobile' ? (
+              <Smartphone size={12} aria-hidden />
+            ) : (
+              <Monitor size={12} aria-hidden />
+            )
+          }
+        >
+          {sessionAudienceLabel(item.audience)}
         </Chip>
         {item.impersonatedById !== null && (
           <Chip size="sm" variant="flat" color="warning">
@@ -46,7 +57,8 @@ export const getColumns = ({
         )}
       </div>
     ),
-    exportValue: (item) => describeUserAgent(item.userAgent),
+    exportValue: (item) =>
+      `${describeUserAgent(item.userAgent)} (${sessionAudienceLabel(item.audience)})`,
   },
   {
     name: 'IP Address',

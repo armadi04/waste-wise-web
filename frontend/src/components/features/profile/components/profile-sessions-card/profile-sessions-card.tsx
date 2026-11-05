@@ -2,7 +2,11 @@ import { Skeleton } from '@heroui/react'
 import { formatDistanceToNow } from 'date-fns'
 import { Monitor, Smartphone } from 'lucide-react'
 import { Button, Chip } from '@/components/shared/controls'
-import { describeUserAgent, isMobileUserAgent } from '@/lib/utils/user-agent'
+import {
+  describeUserAgent,
+  isMobileUserAgent,
+  sessionAudienceLabel,
+} from '@/lib/utils/user-agent'
 import { useMySessionsCard } from '@/hooks/sessions'
 
 /**
@@ -57,9 +61,11 @@ export function ProfileSessionsCard() {
       ) : (
         <div className="flex flex-col divide-y divide-default-100">
           {sessions.map((session) => {
-            const Icon = isMobileUserAgent(session.userAgent)
-              ? Smartphone
-              : Monitor
+            const Icon =
+              session.audience === 'mobile' ||
+              isMobileUserAgent(session.userAgent)
+                ? Smartphone
+                : Monitor
 
             return (
               <div
@@ -75,6 +81,9 @@ export function ProfileSessionsCard() {
                     <p className="truncate text-sm font-semibold text-foreground">
                       {describeUserAgent(session.userAgent)}
                     </p>
+                    <Chip size="sm" variant="flat" color="default">
+                      {sessionAudienceLabel(session.audience)}
+                    </Chip>
                     {session.isCurrent && (
                       <Chip size="sm" variant="flat" color="success">
                         This device
