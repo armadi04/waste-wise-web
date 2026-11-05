@@ -54,7 +54,7 @@ TOTP; the helper is not a public email-OTP login endpoint.
 Request logs carry method, path (no query string) and status — never
 headers or cookies. Set `TRUST_PROXY` to verified proxy addresses/subnets when the API sits
 behind Caddy or another proxy so throttling and sessions see client IPs. Browser identity
-is read through `/api/v1/auth/me`. Mobile/machine clients may use explicit Bearer authorization.
+is read through `/api/v1/auth/me`. Mobile clients may use explicit Bearer authorization.
 
 ## Endpoints
 
@@ -88,7 +88,6 @@ All under `/api/v1/auth`. Tighter throttles protect the credential routes.
   then a legacy query token extractor. Browser clients use cookies; do not introduce new
   token-in-URL flows. It rejects blacklisted tokens, two-factor challenges
   and inactive device sessions, then reloads identity/permissions from the database.
-  Machine tokens re-check current client activity/scopes on each request.
   Returned identity includes userId/email/roles/permissions/emailVerified and optional
   activeRole, sessionId and impersonatorId. `/auth/me` exposes the controller projection.
 
@@ -150,8 +149,7 @@ same rules (`GrantPolicyService`, `src/roles/grant-policy.service.ts`):
 
 - **Only grant what you hold.** Roles added to a user or invitation, and permissions added to
   a user or role, must consist of permissions the caller holds. Only additions are checked,
-  so a user or role may keep access the editor lacks. OAuth client updates apply the same
-  rule to scopes the client doesn't already have.
+  so a user or role may keep access the editor lacks.
 - **Superadmin is superadmin-only.** Only a superadmin can grant the `superadmin` role,
   change, re-role or delete a superadmin account, or edit, rename or delete the role.
 - **Access fields need manage_* permissions.** `roleIds` / `permissionIds` in `PATCH /users/:id`

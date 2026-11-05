@@ -118,7 +118,7 @@ describe('MediaService lifecycle', () => {
     expect(repository.save).not.toHaveBeenCalled();
     expect(adapter.upload).not.toHaveBeenCalled();
   });
-  it('never treats an OAuth client sentinel as unrestricted ownership', async () => {
+  it('never treats user id 0 as unrestricted ownership', async () => {
     await service.findAllMedia(0);
     expect(repository.find).toHaveBeenCalledWith(
       expect.objectContaining({ where: { state: 'ready', userId: 0 } }),

@@ -13,10 +13,6 @@ export interface AuthenticatedUser {
   // Device-session id backing this token, so the sessions endpoints can tell
   // which row is "this device" and logout can revoke exactly it.
   sessionId?: string;
-  // Set for OAuth2 client_credentials principals; `permissions` holds the
-  // granted scopes so @Permissions() guards apply uniformly.
-  isClient?: boolean;
-  clientId?: string;
 }
 
 export interface IAuthRequest extends Request<{

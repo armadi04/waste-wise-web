@@ -16,12 +16,10 @@ export interface JwtPayload {
   // Our own device-session id (UserSession.sessionId). Present on every user
   // login; the JWT strategy rejects the token once that session is revoked.
   sessionId?: string;
-  // Machine (client_credentials) tokens, or the short-lived token that stands
-  // between a correct password and a verified second factor. 'user' marks an
+  // The short-lived token that stands between a correct password and a
+  // verified second factor. 'user' marks an
   // access token and 'refresh' a refresh token; tokens minted before the type
   // existed carry none and are treated as legacy user tokens.
-  tokenType?: 'user' | 'client' | '2fa' | 'refresh';
+  tokenType?: 'user' | '2fa' | 'refresh';
   jti?: string;
-  client_id?: string;
-  scopes?: string[];
 }

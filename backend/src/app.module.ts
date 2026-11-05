@@ -22,7 +22,6 @@ import { EventEmitterModule } from '@nestjs/event-emitter';
 import { NotificationsModule } from './notifications/notifications.module';
 import { MailModule } from './mail/mail.module';
 import { HealthModule } from './health/health.module';
-import { OAuthModule } from './oauth/oauth.module';
 import { SessionsModule } from './sessions/sessions.module';
 import { ScheduleModule } from '@nestjs/schedule';
 import { AuditModule } from './audit/audit.module';
@@ -156,7 +155,6 @@ const initLogger = pino({
     NotificationsModule,
     MailModule,
     HealthModule,
-    OAuthModule,
     SessionsModule,
     ScheduleModule.forRoot(),
     AuditModule,

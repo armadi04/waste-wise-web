@@ -17,14 +17,12 @@ import { User } from '../users/entities/user.entity';
 import { IsUniqueConstraint } from '../common/validators/is-unique.validator';
 import { TurnstileService } from './turnstile.service';
 import { TwoFactorService } from './two-factor.service';
-import { OAuthModule } from '../oauth/oauth.module';
 import { SessionsModule } from '../sessions/sessions.module';
 
 @Module({
   imports: [
     UsersModule,
     PassportModule,
-    OAuthModule,
     SessionsModule,
     TypeOrmModule.forFeature([
       BlacklistedToken,

@@ -28,7 +28,6 @@ export type PermissionType =
   | 'roles.update'
   | 'roles.delete'
   | 'roles.manage_permissions'
-  | 'menu.oauth'
   | 'menu.sessions'
   | 'menu.audit'
   | 'audit.read'
@@ -44,8 +43,4 @@ export type PermissionType =
   | 'reports.status.update'
   | 'sessions.read'
   | 'sessions.delete'
-  | 'oauth.clients.read'
-  | 'oauth.clients.create'
-  | 'oauth.clients.update'
-  | 'oauth.clients.delete'
   | 'app.force_refresh';

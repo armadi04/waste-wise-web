@@ -521,8 +521,8 @@ export class AuthService {
 
   /**
    * Identify the session behind a logout, even once the access token expired:
-   * signature is still required, expiry is not. Challenge and machine tokens
-   * never identify a user session.
+   * signature is still required, expiry is not. Challenge tokens never
+   * identify a user session.
    */
   sessionFromTokens(
     tokens: Array<string | undefined>,
@@ -533,8 +533,7 @@ export class AuthService {
         const payload = this.jwtService.verify<JwtPayload>(token, {
           ignoreExpiration: true,
         });
-        if (payload.tokenType === '2fa' || payload.tokenType === 'client')
-          continue;
+        if (payload.tokenType === '2fa') continue;
         return {
           userId: payload.sub,
           email: payload.email,
@@ -579,7 +578,7 @@ export class AuthService {
     } catch {
       throw new UnauthorizedException('Invalid or expired refresh token');
     }
-    // Only refresh tokens refresh. Access, machine and especially two-factor
+    // Only refresh tokens refresh. Access and especially two-factor
     // challenge tokens are rejected — a challenge token placed in the cookie
     // would otherwise skip the second factor. Untyped tokens predate typing and
     // stay accepted until they expire (at most 7 days after deploy).

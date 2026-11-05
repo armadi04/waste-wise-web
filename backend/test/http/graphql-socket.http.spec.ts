@@ -15,7 +15,6 @@ import { AllExceptionsFilter } from '@/common/filters/all-exceptions.filter';
 import { GqlThrottlerGuard } from '@/common/guards/gql-throttler.guard';
 import { JwtStrategy } from '@/auth/jwt.strategy';
 import { AuthService } from '@/auth/auth.service';
-import { OAuthClientService } from '@/oauth/oauth-client.service';
 import { SessionsService } from '@/sessions/sessions.service';
 import { GraphqlApiModule } from '@/graphql/graphql-api.module';
 import { DataloaderModule } from '@/graphql/dataloaders/dataloader.module';
@@ -66,7 +65,6 @@ const services = [
     MediaService,
     NotificationsService,
     InvitationsService,
-    OAuthClientService,
     SessionsService,
   ].map((provide) => ({ provide, useValue: {} })),
   {

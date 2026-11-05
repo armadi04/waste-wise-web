@@ -29,7 +29,7 @@ there is no root package-manager workspace.
 | Users | Existing user management plus activate/deactivate, session revocation, account status and role names |
 | Dashboard and tables | Role-aware report statistics, Recharts distributions, sortable/searchable/paginated DataTable, Excel export |
 | PWA | Installable frontend, production service worker and update handling |
-| GraphQL | Optional schema-first API, DataLoaders and OAuth client credentials |
+| GraphQL | Optional schema-first API, DataLoaders and RBAC-guarded resolvers |
 | Email | SMTP outbox with retries; no mail-provider API dependency |
 
 ## Tech stack
@@ -112,7 +112,7 @@ E2E suites are opt-in; default test scripts run unit tests.
 | [Auth](backend/docs/AUTH.md) | Change sessions, providers, 2FA, verification or RBAC |
 | [Adding features](backend/docs/ADDING_FEATURES.md) | Implement a CRUD resource end-to-end |
 | [Operations](backend/docs/OPERATIONS.md) | Configure media providers, SMTP and deployment |
-| [GraphQL](backend/docs/GRAPHQL.md) | Enable the optional API and machine clients |
+| [GraphQL](backend/docs/GRAPHQL.md) | Enable the optional API |
 | [Naming](backend/docs/NAMING_CONVENTIONS.md) | Choose filenames, identifiers and schema names |
 | [Agent guide](backend/docs/AI_AGENT_GUIDE.md) | Follow implementation and verification conventions |
 

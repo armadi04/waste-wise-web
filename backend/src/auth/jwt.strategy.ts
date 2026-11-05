@@ -5,13 +5,12 @@ import { ConfigService } from '@nestjs/config';
 import { AuthService } from './auth.service';
 import type { FastifyRequest as Request } from 'fastify';
 import { JwtPayload } from './interfaces/jwt-payload.interface';
-import { OAuthClientService } from '@/oauth/oauth-client.service';
 import { SessionsService } from '@/sessions/sessions.service';
 
 /**
  * Reads the JWT from the httpOnly `accessToken` cookie. Browser (SPA) sessions
  * authenticate this way so the token is never exposed to page JavaScript;
- * mobile / third-party / OAuth clients keep using the Authorization header.
+ * mobile and third-party clients keep using the Authorization header.
  */
 const cookieExtractor = (req: Request): string | null => {
   const cookies = req.cookies as Record<string, unknown> | undefined;
@@ -24,7 +23,6 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
   constructor(
     configService: ConfigService,
     private authService: AuthService,
-    private oauthClientService: OAuthClientService,
     private sessionsService: SessionsService,
   ) {
     super({
@@ -65,33 +63,6 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
       throw new UnauthorizedException(
         'Refresh tokens cannot authenticate requests',
       );
-    }
-
-    // OAuth2 client_credentials principal: no user record; the token carries
-    // its own scopes. Re-derive the effective scopes from the client's CURRENT
-    // grant on every request, so deactivating/deleting the client (null) or
-    // reducing its scopes takes effect immediately rather than lingering until
-    // the token TTL expires. Effective = token scopes ∩ current client scopes.
-    if (payload.tokenType === 'client') {
-      const clientId = payload.client_id ?? '';
-      const currentScopes =
-        await this.oauthClientService.getActiveClientScopes(clientId);
-      if (currentScopes === null) {
-        throw new UnauthorizedException('Client is inactive or revoked');
-      }
-      const tokenScopes = payload.scopes ?? [];
-      const effectiveScopes = tokenScopes.filter((s) =>
-        currentScopes.includes(s),
-      );
-      return {
-        userId: 0,
-        email: clientId,
-        roles: [],
-        permissions: effectiveScopes,
-        emailVerified: true,
-        isClient: true,
-        clientId,
-      };
     }
 
     // Device sessions signed out from the profile page (or by an admin) stop

@@ -94,7 +94,7 @@ const baseEnvSchema = z.object({
   REDIS_USERNAME: z.string().optional(),
   REDIS_PASSWORD: z.string().optional(),
 
-  // OAuth / CAPTCHA (optional)
+  // Google sign-in / CAPTCHA (optional)
   GOOGLE_CLIENT_ID: z.string().optional(),
   TURNSTILE_ENABLED: z.enum(['true', 'false', '1', '0']).optional(),
   TURNSTILE_ALLOWED_HOSTNAMES: z.string().optional(),

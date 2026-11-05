@@ -94,8 +94,7 @@ bounded batches. Failed cleanup retries indefinitely with backoff capped at one 
 Monitor pending/deleting age, cleanupAttempts and cleanupErrorCode; investigate sustained retries.
 
 Local ownership and `media.read_all`/`media.delete_all` gates remain provider-independent.
-OAuth clients cannot upload user-owned media; a client with only `media.read` has no owned
-records. Global client lists require `media.read_all` in addition to `media.read`.
+Global media lists require `media.read_all` in addition to `media.read`.
 Public view redirects honor `isPrivate`; metadata/stream routes require authorization.
 Deletion first durably marks the row deleting and detaches avatar references, then removes the
 remote object and soft-deletes metadata. `queued` means the worker will retry; the file is already
@@ -195,7 +194,6 @@ Configure the following before deployment, keeping the deployment origin unchang
 | Consumer | Previous path | New path | Action |
 |---|---|---|---|
 | Hosting/load balancer probe | `/api/health` | `/api/v1/health` | Change the HTTP probe path; retain the existing port and response criteria. |
-| Machine token consumer | `/api/oauth/token` | `/api/v1/oauth/token` | Update the token endpoint configuration and all REST resource URLs. |
 | External REST clients | `/api/<resource>` | `/api/v1/<resource>` | Update the configured API base or operation paths exactly once. |
 
 The Caddy and Vite `/api` matchers already cover `/api/v1`; do not strip or

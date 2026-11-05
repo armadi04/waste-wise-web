@@ -30,7 +30,7 @@ The starter baseline requires a new database. Applied migrations are immutable.
 
 | Location | Responsibility |
 |---|---|
-| `auth/`, `oauth/`, `sessions/` | Identity, factors, providers, RBAC, machine clients, device sessions |
+| `auth/`, `sessions/` | Identity, factors, providers, RBAC, device sessions |
 | `users/`, `roles/`, `permissions/`, `invitations/` | Administrative resources |
 | `media/` | Ownership and the S3 storage adapter |
 | `mail/` | Templates, SMTP outbox, retries and redaction |
