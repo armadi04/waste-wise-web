@@ -3846,7 +3846,6 @@
                 "EMAIL_OTP",
                 "GOOGLE",
                 "INVITATION",
-                "SSO",
                 "SEEDER",
                 "UNKNOWN"
               ]
@@ -4691,7 +4690,6 @@
           "provider": {
             "type": "string",
             "enum": [
-              "depot",
               "s3"
             ]
           },
@@ -4714,10 +4712,6 @@
           },
           "path": {
             "type": "string",
-            "nullable": true
-          },
-          "depotFileId": {
-            "type": "number",
             "nullable": true
           },
           "url": {
@@ -4757,7 +4751,6 @@
           "mimetype",
           "size",
           "path",
-          "depotFileId",
           "url",
           "driveId",
           "webviewLink",
@@ -4908,7 +4901,6 @@
               "EMAIL_OTP",
               "GOOGLE",
               "INVITATION",
-              "SSO",
               "SEEDER",
               "UNKNOWN"
             ]
@@ -5622,9 +5614,6 @@
             "type": "number",
             "nullable": true
           },
-          "isSso": {
-            "type": "boolean"
-          },
           "audience": {
             "type": "string",
             "enum": [
@@ -5668,7 +5657,6 @@
           "ipAddress",
           "userAgent",
           "impersonatedById",
-          "isSso",
           "audience",
           "lastActiveAt",
           "expiresAt",
@@ -5702,9 +5690,6 @@
           "impersonatedById": {
             "type": "number",
             "nullable": true
-          },
-          "isSso": {
-            "type": "boolean"
           },
           "audience": {
             "type": "string",
@@ -5745,7 +5730,6 @@
           "ipAddress",
           "userAgent",
           "impersonatedById",
-          "isSso",
           "audience",
           "lastActiveAt",
           "expiresAt",
