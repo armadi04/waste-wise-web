@@ -63,8 +63,8 @@ export function DataTableToolbar<T extends { id: string | number }>({
   trailingActions,
 }: Props<T>) {
   return (
-    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-3 border-b border-default-200">
-      <div className="flex items-center gap-2 w-full sm:w-auto sm:flex-1">
+    <div className="flex flex-wrap items-center gap-2 p-3 border-b border-default-200">
+      <div className="contents">
         {/* Only render the search control when a handler is wired — an inert
               box on a static table is misleading (finding #24). */}
         {onSearch && (
@@ -83,7 +83,7 @@ export function DataTableToolbar<T extends { id: string | number }>({
             type="search"
             defaultValue={initialSearch}
             onValueChange={handleSearch}
-            className="w-full sm:max-w-xs"
+            className="order-1 w-full shrink-0 sm:w-72"
             classNames={{
               inputWrapper:
                 'pr-1 border border-default-200 bg-background shadow-none data-[hover=true]:bg-background group-data-[focus=true]:border-primary',
@@ -91,11 +91,13 @@ export function DataTableToolbar<T extends { id: string | number }>({
           />
         )}
         {headerSlot && (
-          <div className="flex items-center gap-2 shrink-0">{headerSlot}</div>
+          <div className="order-2 w-full min-w-0 sm:order-4">
+            {headerSlot}
+          </div>
         )}
         {/* Bulk-action controls, inline with the search bar */}
         {enableSelection && selectedIds.length > 0 && (
-          <div className="flex h-8 items-center gap-1.5 shrink-0 rounded-large border border-default-200 bg-background pl-3 pr-1">
+          <div className="order-4 flex h-8 items-center gap-1.5 shrink-0 rounded-large border border-default-200 bg-background pl-3 pr-1">
             <span className="text-xs text-default-500 whitespace-nowrap">
               <span className="font-semibold text-foreground">
                 {selectedIds.length}
@@ -118,7 +120,7 @@ export function DataTableToolbar<T extends { id: string | number }>({
         )}
       </div>
 
-      <div className="flex flex-wrap items-center gap-2 justify-start sm:justify-end">
+      <div className="order-3 flex w-full flex-wrap items-center gap-2 sm:ml-auto sm:w-auto">
         {headerActions}
         <Dropdown classNames={{ content: 'shadow-xl' }}>
           <DropdownTrigger>
