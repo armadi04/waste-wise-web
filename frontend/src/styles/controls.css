@@ -151,6 +151,20 @@
   ) {
   background: var(--app-surface-pressed);
 }
+/* Current-route state for nav buttons built on the light Button (bottom nav and
+   its drawer). Unlayered `.app-light` above would otherwise wipe the NAV_ACTIVE
+   utility classes, leaving the active item unmarked. */
+.app-button.app-light:is([aria-current='page'], [data-active='true']),
+.app-button.app-light:is([aria-current='page'], [data-active='true']):is(
+    :hover,
+    :active,
+    [data-hover='true'],
+    [data-pressed='true']
+  ) {
+  background: var(--app-selected-background);
+  color: var(--app-selected-foreground);
+  font-weight: 600;
+}
 .app-chip [data-slot='content'],
 .app-button > span {
   color: inherit;
