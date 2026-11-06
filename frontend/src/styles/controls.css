@@ -495,3 +495,47 @@ a:not(.app-button):hover {
 .app-status-info :is(p, span, svg) {
   color: var(--app-info-foreground);
 }
+
+/* Chips never outgrow their container; long labels (emails, filenames) ellipsize. */
+.app-chip {
+  max-width: 100%;
+}
+.app-chip [data-slot='content'] {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Touch devices: keep interactive controls at a comfortable tap size and stop
+   iOS from zooming focused fields (needs >=16px). Desktop (fine pointer)
+   keeps the compact sizing untouched. */
+@media (pointer: coarse) {
+  .app-button {
+    min-height: 2.5rem;
+    min-width: 2.5rem;
+  }
+  .app-field-control {
+    min-height: 2.75rem;
+  }
+  .app-field-text,
+  .app-field [data-slot='input'],
+  .app-field [data-slot='value'],
+  select.app-field-control {
+    font-size: 16px;
+  }
+  select.app-field-control {
+    min-height: 2.5rem;
+  }
+  .app-dropdownitem {
+    min-height: 2.5rem;
+  }
+  .app-choice {
+    min-height: 2.5rem;
+  }
+  [role='tab'] {
+    min-height: 2.5rem;
+  }
+  [data-slot='wrapper'] > :is([data-slot='item'], [data-slot='prev'], [data-slot='next']) {
+    min-width: 2.5rem;
+    min-height: 2.5rem;
+  }
+}
