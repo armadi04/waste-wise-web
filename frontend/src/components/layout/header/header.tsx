@@ -73,7 +73,7 @@ export const Header = () => {
           >
             <Link
               to="/"
-              className="shrink-0 font-medium text-[var(--app-link)] transition-colors hover:text-[var(--app-link-hover)]"
+              className="-my-2 shrink-0 py-2 font-medium text-[var(--app-link)] transition-colors hover:text-[var(--app-link-hover)]"
             >
               Home
             </Link>
@@ -83,7 +83,7 @@ export const Header = () => {
                 {bc.href && !bc.isCurrent ? (
                   <Link
                     to={bc.href}
-                    className="truncate font-medium text-[var(--app-link)] transition-colors hover:text-[var(--app-link-hover)]"
+                    className="-my-2 truncate py-2 font-medium text-[var(--app-link)] transition-colors hover:text-[var(--app-link-hover)]"
                   >
                     {bc.label}
                   </Link>

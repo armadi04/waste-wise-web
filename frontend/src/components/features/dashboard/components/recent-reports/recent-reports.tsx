@@ -29,7 +29,10 @@ export function RecentReports({
             Latest waste reports visible to you.
           </p>
         </div>
-        <Link to="/reports" className="text-sm text-[var(--app-link)]">
+        <Link
+          to="/reports"
+          className="-my-2 shrink-0 py-2 text-sm text-[var(--app-link)]"
+        >
           View all
         </Link>
       </div>
