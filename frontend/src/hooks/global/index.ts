@@ -19,3 +19,4 @@ export { useTheme } from './use-theme'
 export { useTimeZoneSynchronization } from './use-time-zone'
 
 export { useDataTableState } from './use-data-table-state'
+export { useMediaQuery } from './use-media-query'

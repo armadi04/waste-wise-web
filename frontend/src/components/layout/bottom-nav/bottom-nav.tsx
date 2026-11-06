@@ -1,4 +1,5 @@
 import {
+  Avatar,
   Badge,
   Divider,
   DrawerBody,
@@ -7,7 +8,8 @@ import {
   ScrollShadow,
   useDisclosure,
 } from '@heroui/react'
-import { MoreHorizontal } from 'lucide-react'
+import { useLocation, useNavigate } from '@tanstack/react-router'
+import { ChevronRight, MoreHorizontal } from 'lucide-react'
 import { Button, Drawer } from '@/components/shared/controls'
 import {
   BAR_KEYS,
@@ -20,7 +22,11 @@ import { NAV_ACTIVE_CLASSES, NAV_IDLE_CLASSES } from '@/lib/constants/nav'
 import { MobileNavItem } from '@/components/layout/bottom-nav/child/mobile-nav-item'
 
 export const BottomNav = () => {
-  const { activeKey, filteredSidebarData, handleSelect } = useSidebarLogic()
+  const { activeKey, filteredSidebarData, handleSelect, profile } =
+    useSidebarLogic()
+  const navigate = useNavigate()
+  const { pathname } = useLocation()
+  const isProfileActive = pathname.startsWith('/profile')
   const { data: unreadCount = 0 } = useUnreadCount()
 
   const { isOpen, onOpen, onOpenChange } = useDisclosure()
@@ -32,7 +38,8 @@ export const BottomNav = () => {
     allItems.find((item) => item.key === key),
   ).filter((item): item is NonNullable<typeof item> => Boolean(item))
   const topItemKeys = new Set(topItems.map((item) => item.key))
-  const isMoreActive = activeKey !== null && !topItemKeys.has(activeKey)
+  const isMoreActive =
+    isProfileActive || (activeKey !== null && !topItemKeys.has(activeKey))
   const normalizedUnreadCount =
     typeof unreadCount === 'number' && unreadCount > 0 ? unreadCount : 0
   const unreadLabel = normalizedUnreadCount > 99 ? '99+' : normalizedUnreadCount
@@ -125,6 +132,46 @@ export const BottomNav = () => {
               <DrawerBody className="pt-4 pb-10">
                 <ScrollShadow className="max-h-[60vh]">
                   <div className="flex flex-col gap-6">
+                    {profile && (
+                      <Button
+                        variant="light"
+                        aria-label="My profile"
+                        aria-current={isProfileActive ? 'page' : undefined}
+                        onPress={() => {
+                          void navigate({
+                            to: '/profile',
+                            viewTransition: true,
+                          })
+                          onClose()
+                        }}
+                        className={`h-auto w-full justify-start gap-3 rounded-large border border-divider/60 px-4 py-3 text-left ${
+                          isProfileActive
+                            ? NAV_ACTIVE_CLASSES
+                            : NAV_IDLE_CLASSES
+                        }`}
+                      >
+                        <Avatar
+                          src={profile.avatar?.url || undefined}
+                          name={profile.fullname?.charAt(0)}
+                          size="sm"
+                          isBordered
+                          color="primary"
+                          className="shrink-0"
+                        />
+                        <span className="flex min-w-0 flex-1 flex-col items-start">
+                          <span className="w-full truncate text-sm font-semibold">
+                            {profile.fullname}
+                          </span>
+                          <span className="w-full truncate text-xs text-default-500">
+                            {profile.email}
+                          </span>
+                        </span>
+                        <ChevronRight
+                          size={18}
+                          className="shrink-0 text-default-400"
+                        />
+                      </Button>
+                    )}
                     {filteredSidebarData.map((group, groupIdx) => (
                       <div key={group.title} className="flex flex-col gap-3">
                         <p className="text-xs font-semibold text-default-400 uppercase tracking-widest px-4">

@@ -15,6 +15,7 @@ import {
   PanelLeft,
   Repeat,
   Search,
+  User,
   UserCog,
 } from 'lucide-react'
 import { useState } from 'react'
@@ -72,7 +73,7 @@ export const Header = () => {
           >
             <Link
               to="/"
-              className="shrink-0 font-medium text-[var(--app-link)] transition-colors hover:text-[var(--app-link-hover)]"
+              className="-my-2 shrink-0 py-2 font-medium text-[var(--app-link)] transition-colors hover:text-[var(--app-link-hover)]"
             >
               Home
             </Link>
@@ -82,7 +83,7 @@ export const Header = () => {
                 {bc.href && !bc.isCurrent ? (
                   <Link
                     to={bc.href}
-                    className="truncate font-medium text-[var(--app-link)] transition-colors hover:text-[var(--app-link-hover)]"
+                    className="-my-2 truncate py-2 font-medium text-[var(--app-link)] transition-colors hover:text-[var(--app-link-hover)]"
                   >
                     {bc.label}
                   </Link>
@@ -171,7 +172,7 @@ export const Header = () => {
                     key="info"
                     className="h-14 gap-2"
                     textValue="Signed in as"
-                    onPress={() => void navigate({ to: '/profile' })}
+                    isReadOnly
                   >
                     <p className="font-semibold">Signed in as</p>
                     <p className="font-semibold">{profile?.email}</p>
@@ -241,6 +242,13 @@ export const Header = () => {
                     </DropdownItem>
                   ) : null}
                   <DropdownSection showDivider>
+                    <DropdownItem
+                      key="profile"
+                      startContent={<User size={18} />}
+                      onPress={() => void navigate({ to: '/profile' })}
+                    >
+                      My Profile
+                    </DropdownItem>
                     <DropdownItem
                       key="edit"
                       startContent={<UserCog size={18} />}

@@ -118,7 +118,7 @@ export function Dashboard() {
 
       {canViewReports && (
         <>
-          <div className="mt-2 mb-6 grid w-full grid-cols-2 gap-4 lg:grid-cols-5">
+          <div className="mt-2 mb-6 grid w-full grid-cols-2 gap-4 sm:grid-cols-3 xl:grid-cols-5">
             {reportStatsLoading ? (
               Array.from({ length: 5 }).map((_, index) => (
                 <StatCardSkeleton key={index} />
@@ -221,7 +221,7 @@ export function Dashboard() {
           <h2 className="mb-3 text-lg font-semibold text-foreground">
             System &amp; Operations
           </h2>
-          <div className="mt-2 mb-6 grid w-full grid-cols-2 gap-4 lg:grid-cols-4">
+          <div className="mt-2 mb-6 grid w-full grid-cols-2 gap-4 xl:grid-cols-4">
             {overviewLoading ? (
               Array.from({ length: 4 }).map((_, index) => (
                 <StatCardSkeleton key={index} />
@@ -277,7 +277,7 @@ export function Dashboard() {
             className="mb-6"
           />
 
-          <div className="mb-6 grid w-full grid-cols-2 gap-4 lg:grid-cols-4">
+          <div className="mb-6 grid w-full grid-cols-2 gap-4 xl:grid-cols-4">
             <StatCard
               title="System Health"
               value={health ? (healthy ? 'Healthy' : 'Degraded') : '—'}

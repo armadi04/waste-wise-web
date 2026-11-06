@@ -33,7 +33,7 @@ export function RecentActivity({
         </div>
         <Link
           to="/audit-logs"
-          className="shrink-0 text-xs text-[var(--app-link)] underline-offset-2 hover:underline"
+          className="-my-2 shrink-0 py-2 text-xs text-[var(--app-link)] underline-offset-2 hover:underline"
         >
           View all
         </Link>

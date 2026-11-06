@@ -151,6 +151,20 @@
   ) {
   background: var(--app-surface-pressed);
 }
+/* Current-route state for nav buttons built on the light Button (bottom nav and
+   its drawer). Unlayered `.app-light` above would otherwise wipe the NAV_ACTIVE
+   utility classes, leaving the active item unmarked. */
+.app-button.app-light:is([aria-current='page'], [data-active='true']),
+.app-button.app-light:is([aria-current='page'], [data-active='true']):is(
+    :hover,
+    :active,
+    [data-hover='true'],
+    [data-pressed='true']
+  ) {
+  background: var(--app-selected-background);
+  color: var(--app-selected-foreground);
+  font-weight: 600;
+}
 .app-chip [data-slot='content'],
 .app-button > span {
   color: inherit;
@@ -494,4 +508,48 @@ a:not(.app-button):hover {
 }
 .app-status-info :is(p, span, svg) {
   color: var(--app-info-foreground);
+}
+
+/* Chips never outgrow their container; long labels (emails, filenames) ellipsize. */
+.app-chip {
+  max-width: 100%;
+}
+.app-chip [data-slot='content'] {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Touch devices: keep interactive controls at a comfortable tap size and stop
+   iOS from zooming focused fields (needs >=16px). Desktop (fine pointer)
+   keeps the compact sizing untouched. */
+@media (pointer: coarse) {
+  .app-button {
+    min-height: 2.5rem;
+    min-width: 2.5rem;
+  }
+  .app-field-control {
+    min-height: 2.75rem;
+  }
+  .app-field-text,
+  .app-field [data-slot='input'],
+  .app-field [data-slot='value'],
+  select.app-field-control {
+    font-size: 16px;
+  }
+  select.app-field-control {
+    min-height: 2.5rem;
+  }
+  .app-dropdownitem {
+    min-height: 2.5rem;
+  }
+  .app-choice {
+    min-height: 2.5rem;
+  }
+  [role='tab'] {
+    min-height: 2.5rem;
+  }
+  [data-slot='wrapper'] > :is([data-slot='item'], [data-slot='prev'], [data-slot='next']) {
+    min-width: 2.5rem;
+    min-height: 2.5rem;
+  }
 }

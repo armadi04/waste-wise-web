@@ -39,6 +39,7 @@ export const MobileNavItem = ({
         onPress={handlePress}
         aria-label={item.label}
         aria-current={isActive && !hasChildren ? 'page' : undefined}
+        data-active={isActive || undefined}
         aria-expanded={hasChildren ? isExpanded : undefined}
         aria-controls={hasChildren ? submenuId : undefined}
         className={`w-full justify-start gap-4 rounded-large px-4 py-3 text-left transition-all focus-visible:ring-2 focus-visible:ring-focus ${
