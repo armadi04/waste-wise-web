@@ -32,9 +32,9 @@ export function StatCard({
   }
 
   return (
-    <Card className="bg-content1 rounded-large p-6 shadow-none border border-default-200 overflow-visible relative group text-foreground">
-      <div className="flex items-start justify-between">
-        <div className="flex flex-col gap-1">
+    <Card className="bg-content1 rounded-large p-4 shadow-none sm:p-6 border border-default-200 overflow-visible relative group text-foreground">
+      <div className="flex items-start justify-between gap-3">
+        <div className="flex min-w-0 flex-col gap-1">
           <span className="text-sm font-medium text-default-500">{title}</span>
           {loading ? (
             <Skeleton className="h-8 w-16 rounded-large mt-1" />
