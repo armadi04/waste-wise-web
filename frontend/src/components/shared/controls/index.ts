@@ -19,3 +19,4 @@ export {
   Pagination,
   Snippet,
 } from './controls'
+export { FilterField } from './filter-field'
